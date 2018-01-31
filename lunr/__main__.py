@@ -1,8 +1,3 @@
-"""
-Lunr.js boilerplate is quite unpythonic
-
-"""
-
 from .builder import Builder
 
 
