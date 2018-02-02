@@ -1,0 +1,3 @@
+
+class BaseLunrException(Exception):
+    pass

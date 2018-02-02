@@ -48,7 +48,7 @@ class Pipeline:
         """Adds new functions to the end of the pipeline."""
         for fn in args:
             self.warn_if_function_not_registered(fn)
-            self._stack.push(fn)
+            self._stack.append(fn)
 
     def warn_if_function_not_registered(self, fn):
         try:

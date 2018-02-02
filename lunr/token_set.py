@@ -30,16 +30,6 @@ class TokenSet:
         self.id = self._next_id
         self.__class__._next_id += 1
 
-    @classmethod
-    def from_list(list_of_words):
-        from lunr.token_set_builder import TokenSetBuilder
-        builder = TokenSetBuilder()
-        for word in list_of_words:
-            builder.insert(word)
-
-        builder.finish()
-        return builder.root
-
     def __str__(self):
         try:
             return self._string
@@ -65,3 +55,59 @@ class TokenSet:
         string = string + labels[-1] + node_id
 
         return string
+
+    def __repr__(self):
+        return '<TokenSet "{}">'.format(str(self))
+
+    @classmethod
+    def from_string(self, string):
+        node = TokenSet()
+        root = node
+        wildcard_found = False
+
+        for i, char in enumerate(string):
+            final = i == len(string) - 1
+            if char == '*':
+                wildcard_found = True
+                node.edges[char] = node
+                node.final = final
+            else:
+                next_ = TokenSet()
+                next_.final = final
+                node.edges[char] = next_
+                node = next_
+
+                if wildcard_found:
+                    node.edges['*'] = root
+
+        return root
+
+    @classmethod
+    def from_list(cls, list_of_words):
+        from lunr.token_set_builder import TokenSetBuilder
+        builder = TokenSetBuilder()
+        for word in list_of_words:
+            builder.insert(word)
+
+        builder.finish()
+        return builder.root
+
+    def to_list(self):
+        words = []
+        stack = [{
+            'prefix': '',
+            'node': self
+        }]
+
+        while stack:
+            frame = stack.pop()
+            if frame['node'].final:
+                words.append(frame['prefix'])
+
+            for edge in frame['node'].edges.keys():
+                stack.append({
+                    'prefix': frame['prefix'] + str(edge),
+                    'node': frame['node'].edges[edge]
+                })
+
+        return words

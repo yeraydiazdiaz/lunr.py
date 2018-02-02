@@ -1,7 +1,7 @@
+[![Build Status](https://travis-ci.org/yeraydiazdiaz/lunr.py.svg?branch=master)](https://travis-ci.org/yeraydiazdiaz/lunr.py)
+
 # Lunr.py
 
 A Python implementation of [Lunr.js](https://lunrjs.com).
 
-## TODO:
-
-- [NTLK](http://www.nltk.org/) has a built-in tokenizer we can use?
+*Note*: This project is a work in progress and not nearly feature complete with Lunr.js

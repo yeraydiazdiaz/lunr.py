@@ -1,17 +1,18 @@
 from lunr.token_set import TokenSet
+from lunr.exceptions import BaseLunrException
 
 
 class TokenSetBuilder:
 
     def __init__(self):
-        self.previousWord = ""
+        self.previous_word = ""
         self.root = TokenSet()
         self.unchecked_nodes = []
         self.minimized_nodes = {}
 
     def insert(self, word):
-        if word < self.previousWord:
-            raise Exception('Out of order word insertion')
+        if word < self.previous_word:
+            raise BaseLunrException('Out of order word insertion')
 
         common_prefix = 0
         for i in range(min(len(word), len(self.previous_word))):
@@ -22,8 +23,8 @@ class TokenSetBuilder:
 
         self.minimize(common_prefix)
 
-        node = (self.root if self.unchecked_nodes
-                else self.unchecked_nodes[-1].child)
+        node = (self.root if not self.unchecked_nodes
+                else self.unchecked_nodes[-1]['child'])
 
         for i in range(common_prefix, len(word)):
             next_node = TokenSet()
@@ -31,7 +32,7 @@ class TokenSetBuilder:
 
             node.edges[char] = next_node
 
-            self.unchecked_nodes.push({
+            self.unchecked_nodes.append({
                 'parent': node,
                 'char': char,
                 'child': next_node,
@@ -46,14 +47,14 @@ class TokenSetBuilder:
         self.minimize(0)
 
     def minimize(self, down_to):
-        for i in range(len(self.unchecked_nodes), down_to):
-            node = self.unchecked_nodes[i]
-            child_key = str(node.child)
+        for node in reversed(self.unchecked_nodes):
+            child_key = str(node['child'])
 
             if child_key in self.minimized_nodes:
-                node.parent.edges[node.char] = self.minimized_nodes[child_key]
+                node['parent'].edges[node['char']] = self.minimized_nodes[
+                    child_key]
             else:
-                node.child._str = child_key
-                self.minimized_nodes[child_key] = node.child
+                node['child']._str = child_key
+                self.minimized_nodes[child_key] = node['child']
 
             self.unchecked_nodes.pop()

@@ -1,3 +1,5 @@
+import pytest
+
 from lunr.token_set import TokenSet
 
 
@@ -41,3 +43,31 @@ class TestTokenSet:
         assert str(parent_b) == str(parent_c)
         assert str(parent_a) != str(parent_c)
         assert str(parent_a) != str(parent_b)
+
+    def test_from_string_without_wildcard(self):
+        TokenSet._next_id = 1
+        x = TokenSet.from_string('a')
+
+        assert str(x) == '0a2'
+        assert x.edges['a'].final
+
+    def test_from_string_with_trailing_wildcard(self):
+        x = TokenSet.from_string('a*')
+        wild = x.edges['a'].edges['*']
+
+        assert wild == wild.edges['*']
+        assert wild.final
+
+    def test_from_list_with_unsorted_list(self):
+        with pytest.raises(Exception):
+            TokenSet.from_list(['z', 'a'])
+
+    def test_from_list_with_sorted_list(self):
+        token_set = TokenSet.from_list(['a', 'z'])
+        assert ['a', 'z'] == sorted(token_set.to_list())
+
+    def test_to_list_includes_all_words(self):
+        words = ['bat', 'cat']
+        token_set = TokenSet.from_list(words)
+
+        assert set(words) == set(token_set.to_list())
