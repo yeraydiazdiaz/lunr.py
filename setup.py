@@ -3,7 +3,7 @@ from setuptools import setup
 LONG_DESCRIPTION = 'A Python implementation of Lunr.js'
 
 setup(
-    name='lunr.py',
+    name='lunr',
     version='0.1',
     url='http://www.lunr.org',
     license='BSD',
