@@ -1,5 +1,6 @@
 from lunr.token_set import TokenSet
 
+
 class TokenSetBuilder:
 
     def __init__(self):
@@ -14,14 +15,15 @@ class TokenSetBuilder:
 
         common_prefix = 0
         for i in range(min(len(word), len(self.previous_word))):
-            if word[i] != this.previous_word[i]:
+            if word[i] != self.previous_word[i]:
                 break
 
             common_prefix += 1
 
         self.minimize(common_prefix)
 
-        node = self.root if self.unchecked_nodes else self.unchecked_nodes[-1].child
+        node = (self.root if self.unchecked_nodes
+                else self.unchecked_nodes[-1].child)
 
         for i in range(common_prefix, len(word)):
             next_node = TokenSet()
@@ -52,6 +54,6 @@ class TokenSetBuilder:
                 node.parent.edges[node.char] = self.minimized_nodes[child_key]
             else:
                 node.child._str = child_key
-                this.minimized_nodes[child_key] = node.child
+                self.minimized_nodes[child_key] = node.child
 
             self.unchecked_nodes.pop()

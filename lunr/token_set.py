@@ -28,11 +28,12 @@ class TokenSet:
         self.final = False
         self.edges = {}
         self.id = self._next_id
-        self._next_id += 1
+        self.__class__._next_id += 1
 
     @classmethod
     def from_list(list_of_words):
-        builder = Builder()
+        from lunr.token_set_builder import TokenSetBuilder
+        builder = TokenSetBuilder()
         for word in list_of_words:
             builder.insert(word)
 
@@ -47,6 +48,7 @@ class TokenSet:
 
         string = '1' if self.final else '0'
         labels = sorted(self.edges.keys())
+        node = None
         for label in labels:
             node = self.edges[label]
 
@@ -55,9 +57,10 @@ class TokenSet:
 
         label = labels[-1]
         try:
-            node_id = self.edges[label].id
+            node_id = str(node.id)
         except AttributeError:
-            node_id = ''  # TODO: JS seems to rely on undefined for the id attribute?
+            # TODO: JS seems to rely on undefined for the id attribute on test?
+            node_id = ''
 
         string = string + labels[-1] + node_id
 
