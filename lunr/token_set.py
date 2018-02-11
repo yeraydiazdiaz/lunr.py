@@ -111,3 +111,46 @@ class TokenSet:
                 })
 
         return words
+
+    def intersect(self, other):
+        """Returns a new TokenSet that is the intersection of this TokenSet
+        and the passed TokenSet.
+
+        This intersection will take into account any wildcards contained within
+        the TokenSet.
+        """
+        output = TokenSet()
+        frame = None
+
+        stack = [{
+            'node': self,
+            'q_node': other,
+            'output': output,
+        }]
+
+        while stack:
+            frame = stack.pop()
+
+            for q_edge in frame['q_node'].edges.keys():
+                for n_edge in frame['node'].edges.keys():
+                    if n_edge == q_edge or q_edge == '*':
+                        node = frame['node'].edges[n_edge]
+                        q_node = frame['q_node'].edges[q_edge]
+                        final = node.final and q_node.final
+                        next_ = None
+
+                        if n_edge in frame['output'].edges:
+                            next_ = frame['output'].edges[n_edge]
+                            next_.final = next_.final or final
+                        else:
+                            next_ = TokenSet()
+                            next_.final = final
+                            frame['output'].edges[n_edge] = next_
+
+                        stack.append({
+                            'node': node,
+                            'q_node': q_node,
+                            'output': next_
+                        })
+
+        return output

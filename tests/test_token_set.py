@@ -3,7 +3,7 @@ import pytest
 from lunr.token_set import TokenSet
 
 
-class TestTokenSet:
+class TestTokenSetStr:
 
     def test_str_includes_node_finality(self):
         non_final = TokenSet()
@@ -44,6 +44,9 @@ class TestTokenSet:
         assert str(parent_a) != str(parent_c)
         assert str(parent_a) != str(parent_b)
 
+
+class TestTokenSetFromString:
+
     def test_from_string_without_wildcard(self):
         TokenSet._next_id = 1
         x = TokenSet.from_string('a')
@@ -58,6 +61,9 @@ class TestTokenSet:
         assert wild == wild.edges['*']
         assert wild.final
 
+
+class TestTokenSetFromList:
+
     def test_from_list_with_unsorted_list(self):
         with pytest.raises(Exception):
             TokenSet.from_list(['z', 'a'])
@@ -66,8 +72,90 @@ class TestTokenSet:
         token_set = TokenSet.from_list(['a', 'z'])
         assert ['a', 'z'] == sorted(token_set.to_list())
 
+    def test_from_list_is_minimal(self):
+        token_set = TokenSet.from_list(['ac', 'dc'])
+        ac_node = token_set.edges['a'].edges['c']
+        dc_node = token_set.edges['d'].edges['c']
+
+        assert ac_node == dc_node
+
+
+class TestTokenSetToList:
+
     def test_to_list_includes_all_words(self):
         words = ['bat', 'cat']
         token_set = TokenSet.from_list(words)
 
         assert set(words) == set(token_set.to_list())
+
+    def test_to_list_includes_single_words(self):
+        word = 'bat'
+        token_set = TokenSet.from_string(word)
+
+        assert set([word]) == set(token_set.to_list())
+
+
+class TestTokenSetIntersect:
+
+    def test_intersect_no_intersection(self):
+        x = TokenSet.from_string('cat')
+        y = TokenSet.from_string('bar')
+        z = x.intersect(y)
+
+        assert len(z.to_list()) == 0
+
+    def test_intersect_simple_intersection(self):
+        x = TokenSet.from_string('cat')
+        y = TokenSet.from_string('cat')
+        z = x.intersect(y)
+
+        assert {'cat'} == set(z.to_list())
+
+    def test_intersect_trailing_wildcard_intersection(self):
+        x = TokenSet.from_string('cat')
+        y = TokenSet.from_string('c*')
+        z = x.intersect(y)
+
+        assert {'cat'} == set(z.to_list())
+
+    def test_intersect_trailing_wildcard_no_intersection(self):
+        x = TokenSet.from_string('cat')
+        y = TokenSet.from_string('b*')
+        z = x.intersect(y)
+
+        assert len(z.to_list()) == 0
+
+    def test_intersect_leading_wildcard_intersection(self):
+        x = TokenSet.from_string('cat')
+        y = TokenSet.from_string('*t')
+        z = x.intersect(y)
+
+        assert {'cat'} == set(z.to_list())
+
+    def test_intersect_leading_wildcard_no_intersection(self):
+        x = TokenSet.from_string('cat')
+        y = TokenSet.from_string('*r')
+        z = x.intersect(y)
+
+        assert len(z.to_list()) == 0
+
+    def test_intersect_contained_wildcard_intersection(self):
+        x = TokenSet.from_string('foo')
+        y = TokenSet.from_string('f*o')
+        z = x.intersect(y)
+
+        assert {'foo'} == set(z.to_list())
+
+    def test_intersect_contained_wildcard_no_intersection(self):
+        x = TokenSet.from_string('foo')
+        y = TokenSet.from_string('b*r')
+        z = x.intersect(y)
+
+        assert len(z.to_list()) == 0
+
+    def test_intersect_wildcard_zero_or_more_characters(self):
+        x = TokenSet.from_string('foo')
+        y = TokenSet.from_string('foo*')
+        z = x.intersect(y)
+
+        assert {'foo'} == set(z.to_list())
