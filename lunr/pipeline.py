@@ -1,4 +1,5 @@
 import logging
+import six
 
 from lunr.token import Token
 
@@ -68,7 +69,7 @@ class Pipeline:
             index = self._stack.index(existing_fn)
             self._stack.insert(index + 1, new_fn)
         except ValueError as e:
-            raise Exception('Cannot find existing_fn') from e
+            six.raise_from(Exception('Cannot find existing_fn'), e)
 
     def before(self, existing_fn, new_fn):
         """Adds a single function before a function that already exists in the
@@ -80,7 +81,7 @@ class Pipeline:
             index = self._stack.index(existing_fn)
             self._stack.insert(index, new_fn)
         except ValueError as e:
-            raise Exception('Cannot find existing_fn') from e
+            six.raise_from(Exception('Cannot find existing_fn'), e)
 
     def remove(self, fn):
         """Removes a function from the pipeline."""

@@ -5,9 +5,16 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
-install: pip install tox-travis
+
+install:
+  - pip install tox-travis
+  - pip install codecov
+
 script: tox
+
 matrix:
   include:
   - python: "3.6"
     env: TOXENV="flake8"
+
+after_success: codecov
