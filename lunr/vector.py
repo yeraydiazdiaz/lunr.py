@@ -16,6 +16,8 @@ class Vector:
     elements index is immediately followed by its value.
     E.g. [index, value, index, value].
 
+    TODO: consider implemetation as 2-tuples.
+
     This allows the underlying array to be as sparse as possible and still
     offer decent performance when being used for vector calculations.
     """
@@ -92,3 +94,11 @@ class Vector:
             self._magnitude = sqrt(sum_of_squares)
 
         return self._magnitude
+
+    def to_list(self):
+        """Converts the vector to an array of the elements within the vector.
+        """
+        output = []
+        for i in range(1, len(self.elements), 2):
+            output.append(self.elements[i])
+        return output

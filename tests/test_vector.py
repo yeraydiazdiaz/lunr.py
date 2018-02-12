@@ -1,6 +1,9 @@
 from math import sqrt
 
+import pytest
+
 from lunr.vector import Vector
+from lunr.exceptions import BaseLunrException
 
 
 def _vector(*args):
@@ -45,3 +48,28 @@ class TestVectorPositionForIndex:
 def test_magnitude_calculates_magnitude():
     vector = _vector(4, 5, 6)
     assert sqrt(77) == vector.magnitude
+
+
+class TestVectorInsert:
+
+    def test_insert_invalidates_magnitude_cache(self):
+        vector = _vector(4, 5, 6)
+        assert sqrt(77) == vector.magnitude
+
+        vector.insert(3, 7)
+
+        assert sqrt(126) == vector.magnitude
+
+    def test_insert_keeps_items_in_index_specified_order(self):
+        vector = Vector()
+
+        vector.insert(2, 4)
+        vector.insert(1, 5)
+        vector.insert(0, 6)
+
+        assert vector.to_list() == [6, 5, 4]
+
+    def test_insert_fails_when_duplicate_entry(self):
+        vector = _vector(4, 5, 6)
+        with pytest.raises(BaseLunrException):
+            vector.insert(0, 44)
