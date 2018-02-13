@@ -72,8 +72,9 @@ class Vector:
             raise BaseLunrException('Duplicate index')
         self.upsert(insert_index, val, prevent_duplicates)
 
-    def upsert(self, insert_index, val, fn):
+    def upsert(self, insert_index, val, fn=None):
         """Inserts or updates an existing index within the vector."""
+        fn = fn or (lambda *args, **kwargs: None)
         self._magnitude = 0
         position = self.position_for_index(insert_index)
         if (position < len(self.elements) and
@@ -82,6 +83,14 @@ class Vector:
         else:
             self.elements.insert(position, val)
             self.elements.insert(position, insert_index)
+
+    def to_list(self):
+        """Converts the vector to an array of the elements within the vector.
+        """
+        output = []
+        for i in range(1, len(self.elements), 2):
+            output.append(self.elements[i])
+        return output
 
     @property
     def magnitude(self):
@@ -95,10 +104,30 @@ class Vector:
 
         return self._magnitude
 
-    def to_list(self):
-        """Converts the vector to an array of the elements within the vector.
-        """
-        output = []
-        for i in range(1, len(self.elements), 2):
-            output.append(self.elements[i])
-        return output
+    def dot(self, other):
+        """Calculates the dot product of this vector and another vector."""
+        dot_product = 0
+        a = self.elements
+        b = other.elements
+        a_len = len(a)
+        b_len = len(b)
+        i = j = 0
+
+        while i < a_len and j < b_len:
+            a_val = a[i]
+            b_val = b[j]
+            if a_val < b_val:
+                i += 2
+            elif a_val > b_val:
+                j += 2
+            else:
+                dot_product += a[i + 1] * b[j + 1]
+                i += 2
+                j += 2
+
+        return dot_product
+
+    def similarity(self, other):
+        """Calculates the cosine similarity between this vector and another
+        vector."""
+        return self.dot(other) / (self.magnitude * other.magnitude)

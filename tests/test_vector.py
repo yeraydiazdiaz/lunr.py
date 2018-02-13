@@ -6,7 +6,7 @@ from lunr.vector import Vector
 from lunr.exceptions import BaseLunrException
 
 
-def _vector(*args):
+def _vector_from_args(*args):
     vector = Vector()
     for i, arg in enumerate(args):
         vector.insert(i, arg)
@@ -46,14 +46,28 @@ class TestVectorPositionForIndex:
 
 
 def test_magnitude_calculates_magnitude():
-    vector = _vector(4, 5, 6)
+    vector = _vector_from_args(4, 5, 6)
     assert sqrt(77) == vector.magnitude
+
+
+def test_dot_calculates_dot_product_of_two_vectors():
+    v1 = _vector_from_args(1, 3, -5)
+    v2 = _vector_from_args(4, -2, -1)
+
+    assert v1.dot(v2) == 3
+
+
+def test_similarity_calculates_the_similarity_between_two_vectors():
+    v1 = _vector_from_args(1, 3, -5)
+    v2 = _vector_from_args(4, -2, -1)
+
+    assert v1.similarity(v2) == pytest.approx(0.1106, 0.001)
 
 
 class TestVectorInsert:
 
     def test_insert_invalidates_magnitude_cache(self):
-        vector = _vector(4, 5, 6)
+        vector = _vector_from_args(4, 5, 6)
         assert sqrt(77) == vector.magnitude
 
         vector.insert(3, 7)
@@ -70,6 +84,34 @@ class TestVectorInsert:
         assert vector.to_list() == [6, 5, 4]
 
     def test_insert_fails_when_duplicate_entry(self):
-        vector = _vector(4, 5, 6)
+        vector = _vector_from_args(4, 5, 6)
         with pytest.raises(BaseLunrException):
             vector.insert(0, 44)
+
+
+class TestVectorUpsert:
+
+    def test_upsert_invalidates_magnitude_cache(self):
+        vector = _vector_from_args(4, 5, 6)
+        assert vector.magnitude == sqrt(77)
+
+        vector.upsert(3, 7)
+
+        assert vector.magnitude == sqrt(126)
+
+    def test_upsert_keeps_items_in_index_specified_order(self):
+        vector = Vector()
+
+        vector.upsert(2, 4)
+        vector.upsert(1, 5)
+        vector.upsert(0, 6)
+
+        assert vector.to_list() == [6, 5, 4]
+
+    def test_upsert_calls_fn_for_value_on_duplicate(self):
+        vector = _vector_from_args(4, 5, 6)
+
+        vector.upsert(
+            0, 4, lambda current, passed: current + passed)
+
+        assert vector.to_list() == [8, 5, 6]
