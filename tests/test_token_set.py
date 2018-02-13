@@ -159,3 +159,57 @@ class TestTokenSetIntersect:
         z = x.intersect(y)
 
         assert {'foo'} == set(z.to_list())
+
+    def test_intersect_with_fuzzy_string_subtitution(self):
+        x1 = TokenSet.from_string('bar')
+        x2 = TokenSet.from_string('cur')
+        x3 = TokenSet.from_string('cat')
+        x4 = TokenSet.from_string('car')
+        x5 = TokenSet.from_string('foo')
+        y = TokenSet.from_fuzzy_string('car', 1)
+
+        assert x1.intersect(y).to_list() == ['bar']
+        assert x2.intersect(y).to_list() == ['cur']
+        assert x3.intersect(y).to_list() == ['cat']
+        assert x4.intersect(y).to_list() == ['car']
+        assert x5.intersect(y).to_list() == []
+
+    def test_intersect_with_fuzzy_string_deletion(self):
+        x1 = TokenSet.from_string('ar')
+        x2 = TokenSet.from_string('br')
+        x3 = TokenSet.from_string('ba')
+        x4 = TokenSet.from_string('bar')
+        x5 = TokenSet.from_string('foo')
+        y = TokenSet.from_fuzzy_string('bar', 1)
+
+        assert x1.intersect(y).to_list() == ['ar']
+        assert x2.intersect(y).to_list() == ['br']
+        assert x3.intersect(y).to_list() == ['ba']
+        assert x4.intersect(y).to_list() == ['bar']
+        assert x5.intersect(y).to_list() == []
+
+    def test_intersect_with_fuzzy_string_insertion(self):
+        x1 = TokenSet.from_string('bbar')
+        x2 = TokenSet.from_string('baar')
+        x3 = TokenSet.from_string('barr')
+        x4 = TokenSet.from_string('bar')
+        x5 = TokenSet.from_string('ba')
+        x6 = TokenSet.from_string('foo')
+        y = TokenSet.from_fuzzy_string('bar', 1)
+
+        assert x1.intersect(y).to_list() == ['bbar']
+        assert x2.intersect(y).to_list() == ['baar']
+        assert x3.intersect(y).to_list() == ['barr']
+        assert x4.intersect(y).to_list() == ['bar']
+        assert x5.intersect(y).to_list() == ['ba']
+        assert x6.intersect(y).to_list() == []
+
+    def test_intersect_with_fuzzy_string_transpose(self):
+        x1 = TokenSet.from_string('abr')
+        x2 = TokenSet.from_string('bra')
+        x3 = TokenSet.from_string('foo')
+        y = TokenSet.from_fuzzy_string('bar', 1)
+
+        assert x1.intersect(y).to_list() == ['abr']
+        assert x2.intersect(y).to_list() == ['bra']
+        assert x3.intersect(y).to_list() == []

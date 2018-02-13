@@ -83,6 +83,130 @@ class TokenSet:
         return root
 
     @classmethod
+    def from_fuzzy_string(cls, string, edit_distance):
+        """Creates a token set representing a single string with a specified
+        edit distance.
+
+        Insertions, deletions, substitutions and transpositions are each
+        treated as an edit distance of 1.
+
+        Increasing the allowed edit distance will have a dramatic impact
+        on the performance of both creating and intersecting these TokenSets.
+        It is advised to keep the edit distance less than 3.
+        """
+        root = TokenSet()
+
+        stack = [{
+            'node': root,
+            'edits_remaining': edit_distance,
+            'string': string,
+        }]
+
+        while stack:
+            frame = stack.pop()
+            # no edit
+            if len(frame['string']) > 0:
+                char = frame['string'][0]
+                no_edit_node = None
+                if char in frame['node'].edges:
+                    no_edit_node = frame['node'].edges[char]
+                else:
+                    no_edit_node = TokenSet()
+                    frame['node'].edges[char] = no_edit_node
+
+                if len(frame['string']) == 1:
+                    no_edit_node.final = True
+                else:
+                    stack.append({
+                        'node': no_edit_node,
+                        'edits_remaining': frame['edits_remaining'],
+                        'string': frame['string'][1:],
+                    })
+
+            # deletion, can only do a deletion if we have enough edits
+            # remaining and if there are characters left to delte in the string
+            if frame['edits_remaining'] > 0 and len(frame['string']) > 1:
+                char = frame['string'][1]
+                deletion_node = None
+                if char in frame['node'].edges:
+                    deletion_node = frame['node'].edges[char]
+                else:
+                    deletion_node = TokenSet()
+                    frame['node'].edges[char] = deletion_node
+
+                if len(frame['string']) <= 2:
+                    deletion_node.final = True
+                else:
+                    stack.append({
+                        'node': deletion_node,
+                        'edits_remaining': frame['edits_remaining'] - 1,
+                        'string': frame['string'][2:],
+                    })
+
+            # deletion, just removing the last character of the string
+            if frame['edits_remaining'] > 0 and len(frame['string']) == 1:
+                frame['node'].final = True
+
+            # substitution, can only do a substitution if we have enough edits
+            # remaining and there are characters left to substitute
+            if frame['edits_remaining'] > 0 and len(frame['string']) >= 1:
+                if '*' in frame['node'].edges:
+                    substitution_node = frame['node'].edges['*']
+                else:
+                    substitution_node = TokenSet()
+                    frame['node'].edges['*'] = substitution_node
+
+                if len(frame['string']) == 1:
+                    substitution_node.final = True
+                else:
+                    stack.append({
+                        'node': substitution_node,
+                        'edits_remaining': frame['edits_remaining'] - 1,
+                        'string': frame['string'][1:],
+                    })
+
+            # insertion, can only do insertion if there are edits remaining
+            if frame['edits_remaining']:
+                if '*' in frame['node'].edges:
+                    insertion_node = frame['node'].edges['*']
+                else:
+                    insertion_node = TokenSet()
+                    frame['node'].edges['*'] = insertion_node
+
+                if len(frame['string']) == 0:
+                    insertion_node.final = True
+                else:
+                    stack.append({
+                        'node': insertion_node,
+                        'edits_remaining': frame['edits_remaining'] - 1,
+                        'string': frame['string'],
+                    })
+
+            # transposition, can only do a transposition if there are edits
+            # remaining and there are enough characters to transpose
+            if frame['edits_remaining'] and len(frame['string']) > 1:
+                char_a = frame['string'][0]
+                char_b = frame['string'][1]
+                transpose_node = None
+
+                if char_b in frame['node'].edges:
+                    transpose_node = frame['node'].edges[char_b]
+                else:
+                    transpose_node = TokenSet()
+                    frame['node'].edges[char_b] = transpose_node
+
+                if len(frame['string']) == 1:
+                    transpose_node.final = True
+                else:
+                    stack.append({
+                        'node': transpose_node,
+                        'edits_remaining': frame['edits_remaining'] - 1,
+                        'string': char_a + frame['string'][2:],
+                    })
+
+        return root
+
+    @classmethod
     def from_list(cls, list_of_words):
         from lunr.token_set_builder import TokenSetBuilder
         builder = TokenSetBuilder()
@@ -120,8 +244,6 @@ class TokenSet:
         the TokenSet.
         """
         output = TokenSet()
-        frame = None
-
         stack = [{
             'node': self,
             'q_node': other,
@@ -130,7 +252,6 @@ class TokenSet:
 
         while stack:
             frame = stack.pop()
-
             for q_edge in frame['q_node'].edges.keys():
                 for n_edge in frame['node'].edges.keys():
                     if n_edge == q_edge or q_edge == '*':
