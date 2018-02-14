@@ -189,3 +189,59 @@ class TestRun(BaseTestPipeline):
         self.pipeline.run(['foo'])
 
         assert received == ['foo', 'FOO']
+
+
+class TestToJson(BaseTestPipeline):
+
+    def test_to_json_returns_array_of_registered_function_labels(self):
+        Pipeline.register_function(fn, 'fn')
+        self.pipeline.add(fn)
+
+        assert self.pipeline.to_json() == ['fn']
+
+
+class TestRegisterFunction(BaseTestPipeline):
+
+    def setup_method(self, method):
+        def fn(*args):
+            pass
+
+        self.fn = fn
+
+    def test_register_function_adds_a_label_property_to_the_function(self):
+        Pipeline.register_function(self.fn, 'fn')
+
+        assert self.fn.label == 'fn'
+
+    def test_register_function_adds_function_to_list_of_registered_functions(
+            self):
+        Pipeline.register_function(self.fn, 'fn')
+
+        assert Pipeline.registered_functions['fn'] == self.fn
+
+
+class TestLoad(BaseTestPipeline):
+
+    def test_load_with_registered_functions(self):
+        serialized_pipeline = ['fn']
+        Pipeline.register_function(fn, 'fn')
+
+        pipeline = Pipeline.load(serialized_pipeline)
+
+        assert len(pipeline) == 1
+        assert pipeline._stack[0] == fn
+
+    def test_load_with_unregistered_functions(self):
+        serialized_pipeline = ['fn']
+        with pytest.raises(BaseLunrException):
+            Pipeline.load(serialized_pipeline)
+
+
+class TestReset(BaseTestPipeline):
+
+    def test_reset_empties_the_stack(self):
+        self.pipeline.add(noop)
+        assert len(self.pipeline) == 1
+
+        self.pipeline.reset()
+        assert len(self.pipeline) == 0
