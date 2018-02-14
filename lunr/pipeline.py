@@ -1,6 +1,7 @@
 import logging
 import six
 
+from lunr.exceptions import BaseLunrException
 from lunr.token import Token
 
 log = logging.getLogger(__name__)
@@ -69,7 +70,7 @@ class Pipeline:
             index = self._stack.index(existing_fn)
             self._stack.insert(index + 1, new_fn)
         except ValueError as e:
-            six.raise_from(Exception('Cannot find existing_fn'), e)
+            six.raise_from(BaseLunrException('Cannot find existing_fn'), e)
 
     def before(self, existing_fn, new_fn):
         """Adds a single function before a function that already exists in the
@@ -81,7 +82,7 @@ class Pipeline:
             index = self._stack.index(existing_fn)
             self._stack.insert(index, new_fn)
         except ValueError as e:
-            six.raise_from(Exception('Cannot find existing_fn'), e)
+            six.raise_from(BaseLunrException('Cannot find existing_fn'), e)
 
     def remove(self, fn):
         """Removes a function from the pipeline."""
@@ -93,16 +94,19 @@ class Pipeline:
     def run(self, tokens):
         """Runs the current list of functions that make up the pipeline against the
         passed tokens."""
-        results = []
         for fn in self._stack:
-            result = ''
+            results = []
             for i, token in enumerate(tokens):
-                result += fn(token, i, tokens)
+                result = fn(token, i, tokens)
                 if not result:
-                    break
-            results.append(result)
+                    continue
+                if isinstance(result, (list, tuple)):  # simulate Array.concat
+                    results.extend(result)
+                else:
+                    results.append(result)
+            tokens = results
 
-        return results
+        return tokens
 
     def run_string(self, string):
         """Convenience method for passing a string through a pipeline and getting
