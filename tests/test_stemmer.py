@@ -17,8 +17,7 @@ class TestStemmer:
             token = Token(word)
             result = str(stemmer(token))
 
-            if result != expected:
-                print(result, expected)
+            assert result == expected
 
     def test_is_a_registered_pipeline_function(self):
         assert stemmer.label == 'stemmer'
