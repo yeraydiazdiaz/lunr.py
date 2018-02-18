@@ -12,6 +12,7 @@ class Token:
         when cloning a token."""
         # TODO: we require functions to have two parameters, JS doesn't care
         self.string = fn(self.string, self.metadata)
+        return self
 
     def clone(self, fn=None):
         """Applies the given function to the wrapped string token."""
