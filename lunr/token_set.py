@@ -216,6 +216,14 @@ class TokenSet:
         builder.finish()
         return builder.root
 
+    @classmethod
+    def from_clause(cls, clause):
+        if 'edit_distance' in clause:
+            return cls.from_fuzzy_string(
+                clause['term'], clause['edit_distance'])
+        else:
+            return cls.from_string(clause['term'])
+
     def to_list(self):
         words = []
         stack = [{
