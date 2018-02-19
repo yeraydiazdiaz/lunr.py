@@ -13,7 +13,8 @@ class TestMatchData:
             MatchData('baz', 'body', {'position': [4]}))
 
     def test_combine_terms(self):
-        assert list(self.match.metadata.keys()) == ['foo', 'bar', 'baz']
+        assert sorted(
+            list(self.match.metadata.keys())) == ['bar', 'baz', 'foo']
 
     def test_combine_metadata(self):
         assert self.match.metadata['foo']['title']['position'] == [1]
