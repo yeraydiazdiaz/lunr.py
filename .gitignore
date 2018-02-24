@@ -6,6 +6,7 @@ coverage.xml
 htmlcov/
 .tox/
 .pytest_cache/
+**/node_modules
 
 .vscode/
 *.code-workspace

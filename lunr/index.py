@@ -2,7 +2,7 @@ from lunr.field_ref import FieldRef
 from lunr.match_data import MatchData
 from lunr.vector import Vector
 from lunr.token_set import TokenSet
-from lunr.query import Query, Clause
+from lunr.query import Query
 
 
 class Index:

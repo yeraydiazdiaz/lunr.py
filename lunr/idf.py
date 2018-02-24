@@ -10,8 +10,7 @@ def idf(posting, document_count):
     for field_name in posting:
         if field_name == '_index':
             continue
-
-    documents_with_term += len(posting[field_name].keys())
+        documents_with_term += len(posting[field_name].keys())
 
     x = (
         (document_count - documents_with_term + 0.5) /
