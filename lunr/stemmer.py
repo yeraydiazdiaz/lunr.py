@@ -360,7 +360,7 @@ class PorterStemmer:
 porter_stemmer = PorterStemmer()
 
 
-def stemmer(token, i, tokens):
+def stemmer(token, i=None, tokens=None):
     return token.update(porter_stemmer.stem)
 
 

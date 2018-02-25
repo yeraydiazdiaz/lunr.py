@@ -1,8 +1,11 @@
+from operator import getitem
+
 from lunr.field_ref import FieldRef
 from lunr.match_data import MatchData
 from lunr.vector import Vector
 from lunr.token_set import TokenSet
 from lunr.query import Query
+from lunr.query_parser import QueryParser
 
 
 class Index:
@@ -30,8 +33,13 @@ class Index:
 
         For more programmatic querying use `lunr.Index.query`.
         """
+        def callback(query):
+            parser = QueryParser(query_string, query)
+            parser.parse()
 
-    def query(self, query_builder):
+        return self.query(callback)
+
+    def query(self, fn):
         """Performs a query against the index using the yielded lunr.Query
         object.
 
@@ -41,10 +49,6 @@ class Index:
 
         A query object is yielded to the supplied function which should be used
         to express the query to be run against the index.
-
-        Note that although this function takes a callback parameter it is _not_
-        an asynchronous operation, the callback is just yielded a query object
-        to be customized.
         """
         # for each query clause
         # * process terms
@@ -58,8 +62,8 @@ class Index:
         query_vectors = {}
         term_field_cache = {}
 
-        # TODO: QueryBuilders construct Query objects?
-        query_builder(query)
+        # TODO: query initialization via callback is not very Pythonic
+        fn(query)
 
         for i, clause in enumerate(query.clauses):
             # Unless the pipeline has been disabled for this term, which is
@@ -68,7 +72,7 @@ class Index:
             # of processed terms. Pipeline functions may expand the passed
             # term, which means we may end up performing multiple index lookups
             # for a single query term.
-            if clause.use_pipeline:
+            if clause['use_pipeline']:
                 terms = self.pipeline.run_string(clause['term'])
             else:
                 terms = [clause['term']]
@@ -125,7 +129,7 @@ class Index:
                         # If we've already seen this term, field combo then
                         # we've already collected the matching documents and
                         # metadata, no need to go through all that again
-                        if term_field_cache[term_field]:
+                        if term_field in term_field_cache:
                             continue
 
                         for matching_document_ref in matching_document_refs:
@@ -135,16 +139,17 @@ class Index:
                             # query results
                             matching_field_ref = FieldRef(
                                 matching_document_ref, field)
-                            metadata = field_posting[matching_document_ref]
+                            metadata = field_posting[
+                                str(matching_document_ref)]
 
                             try:
                                 field_match = matching_fields[
-                                    matching_field_ref]
+                                    str(matching_field_ref)]
                             except KeyError:
                                 field_match = MatchData(
                                     expanded_term, field, metadata)
                                 matching_fields[
-                                    matching_field_ref] = field_match
+                                    str(matching_field_ref)] = field_match
 
                         term_field_cache[term_field] = True
 
@@ -159,23 +164,24 @@ class Index:
             #
             # Scores are calculated by field, using the query vectors created
             # above, and combined into a final document score using addition.
-            field_ref = FieldRef.from_string(matching_document_ref)
-            doc_ref = field_ref.doc_ref
-            field_vector = self.field_vectors[field_ref]
-            score = query_vectors[field_ref.field_name].similarity(
+            _field_ref = FieldRef.from_string(matching_field_ref)
+            doc_ref = _field_ref.doc_ref
+            field_vector = self.field_vectors[matching_field_ref]
+            score = query_vectors[_field_ref.field_name].similarity(
                 field_vector)
 
             try:
                 doc_match = matches[doc_ref]
-                doc_match += score
-                doc_match.match_data.combine(matching_fields[field_ref])
+                doc_match['score'] += score
+                doc_match['match_data'].combine(
+                    matching_fields[matching_field_ref])
             except KeyError:
                 match = {
                     'ref': doc_ref,
                     'score': score,
-                    'match_data': matching_fields[field_ref]
+                    'match_data': matching_fields[matching_field_ref]
                 }
                 matches[doc_ref] = match
-                results.push(match)
+                results.append(match)
 
-        return sorted(results, key=lambda a, b: b.score - a.score)
+        return sorted(results, key=lambda a: a['score'], reverse=True)
