@@ -7,6 +7,9 @@ class Token:
     def __str__(self):
         return self.string
 
+    def __repr__(self):
+        return '<Token "{}">'.format(str(self))
+
     def update(self, fn):
         """A token update function is used when updating or optionally
         when cloning a token."""

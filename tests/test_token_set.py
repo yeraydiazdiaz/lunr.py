@@ -1,6 +1,7 @@
 import pytest
 
 from lunr.token_set import TokenSet
+from lunr.exceptions import BaseLunrException
 
 
 class TestTokenSetStr:
@@ -65,7 +66,7 @@ class TestTokenSetFromString:
 class TestTokenSetFromList:
 
     def test_from_list_with_unsorted_list(self):
-        with pytest.raises(Exception):
+        with pytest.raises(BaseLunrException):
             TokenSet.from_list(['z', 'a'])
 
     def test_from_list_with_sorted_list(self):

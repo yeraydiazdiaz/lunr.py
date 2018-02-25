@@ -37,22 +37,15 @@ class TokenSet:
             pass
 
         string = '1' if self.final else '0'
-        labels = sorted(self.edges.keys())
-        node = None
-        for label in labels:
+        for label in sorted(list(self.edges.keys())):
             node = self.edges[label]
+            try:
+                node_id = str(node.id)
+            except AttributeError:
+                # TODO: JS seems to rely on undefined for the id attribute?
+                node_id = ''
 
-        if not labels:
-            return string
-
-        label = labels[-1]
-        try:
-            node_id = str(node.id)
-        except AttributeError:
-            # TODO: JS seems to rely on undefined for the id attribute on test?
-            node_id = ''
-
-        string = string + labels[-1] + node_id
+            string = string + label + node_id
 
         return string
 

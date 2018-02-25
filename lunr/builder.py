@@ -122,7 +122,7 @@ class Builder:
                     posting = {_field_name: {} for _field_name in self._fields}
                     posting['_index'] = self.term_index
                     self.term_index += 1
-                    self.inverted_index[(term)] = posting
+                    self.inverted_index[term] = posting
 
                 if doc_ref not in self.inverted_index[term][field_name]:
                     self.inverted_index[term][field_name][doc_ref] = {}

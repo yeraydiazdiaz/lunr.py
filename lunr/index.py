@@ -1,5 +1,3 @@
-from operator import getitem
-
 from lunr.field_ref import FieldRef
 from lunr.match_data import MatchData
 from lunr.vector import Vector

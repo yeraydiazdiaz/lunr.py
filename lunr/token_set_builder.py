@@ -47,7 +47,8 @@ class TokenSetBuilder:
         self.minimize(0)
 
     def minimize(self, down_to):
-        for node in reversed(self.unchecked_nodes):
+        for i in range(len(self.unchecked_nodes) - 1, down_to - 1, -1):
+            node = self.unchecked_nodes[i]
             child_key = str(node['child'])
 
             if child_key in self.minimized_nodes:
