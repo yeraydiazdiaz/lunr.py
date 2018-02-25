@@ -133,7 +133,7 @@ def generate_stop_word_filter(stop_words):
     # TODO: do we need this dict?
     words = {word: word for word in stop_words}
 
-    def stop_word_filter(token, metadata=None):
+    def stop_word_filter(token, i, tokens):
         if token and words.get(str(token)) != str(token):
             return token
 

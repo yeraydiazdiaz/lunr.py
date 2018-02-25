@@ -97,6 +97,9 @@ class Pipeline:
         for fn in self._stack:
             results = []
             for i, token in enumerate(tokens):
+                # JS ignores additional arguments to the functions but we
+                # force pipeline functions to declare (token, i, tokens)
+                # or *args
                 result = fn(token, i, tokens)
                 if not result:
                     continue

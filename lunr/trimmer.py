@@ -3,7 +3,7 @@ import re
 from lunr.pipeline import Pipeline
 
 
-def trimmer(token):
+def trimmer(token, i, tokens):
     def trim(s, metadata=None):
         s = re.sub(r'^\W+', '', s)
         s = re.sub(r'\W+$', '', s)

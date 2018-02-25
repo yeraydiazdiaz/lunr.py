@@ -23,8 +23,13 @@ class Index:
         self.pipeline = attrs['pipeline']
 
     def search(self, query_string):
-        # TODO: depends on QueryParser
-        pass
+        """Performs a search against the index using lunr query syntax.
+
+        Results will be returned sorted by their score, the most relevant
+        results will be returned first.
+
+        For more programmatic querying use `lunr.Index.query`.
+        """
 
     def query(self, query_builder):
         """Performs a query against the index using the yielded lunr.Query
