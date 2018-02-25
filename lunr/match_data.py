@@ -40,3 +40,19 @@ class MatchData:
                     else:
                         self.metadata[term][field][key].extend(
                             other.metadata[term][field][key])
+
+    def add(self, term, field, metadata):
+        """Add metadata for a term/field pair to this instance of match data"""
+        if term not in self.metadata:
+            self.metadata[term] = {field: metadata}
+            return
+
+        if field not in self.metadata[term]:
+            self.metadata[term][field] = metadata
+            return
+
+        for key in metadata.keys():
+            if key in self.metadata[term][field]:
+                self.metadata[term][field][key] += metadata[key]
+            else:
+                self.metadata[term][field][key] = metadata[key]

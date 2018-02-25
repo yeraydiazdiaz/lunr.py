@@ -140,14 +140,14 @@ class Index:
                             metadata = field_posting[
                                 str(matching_document_ref)]
 
-                            try:
-                                field_match = matching_fields[
-                                    str(matching_field_ref)]
-                            except KeyError:
-                                field_match = MatchData(
-                                    expanded_term, field, metadata)
+                            if str(matching_field_ref) not in matching_fields:
                                 matching_fields[
-                                    str(matching_field_ref)] = field_match
+                                    str(matching_field_ref)] = MatchData(
+                                        expanded_term, field, metadata)
+                            else:
+                                matching_fields[
+                                    str(matching_field_ref)].add(
+                                        expanded_term, field, metadata)
 
                         term_field_cache[term_field] = True
 
