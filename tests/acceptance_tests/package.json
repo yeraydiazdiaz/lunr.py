@@ -1,0 +1,14 @@
+{
+  "name": "acceptance_tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test_mkdocs.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lunr": "^2.1.5"
+  }
+}
