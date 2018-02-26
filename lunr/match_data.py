@@ -56,3 +56,6 @@ class MatchData:
                 self.metadata[term][field][key] += metadata[key]
             else:
                 self.metadata[term][field][key] = metadata[key]
+
+    def __eq__(self, other):
+        return self.metadata == other.metadata

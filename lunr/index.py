@@ -1,9 +1,17 @@
+import logging
+
+import six
+
 from lunr.field_ref import FieldRef
 from lunr.match_data import MatchData
-from lunr.vector import Vector
 from lunr.token_set import TokenSet
+from lunr.token_set_builder import TokenSetBuilder
+from lunr.pipeline import Pipeline
 from lunr.query import Query
 from lunr.query_parser import QueryParser
+from lunr.vector import Vector
+
+logger = logging.getLogger(__name__)
 
 
 class Index:
@@ -183,3 +191,49 @@ class Index:
                 results.append(match)
 
         return sorted(results, key=lambda a: a['score'], reverse=True)
+
+    def serialize(self):
+        from lunr import __VERSION__
+        inverted_index = [
+            [term, self.inverted_index[term]]
+            for term in sorted(self.inverted_index)]
+        field_vectors = [
+            [ref, vector.serialize()]
+            for ref, vector in six.iteritems(self.field_vectors)]
+
+        return {
+            'version': __VERSION__,
+            'fields': self.fields,
+            'field_vectors': field_vectors,
+            'inverted_index': inverted_index,
+            'pipeline': self.pipeline.serialize()
+        }
+
+    @classmethod
+    def load(cls, serialized_index):
+        from lunr import __VERSION__
+        if serialized_index['version'] != __VERSION__:
+            logger.warning(
+                'Version mismatch when loading serialized index. '
+                'Current version of lunr {} does not match that of serialized '
+                'index {}'.format(__VERSION__, serialized_index['version']))
+
+        field_vectors = {
+            ref: Vector(elements)
+            for ref, elements in serialized_index['field_vectors']}
+
+        tokenset_builder = TokenSetBuilder()
+        inverted_index = {}
+        for term, posting in serialized_index['inverted_index']:
+            tokenset_builder.insert(term)
+            inverted_index[term] = posting
+
+        tokenset_builder.finish()
+
+        return Index({
+            'fields': serialized_index['fields'],
+            'field_vectors': field_vectors,
+            'inverted_index': inverted_index,
+            'token_set': tokenset_builder.root,
+            'pipeline': Pipeline.load(serialized_index['pipeline'])
+        })

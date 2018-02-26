@@ -121,5 +121,5 @@ class Pipeline:
     def reset(self):
         self._stack = []
 
-    def to_json(self):
+    def serialize(self):
         return [fn.label for fn in self._stack]

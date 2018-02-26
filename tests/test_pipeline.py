@@ -191,13 +191,13 @@ class TestRun(BaseTestPipeline):
         assert received == ['foo', 'FOO']
 
 
-class TestToJson(BaseTestPipeline):
+class TestSerialize(BaseTestPipeline):
 
-    def test_to_json_returns_array_of_registered_function_labels(self):
+    def test_serialize_returns_array_of_registered_function_labels(self):
         Pipeline.register_function(fn, 'fn')
         self.pipeline.add(fn)
 
-        assert self.pipeline.to_json() == ['fn']
+        assert self.pipeline.serialize() == ['fn']
 
 
 class TestRegisterFunction(BaseTestPipeline):

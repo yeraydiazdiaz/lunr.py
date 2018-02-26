@@ -32,11 +32,6 @@ while he was away from his office last week.""",
             documents=documents
         )
 
-    def _sorted_metadata_keys(self, results):
-        return sorted(
-            [result['match_data'].metadata.keys() for result in results]
-        )
-
 
 class TestSingleTermSearch(BaseTestSearch):
 

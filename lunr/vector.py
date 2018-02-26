@@ -85,12 +85,14 @@ class Vector:
             self.elements.insert(position, insert_index)
 
     def to_list(self):
-        """Converts the vector to an array of the elements within the vector.
-        """
+        """Converts the vector to an array of the elements within the vector"""
         output = []
         for i in range(1, len(self.elements), 2):
             output.append(self.elements[i])
         return output
+
+    def serialize(self):
+        return self.elements
 
     @property
     def magnitude(self):
