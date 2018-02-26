@@ -1,4 +1,8 @@
+import pytest
+
 from lunr import lunr
+from lunr.query import Query
+from lunr.exceptions import QueryParseError
 
 
 class BaseTestSearch:
@@ -122,12 +126,15 @@ class TestSingleTermSearch(BaseTestSearch):
 
         assert len(results) == 0
 
-    def test_wildcard_matching_no_matches(self):
+
+class TestSearchWildcardTrailing(BaseTestSearch):
+
+    def test_matching_no_matches(self):
         results = self.idx.search('fo*')
 
         assert len(results) == 0
 
-    def test_wildcard_matching_one_match(self):
+    def test_matching_one_match(self):
         results = self.idx.search('candle*')
 
         assert len(results) == 1
@@ -135,7 +142,7 @@ class TestSingleTermSearch(BaseTestSearch):
         assert list(
             results[0]['match_data'].metadata.keys()) == ['candlestick']
 
-    def test_wildcard_matching_multiple_terms_match(self):
+    def test_matching_multiple_terms_match(self):
         results = self.idx.search('pl*')
 
         assert len(results) == 2
@@ -147,3 +154,118 @@ class TestSingleTermSearch(BaseTestSearch):
         assert list(
             results[1]['match_data'].metadata.keys()
         ) == ['plumb', 'plant']
+
+
+class TestSearchWildcardLeading(BaseTestSearch):
+
+    def test_matching_no_matches(self):
+        results = self.idx.search('*oo')
+
+        assert len(results) == 0
+
+    def test_matching_multiple_terms_match(self):
+        results = self.idx.search('*ant')
+
+        assert len(results) == 2
+        assert [r['ref'] for r in results] == ['b', 'c']
+        assert list(results[0]['match_data'].metadata.keys()) == ['plant']
+        assert list(results[1]['match_data'].metadata.keys()) == ['plant']
+
+
+class TestSearchWildcardContained(BaseTestSearch):
+
+    def test_matching_no_matches(self):
+        results = self.idx.search('f*o')
+        assert len(results) == 0
+
+    def test_matching_multiple_terms_match(self):
+        results = self.idx.search('pl*nt')
+
+        assert len(results) == 2
+        assert [r['ref'] for r in results] == ['b', 'c']
+        assert list(results[0]['match_data'].metadata.keys()) == ['plant']
+        assert list(results[1]['match_data'].metadata.keys()) == ['plant']
+
+
+class TestEditDistance(BaseTestSearch):
+
+    def test_edit_distance_no_results(self):
+        results = self.idx.search('foo~1')
+        assert len(results) == 0
+
+    def test_edit_distance_two_results(self):
+        results = self.idx.search('plont~1')
+
+        assert len(results) == 2
+        assert [r['ref'] for r in results] == ['b', 'c']
+        assert list(results[0]['match_data'].metadata.keys()) == ['plant']
+        assert list(results[1]['match_data'].metadata.keys()) == ['plant']
+
+
+class TestSearchByField(BaseTestSearch):
+
+    def test_search_by_field_unknown_field(self):
+        with pytest.raises(QueryParseError):
+            self.idx.search('unknown-field:plant')
+
+    def test_search_by_field_no_results(self):
+        results = self.idx.search('title:candlestick')
+        assert len(results) == 0
+
+    def test_search_by_field_results(self):
+        results = self.idx.search('title:plant')
+
+        assert len(results) == 1
+        assert results[0]['ref'] == 'b'
+        assert list(results[0]['match_data'].metadata.keys()) == ['plant']
+
+
+class TestTermBoosts(BaseTestSearch):
+
+    def test_term_boosts_no_results(self):
+        results = self.idx.search('foo^10')
+        assert len(results) == 0
+
+    def test_term_boosts_results(self):
+        results = self.idx.search('scarlett candlestick^5')
+
+        assert len(results) == 2
+        assert [r['ref'] for r in results] == ['a', 'c']
+        assert list(
+            results[0]['match_data'].metadata.keys()) == ['candlestick']
+        assert list(results[1]['match_data'].metadata.keys()) == ['scarlett']
+
+
+class TestTypeaheadStyleSearch(BaseTestSearch):
+
+    def test_typeahead_no_results(self):
+        def config(q):
+            q.term('xyz', {'boost': 100, 'use_pipeline': True})
+            q.term('xyz', {
+                'boost': 10,
+                'use_pipeline': False,
+                'wildcard': Query.WILDCARD_TRAILING
+            })
+            q.term('xyz', {'boost': 1, 'edit_distance': 1})
+
+        results = self.idx.query(config)
+        assert len(results) == 0
+
+    def test_typeahead_results(self):
+        def config(q):
+            q.term('pl', {'boost': 100, 'use_pipeline': True})
+            q.term('pl', {
+                'boost': 10,
+                'use_pipeline': False,
+                'wildcard': Query.WILDCARD_TRAILING
+            })
+            q.term('pl', {'boost': 1, 'edit_distance': 1})
+
+        results = self.idx.query(config)
+
+        assert len(results) == 2
+        assert [r['ref'] for r in results] == ['b', 'c']
+        assert list(
+            results[0]['match_data'].metadata.keys()) == ['plumb', 'plant']
+        assert list(
+            results[1]['match_data'].metadata.keys()) == ['plumb', 'plant']
