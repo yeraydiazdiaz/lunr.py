@@ -4,7 +4,7 @@ class Clause(dict):
     """
     def __init__(
             self, boost=1, wildcard=0):
-        super().__init__()
+        super(Clause, self).__init__()
         # self['fields'] = fields
         # self['edit_distance'] = edit_distance
         # self['use_pipeline'] = use_pipeline
