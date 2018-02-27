@@ -6,9 +6,14 @@ python:
   - "3.5"
   - "3.6"
 
+before_install:
+  - nvm install 8.9
+  - nvm use 8.9
+
 install:
   - pip install tox-travis
   - pip install codecov
+  - cd tests/acceptance_tests/ && npm install
 
 script: tox
 
