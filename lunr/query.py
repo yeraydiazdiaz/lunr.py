@@ -1,6 +1,11 @@
+from __future__ import unicode_literals
+
+
 class Clause(dict):
     """A single clause in a `lunr.Query` contains a term and details on
     how to match that term against a `lunr.Index`.
+
+    TODO: use an actual class
     """
     def __init__(
             self, boost=1, wildcard=0):

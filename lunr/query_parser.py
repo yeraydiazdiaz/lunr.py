@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import six
 
 from lunr.query_lexer import QueryLexer

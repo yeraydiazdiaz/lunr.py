@@ -1,3 +1,11 @@
+from __future__ import unicode_literals
+
+from builtins import str
+
+import six
+
+
+@six.python_2_unicode_compatible
 class Token:
 
     def __init__(self, string='', metadata=None):

@@ -1,3 +1,7 @@
+from __future__ import unicode_literals
+
+from builtins import str
+
 from lunr.builder import Builder
 from lunr.token_set import TokenSet
 from lunr.index import Index

@@ -1,4 +1,7 @@
+from __future__ import unicode_literals
+
 import logging
+
 from lunr.__main__ import lunr
 
 __all__ = (lunr,)

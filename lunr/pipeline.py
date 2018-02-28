@@ -1,4 +1,8 @@
+from __future__ import unicode_literals
+
 import logging
+
+from builtins import str
 import six
 
 from lunr.exceptions import BaseLunrException

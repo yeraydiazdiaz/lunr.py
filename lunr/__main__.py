@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from lunr.builder import Builder
 from lunr.trimmer import trimmer
 from lunr.stop_word_filter import stop_word_filter

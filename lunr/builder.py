@@ -1,4 +1,8 @@
+from __future__ import unicode_literals
+
 from collections import defaultdict
+
+from builtins import str, dict  # noqa
 
 from lunr.pipeline import Pipeline
 from lunr.tokenizer import Tokenizer

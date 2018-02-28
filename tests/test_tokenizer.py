@@ -1,3 +1,9 @@
+from __future__ import unicode_literals
+
+from builtins import str
+
+import six
+
 from lunr.tokenizer import Tokenizer
 
 
@@ -45,6 +51,7 @@ class TestTokenizer:
         assert tokens == ['false']
 
     def test_converting_an_object_to_tokens(self):
+        @six.python_2_unicode_compatible
         class Subject:
             def __str__(self):
                 return 'custom object'

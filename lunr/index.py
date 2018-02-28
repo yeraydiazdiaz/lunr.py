@@ -1,6 +1,8 @@
+from __future__ import unicode_literals
+
 import logging
 
-import six
+from builtins import str, dict  # noqa
 
 from lunr.field_ref import FieldRef
 from lunr.match_data import MatchData
@@ -199,7 +201,7 @@ class Index:
             for term in sorted(self.inverted_index)]
         field_vectors = [
             [ref, vector.serialize()]
-            for ref, vector in six.iteritems(self.field_vectors)]
+            for ref, vector in self.field_vectors.items()]
 
         return {
             'version': __VERSION__,
