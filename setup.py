@@ -1,11 +1,40 @@
+import os
+import re
 from setuptools import setup
 
-LONG_DESCRIPTION = 'A Python implementation of Lunr.js'
+
+PATH = os.path.abspath(os.path.dirname(__file__))
+
+LONG_DESCRIPTION = (
+    "A Python implementation of Lunr.js (https://lunrjs.com) by Oliver "
+    "Nightingale.\n\n"
+    "> A bit like Solr, but much smaller and not as bright.\n\n"
+    "This Python version of Lunr.js aims to bring the simple and powerful "
+    "full text search capabilities into Python guaranteeing results as close "
+    "as the original implementation as possible."
+)
+
+
+def read_file(filepath):
+    with open(filepath, 'r') as fd:
+        return fd.read()
+
+
+def find_version():
+    version_path = os.path.join(PATH, 'lunr', '__init__.py')
+    contents = read_file(version_path)
+    version_string = contents[contents.index('__VERSION__'):]
+    try:
+        return re.match(
+            r'.*__VERSION__ = [\'"]([\d\w\.]+)[\'"]', version_string).group(1)
+    except AttributeError:
+        raise RuntimeError("Unable to find version string.")
+
 
 setup(
     name='lunr',
-    version='0.1',
-    url='http://www.lunr.org',
+    version=find_version(),
+    url='https://github.com/yeraydiazdiaz/lunr.py',
     license='BSD',
     description='A Python implementation of Lunr.js',
     long_description=LONG_DESCRIPTION,
@@ -14,8 +43,10 @@ setup(
     packages=['lunr'],
     include_package_data=True,
     install_requires=[
-        'future'
+        'future==0.16.0',
+        'six==1.11.0',
     ],
+    keywords='lunr full text search',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
@@ -32,5 +63,4 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Text Processing',
     ],
-    zip_safe=False,
 )
