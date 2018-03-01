@@ -53,20 +53,22 @@ class TestSingleTermSearch(BaseTestSearch):
         assert results[1]['ref'] == 'c'
 
     def test_pipeline_processing_enabled(self):
-        results = self.idx.query(lambda q: q.clause({
-            'term': 'study',  # stemmed to studi
-            'use_pipeline': True
-        }))
+        query = Query(self.idx.fields)
+        query.clause(
+            term='study',  # stemmed to studi
+            use_pipeline=True)
+        results = self.idx.query(query)
 
         assert len(results) == 2
         assert results[0]['ref'] == 'b'
         assert results[1]['ref'] == 'a'
 
     def test_pipeline_processing_disabled(self):
-        results = self.idx.query(lambda q: q.clause({
-            'term': 'study',  # stemmed to studi
-            'use_pipeline': False
-        }))
+        query = Query(self.idx.fields)
+        query.clause(
+            term='study',  # stemmed to studi
+            use_pipeline=False)
+        results = self.idx.query(query)
 
         assert len(results) == 0
 
@@ -239,29 +241,25 @@ class TestTermBoosts(BaseTestSearch):
 class TestTypeaheadStyleSearch(BaseTestSearch):
 
     def test_typeahead_no_results(self):
-        def config(q):
-            q.term('xyz', {'boost': 100, 'use_pipeline': True})
-            q.term('xyz', {
-                'boost': 10,
-                'use_pipeline': False,
-                'wildcard': Query.WILDCARD_TRAILING
-            })
-            q.term('xyz', {'boost': 1, 'edit_distance': 1})
+        query = Query(self.idx.fields)
+        query.clause('xyz', boost=100, use_pipeline=True)
+        query.clause(
+            'xyz', boost=10, use_pipeline=False,
+            wildcard=Query.WILDCARD_TRAILING)
+        query.clause('xyz', boost=1, edit_distance=1)
 
-        results = self.idx.query(config)
+        results = self.idx.query(query)
         assert len(results) == 0
 
     def test_typeahead_results(self):
-        def config(q):
-            q.term('pl', {'boost': 100, 'use_pipeline': True})
-            q.term('pl', {
-                'boost': 10,
-                'use_pipeline': False,
-                'wildcard': Query.WILDCARD_TRAILING
-            })
-            q.term('pl', {'boost': 1, 'edit_distance': 1})
+        query = Query(self.idx.fields)
+        query.clause('pl', boost=100, use_pipeline=True)
+        query.clause(
+            'pl', boost=10, use_pipeline=False,
+            wildcard=Query.WILDCARD_TRAILING)
+        query.clause('pl', boost=1, edit_distance=1)
 
-        results = self.idx.query(config)
+        results = self.idx.query(query)
 
         assert len(results) == 2
         assert {r['ref'] for r in results} == {'b', 'c'}

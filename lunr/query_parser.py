@@ -39,7 +39,7 @@ class QueryParser:
 
     def next_clause(self):
         self.query.clause(self.current_clause)
-        self.current_clause = Clause()  # maybe we should just use dicts?
+        self.current_clause = Clause()
 
     @classmethod
     def parse_field_or_term(cls, parser):
@@ -72,7 +72,7 @@ class QueryParser:
                     lexeme['string'], ', '.join(parser.query.all_fields)
                 ))
 
-        parser.current_clause['fields'] = [lexeme['string']]
+        parser.current_clause.fields = [lexeme['string']]
 
         next_lexeme = parser.peek_lexeme()
         if next_lexeme is None:
@@ -90,9 +90,9 @@ class QueryParser:
         if lexeme is None:
             return
 
-        parser.current_clause['term'] = lexeme['string'].lower()
+        parser.current_clause.term = lexeme['string'].lower()
         if '*' in lexeme['string']:
-            parser.current_clause['use_pipeline'] = False
+            parser.current_clause.use_pipeline = False
 
         return cls._peek_next_lexeme(parser)
 
@@ -108,7 +108,7 @@ class QueryParser:
             six.raise_from(
                 QueryParseError('Edit distance must be numeric'), e)
 
-        parser.current_clause['edit_distance'] = edit_distance
+        parser.current_clause.edit_distance = edit_distance
 
         return cls._peek_next_lexeme(parser)
 
@@ -124,7 +124,7 @@ class QueryParser:
             six.raise_from(
                 QueryParseError('Boost must be numeric'), e)
 
-        parser.current_clause['boost'] = boost
+        parser.current_clause.boost = boost
 
         return cls._peek_next_lexeme(parser)
 

@@ -40,23 +40,28 @@ class Index:
         results will be returned first.
 
         For more programmatic querying use `lunr.Index.query`.
+
+        Args:
+            query_string (str): A string to parse into a Query.
+
+        Returns:
+            dict: Results of executing the query.
         """
-        def callback(query):
-            parser = QueryParser(query_string, query)
-            parser.parse()
+        query = Query(self.fields)
+        parser = QueryParser(query_string, query)
+        parser.parse()
+        return self.query(query)
 
-        return self.query(callback)
-
-    def query(self, fn):
-        """Performs a query against the index using the yielded lunr.Query
+    def query(self, query):
+        """Performs a query against the index using the passed lunr.Query
         object.
 
         If performing programmatic queries against the index, this method is
         preferred over `lunr.Index.search` so as to avoid the additional query
         parsing overhead.
 
-        A query object is yielded to the supplied function which should be used
-        to express the query to be run against the index.
+        Args:
+            lunr.Query: A preconfigured Query to perform the search against.
         """
         # for each query clause
         # * process terms
@@ -65,13 +70,9 @@ class Index:
         # * get document vectors
         # * score documents
 
-        query = Query(self.fields)
         matching_fields = {}
         query_vectors = {}
         term_field_cache = {}
-
-        # TODO: query initialization via callback is not very Pythonic
-        fn(query)
 
         for i, clause in enumerate(query.clauses):
             # Unless the pipeline has been disabled for this term, which is
@@ -80,17 +81,17 @@ class Index:
             # of processed terms. Pipeline functions may expand the passed
             # term, which means we may end up performing multiple index lookups
             # for a single query term.
-            if clause['use_pipeline']:
-                terms = self.pipeline.run_string(clause['term'])
+            if clause.use_pipeline:
+                terms = self.pipeline.run_string(clause.term)
             else:
-                terms = [clause['term']]
+                terms = [clause.term]
 
             for term in terms:
                 # Each term returned from the pipeline needs to use the same
                 # query clause object, e.g. the same boost and or edit distance
                 # The simplest way to do this is to re-use the clause object
                 # but mutate its term property.
-                clause['term'] = term
+                clause.term = term
 
                 # From the term in the clause we create a token set which will
                 # then be used to intersect the indexes token set to get a list
@@ -103,7 +104,7 @@ class Index:
                     posting = self.inverted_index[expanded_term]
                     term_index = posting['_index']
 
-                    for field in clause['fields']:
+                    for field in clause.fields:
                         # For each field that this query term is scoped by
                         # (by default all fields are in scope) we need to get
                         # all the document refs that have this term in that
@@ -130,7 +131,7 @@ class Index:
                         # In that case we just add the scores together.
                         query_vectors[field].upsert(
                             term_index,
-                            1 * clause['boost'],
+                            1 * clause.boost,
                             lambda a, b: a + b
                         )
 

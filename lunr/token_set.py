@@ -218,11 +218,11 @@ class TokenSet:
 
     @classmethod
     def from_clause(cls, clause):
-        if 'edit_distance' in clause:
+        if clause.edit_distance:
             return cls.from_fuzzy_string(
-                clause['term'], clause['edit_distance'])
+                clause.term, clause.edit_distance)
         else:
-            return cls.from_string(clause['term'])
+            return cls.from_string(clause.term)
 
     def to_list(self):
         words = []
