@@ -1,79 +1,50 @@
 import pytest
 
-from lunr import lunr
 from lunr.query import Query
 from lunr.exceptions import QueryParseError
 
 
-class BaseTestSearch:
+class TestSingleTermSearch:
 
-    def setup_method(self, method):
-        documents = [{
-            'id': 'a',
-            'title': 'Mr. Green kills Colonel Mustard',
-            'body': """Mr. Green killed Colonel Mustard in the study with the
-candlestick. Mr. Green is not a very nice fellow.""",
-            'word_count': 19
-        }, {
-            'id': 'b',
-            'title': 'Plumb waters plant',
-            'body': 'Professor Plumb has a green plant in his study',
-            'word_count': 9
-        }, {
-            'id': 'c',
-            'title': 'Scarlett helps Professor',
-            'body': """Miss Scarlett watered Professor Plumbs green plant
-while he was away from his office last week.""",
-            'word_count': 16
-        }]
-        self.idx = lunr(
-            ref='id',
-            fields=('title', 'body'),
-            documents=documents
-        )
-
-
-class TestSingleTermSearch(BaseTestSearch):
-
-    def test_one_match(self):
-        results = self.idx.search('scarlett')
+    def test_one_match(self, index):
+        results = index.search('scarlett')
         assert len(results) == 1
         assert results[0]['ref'] == 'c'
         assert set(
             results[0]['match_data'].metadata.keys()) == {'scarlett'}
 
-    def test_no_match(self):
-        results = self.idx.search('foo')
+    def test_no_match(self, index):
+        results = index.search('foo')
         assert len(results) == 0
 
-    def test_multiple_matches_sorts_by_relevance(self):
-        results = self.idx.search('plant')
+    def test_multiple_matches_sorts_by_relevance(self, index):
+        results = index.search('plant')
         assert len(results) == 2
         assert results[0]['ref'] == 'b'
         assert results[1]['ref'] == 'c'
 
-    def test_pipeline_processing_enabled(self):
-        query = Query(self.idx.fields)
+    def test_pipeline_processing_enabled(self, index):
+        query = Query(index.fields)
         query.clause(
             term='study',  # stemmed to studi
             use_pipeline=True)
-        results = self.idx.query(query)
+        results = index.query(query)
 
         assert len(results) == 2
         assert results[0]['ref'] == 'b'
         assert results[1]['ref'] == 'a'
 
-    def test_pipeline_processing_disabled(self):
-        query = Query(self.idx.fields)
+    def test_pipeline_processing_disabled(self, index):
+        query = Query(index.fields)
         query.clause(
             term='study',  # stemmed to studi
             use_pipeline=False)
-        results = self.idx.query(query)
+        results = index.query(query)
 
         assert len(results) == 0
 
-    def test_multiple_terms_all_terms_match(self):
-        results = self.idx.search('fellow candlestick')
+    def test_multiple_terms_all_terms_match(self, index):
+        results = index.search('fellow candlestick')
 
         assert len(results) == 1
         assert results[0]['ref'] == 'a'
@@ -82,19 +53,19 @@ class TestSingleTermSearch(BaseTestSearch):
         assert set(metadata['fellow'].keys()) == {'body'}
         assert set(metadata['candlestick'].keys()) == {'body'}
 
-    def test_one_term_matches(self):
-        results = self.idx.search('week foo')
+    def test_one_term_matches(self, index):
+        results = index.search('week foo')
 
         assert len(results) == 1
         assert results[0]['ref'] == 'c'
         metadata = results[0]['match_data'].metadata
         assert set(metadata.keys()) == {'week'}
 
-    def test_duplicate_query_terms(self):
-        self.idx.search('fellow candlestick foo bar green plant fellow')
+    def test_duplicate_query_terms(self, index):
+        index.search('fellow candlestick foo bar green plant fellow')
 
-    def test_documents_with_all_terms_score_higher(self):
-        results = self.idx.search('candlestick green')
+    def test_documents_with_all_terms_score_higher(self, index):
+        results = index.search('candlestick green')
 
         assert len(results) == 3
 
@@ -105,47 +76,47 @@ class TestSingleTermSearch(BaseTestSearch):
         assert set(results[1]['match_data'].metadata.keys()) == {'green'}
         assert set(results[2]['match_data'].metadata.keys()) == {'green'}
 
-    def test_no_terms_match(self):
-        results = self.idx.search('foo bar')
+    def test_no_terms_match(self, index):
+        results = index.search('foo bar')
 
         assert len(results) == 0
 
-    def test_corpus_terms_are_stemmed(self):
-        results = self.idx.search('water')
+    def test_corpus_terms_are_stemmed(self, index):
+        results = index.search('water')
 
         assert len(results) == 2
         assert {r['ref'] for r in results} == {'b', 'c'}
 
-    def test_field_scoped_terms(self):
-        results = self.idx.search('title:plant')
+    def test_field_scoped_terms(self, index):
+        results = index.search('title:plant')
 
         assert len(results) == 1
         assert results[0]['ref'] == 'b'
         assert set(results[0]['match_data'].metadata.keys()) == {'plant'}
 
-    def test_field_scoped_no_matching_terms(self):
-        results = self.idx.search('title:candlestick')
+    def test_field_scoped_no_matching_terms(self, index):
+        results = index.search('title:candlestick')
 
         assert len(results) == 0
 
 
-class TestSearchWildcardTrailing(BaseTestSearch):
+class TestSearchWildcardTrailing:
 
-    def test_matching_no_matches(self):
-        results = self.idx.search('fo*')
+    def test_matching_no_matches(self, index):
+        results = index.search('fo*')
 
         assert len(results) == 0
 
-    def test_matching_one_match(self):
-        results = self.idx.search('candle*')
+    def test_matching_one_match(self, index):
+        results = index.search('candle*')
 
         assert len(results) == 1
         assert results[0]['ref'] == 'a'
         assert set(
             results[0]['match_data'].metadata.keys()) == {'candlestick'}
 
-    def test_matching_multiple_terms_match(self):
-        results = self.idx.search('pl*')
+    def test_matching_multiple_terms_match(self, index):
+        results = index.search('pl*')
 
         assert len(results) == 2
 
@@ -158,15 +129,15 @@ class TestSearchWildcardTrailing(BaseTestSearch):
         ) == {'plumb', 'plant'}
 
 
-class TestSearchWildcardLeading(BaseTestSearch):
+class TestSearchWildcardLeading:
 
-    def test_matching_no_matches(self):
-        results = self.idx.search('*oo')
+    def test_matching_no_matches(self, index):
+        results = index.search('*oo')
 
         assert len(results) == 0
 
-    def test_matching_multiple_terms_match(self):
-        results = self.idx.search('*ant')
+    def test_matching_multiple_terms_match(self, index):
+        results = index.search('*ant')
 
         assert len(results) == 2
         assert {r['ref'] for r in results} == {'b', 'c'}
@@ -174,14 +145,14 @@ class TestSearchWildcardLeading(BaseTestSearch):
         assert set(results[1]['match_data'].metadata.keys()) == {'plant'}
 
 
-class TestSearchWildcardContained(BaseTestSearch):
+class TestSearchWildcardContained:
 
-    def test_matching_no_matches(self):
-        results = self.idx.search('f*o')
+    def test_matching_no_matches(self, index):
+        results = index.search('f*o')
         assert len(results) == 0
 
-    def test_matching_multiple_terms_match(self):
-        results = self.idx.search('pl*nt')
+    def test_matching_multiple_terms_match(self, index):
+        results = index.search('pl*nt')
 
         assert len(results) == 2
         assert {r['ref'] for r in results} == {'b', 'c'}
@@ -189,14 +160,14 @@ class TestSearchWildcardContained(BaseTestSearch):
         assert set(results[1]['match_data'].metadata.keys()) == {'plant'}
 
 
-class TestEditDistance(BaseTestSearch):
+class TestEditDistance:
 
-    def test_edit_distance_no_results(self):
-        results = self.idx.search('foo~1')
+    def test_edit_distance_no_results(self, index):
+        results = index.search('foo~1')
         assert len(results) == 0
 
-    def test_edit_distance_two_results(self):
-        results = self.idx.search('plont~1')
+    def test_edit_distance_two_results(self, index):
+        results = index.search('plont~1')
 
         assert len(results) == 2
         assert {r['ref'] for r in results} == {'b', 'c'}
@@ -204,32 +175,32 @@ class TestEditDistance(BaseTestSearch):
         assert set(results[1]['match_data'].metadata.keys()) == {'plant'}
 
 
-class TestSearchByField(BaseTestSearch):
+class TestSearchByField:
 
-    def test_search_by_field_unknown_field(self):
+    def test_search_by_field_unknown_field(self, index):
         with pytest.raises(QueryParseError):
-            self.idx.search('unknown-field:plant')
+            index.search('unknown-field:plant')
 
-    def test_search_by_field_no_results(self):
-        results = self.idx.search('title:candlestick')
+    def test_search_by_field_no_results(self, index):
+        results = index.search('title:candlestick')
         assert len(results) == 0
 
-    def test_search_by_field_results(self):
-        results = self.idx.search('title:plant')
+    def test_search_by_field_results(self, index):
+        results = index.search('title:plant')
 
         assert len(results) == 1
         assert results[0]['ref'] == 'b'
         assert set(results[0]['match_data'].metadata.keys()) == {'plant'}
 
 
-class TestTermBoosts(BaseTestSearch):
+class TestTermBoosts:
 
-    def test_term_boosts_no_results(self):
-        results = self.idx.search('foo^10')
+    def test_term_boosts_no_results(self, index):
+        results = index.search('foo^10')
         assert len(results) == 0
 
-    def test_term_boosts_results(self):
-        results = self.idx.search('scarlett candlestick^5')
+    def test_term_boosts_results(self, index):
+        results = index.search('scarlett candlestick^5')
 
         assert len(results) == 2
         assert {r['ref'] for r in results} == {'a', 'c'}
@@ -238,28 +209,28 @@ class TestTermBoosts(BaseTestSearch):
         assert set(results[1]['match_data'].metadata.keys()) == {'scarlett'}
 
 
-class TestTypeaheadStyleSearch(BaseTestSearch):
+class TestTypeaheadStyleSearch:
 
-    def test_typeahead_no_results(self):
-        query = Query(self.idx.fields)
+    def test_typeahead_no_results(self, index):
+        query = Query(index.fields)
         query.clause('xyz', boost=100, use_pipeline=True)
         query.clause(
             'xyz', boost=10, use_pipeline=False,
             wildcard=Query.WILDCARD_TRAILING)
         query.clause('xyz', boost=1, edit_distance=1)
 
-        results = self.idx.query(query)
+        results = index.query(query)
         assert len(results) == 0
 
-    def test_typeahead_results(self):
-        query = Query(self.idx.fields)
+    def test_typeahead_results(self, index):
+        query = Query(index.fields)
         query.clause('pl', boost=100, use_pipeline=True)
         query.clause(
             'pl', boost=10, use_pipeline=False,
             wildcard=Query.WILDCARD_TRAILING)
         query.clause('pl', boost=1, edit_distance=1)
 
-        results = self.idx.query(query)
+        results = index.query(query)
 
         assert len(results) == 2
         assert {r['ref'] for r in results} == {'b', 'c'}

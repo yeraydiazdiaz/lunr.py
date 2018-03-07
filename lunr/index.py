@@ -4,6 +4,7 @@ import logging
 
 from builtins import str, dict  # noqa
 
+from lunr.exceptions import BaseLunrException
 from lunr.field_ref import FieldRef
 from lunr.match_data import MatchData
 from lunr.token_set import TokenSet
@@ -47,10 +48,32 @@ class Index:
         Returns:
             dict: Results of executing the query.
         """
-        query = Query(self.fields)
+        query = self.create_query()
+        # TODO: should QueryParser be a method of query? should it return one?
         parser = QueryParser(query_string, query)
         parser.parse()
         return self.query(query)
+
+    def create_query(self, fields=None):
+        """Convenience method to create a Query with the Index's fields.
+
+        Args:
+            fields (iterable, optional): The fields to include in the Query,
+                defaults to the Index's `all_fields`.
+
+        Returns:
+            Query: With the specified fields or all the fields in the Index.
+        """
+        if fields is None:
+            return Query(self.fields)
+
+        non_contained_fields = set(fields) - set(self.fields)
+        if non_contained_fields:
+            raise BaseLunrException(
+                'Fields {} are not part of the index',
+                non_contained_fields)
+
+        return Query(fields)
 
     def query(self, query):
         """Performs a query against the index using the passed lunr.Query

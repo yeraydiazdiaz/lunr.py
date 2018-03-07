@@ -3,7 +3,21 @@ from __future__ import unicode_literals
 
 class Clause(object):
     """A single clause in a `lunr.Query` contains a term and details on
-    how to match that term against a `lunr.Index` """
+    how to match that term against a `lunr.Index`
+
+    Args:
+        term (str, optional): The term for the clause.
+        field (iterable, optional): The fields for the term to be searched
+            against.
+        edit_distance (int, optional): The character distance to use, defaults
+            to 0.
+        use_pipeline (bool, optional): Whether the clause should be pre
+            processed by the index's pipeline, default to True.
+        boost (int, optional): Boost to apply to the clause, defaults to 1.
+        wildcard (Query.WILDCARD_*): Any of the Query.WILDCARD constants
+            defining if a wildcard is to be used and how, defaults to
+            Query.WILDCARD_NONE.
+    """
     def __init__(
             self, term=None, fields=None, edit_distance=0,
             use_pipeline=True, boost=1, wildcard=None):
@@ -43,7 +57,8 @@ class Query(object):
         self.all_fields = all_fields
 
     def __repr__(self):
-        return '<Query terms="{}">'.format(','.join(self.all_fields))
+        return '<Query terms="{}" clauses="{}">'.format(
+            ','.join(self.all_fields), ','.join(c.term for c in self.clauses))
 
     def clause(self, *args, **kwargs):
         """Adds a `lunr.Clause` to this query.
