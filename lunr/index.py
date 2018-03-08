@@ -219,7 +219,7 @@ class Index:
         return sorted(results, key=lambda a: a['score'], reverse=True)
 
     def serialize(self):
-        from lunr import __VERSION__
+        from lunr import __TARGET_JS_VERSION__
         inverted_index = [
             [term, self.inverted_index[term]]
             for term in sorted(self.inverted_index)]
@@ -227,11 +227,12 @@ class Index:
             [ref, vector.serialize()]
             for ref, vector in self.field_vectors.items()]
 
+        # CamelCased keys for compatibility with JS version
         return {
-            'version': __VERSION__,
+            'version': __TARGET_JS_VERSION__,
             'fields': self.fields,
-            'field_vectors': field_vectors,
-            'inverted_index': inverted_index,
+            'fieldVectors': field_vectors,
+            'invertedIndex': inverted_index,
             'pipeline': self.pipeline.serialize()
         }
 

@@ -9,3 +9,4 @@ __all__ = (lunr,)
 logging.basicConfig(format="%(levelname)-7s -  %(message)s")
 
 __VERSION__ = '0.1.1a1'
+__TARGET_JS_VERSION__ = '2.1.5'

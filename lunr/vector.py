@@ -94,7 +94,9 @@ class Vector:
         return output
 
     def serialize(self):
-        return self.elements
+        # TODO: the JS version forces rounding on the elements upon insertion
+        # to ensure symmetry upon serialization
+        return [round(element, 3) for element in self.elements]
 
     @property
     def magnitude(self):
