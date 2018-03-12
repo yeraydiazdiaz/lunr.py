@@ -212,9 +212,7 @@ class Builder:
                         1 - self._b + self._b * (
                             field_length / self.average_field_length[field])
                         ) + tf)
-                # TODO: Convert 1.23456789 to 1.234 to reduce space upon
-                # seralizing the index, evaluate impact
-                score_with_precision = score
+                score_with_precision = round(score, 3)
 
                 field_vector.insert(term_index, score_with_precision)
 
