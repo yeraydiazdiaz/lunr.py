@@ -8,7 +8,7 @@ PATH = os.path.abspath(os.path.dirname(__file__))
 LONG_DESCRIPTION = (
     "A Python implementation of Lunr.js (https://lunrjs.com) by Oliver "
     "Nightingale.\n\n"
-    "> A bit like Solr, but much smaller and not as bright.\n\n"
+    "   A bit like Solr, but much smaller and not as bright.\n\n"
     "This Python version of Lunr.js aims to bring the simple and powerful "
     "full text search capabilities into Python guaranteeing results as close "
     "as the original implementation as possible."
