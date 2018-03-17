@@ -94,7 +94,7 @@ class Builder:
     def add(self, doc):
         """Adds a document to the index.
 
-        Before adding fields to the index the index should have been fully
+        Before adding documents to the index it should have been fully
         setup, with the document ref and all fields to index already having
         been specified.
 
@@ -167,22 +167,20 @@ class Builder:
 
     def _calculate_average_field_lenghts(self):
         """Calculates the average document length for this index"""
-        field_refs = list(self.field_lengths.keys())
         accumulator = defaultdict(int)
         documents_with_field = defaultdict(int)
 
-        for field_ref in field_refs:
+        for field_ref, length in self.field_lengths.items():
             # TODO: this seems unnecessary, use FieldRefs as keys?
             _field_ref = FieldRef.from_string(field_ref)
             field = _field_ref.field_name
 
             documents_with_field[field] += 1
-            accumulator[field] += self.field_lengths[field_ref]
+            accumulator[field] += length
 
         for field in self._fields:
             accumulator[field] /= documents_with_field[field]
 
-        # TODO: promote to instance variable?
         self.average_field_length = accumulator
 
     def _create_field_vectors(self):

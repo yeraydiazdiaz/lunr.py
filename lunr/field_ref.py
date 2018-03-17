@@ -15,6 +15,10 @@ class FieldRef:
         self.field_name = field_name
         self._string_value = string_value
 
+    def __repr__(self):
+        return '<FieldRef ref="{}" field="{}">'.format(
+            self.doc_ref, self.field_name)
+
     @classmethod
     def from_string(cls, string):
         if cls.JOINER not in string:

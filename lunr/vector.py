@@ -28,6 +28,9 @@ class Vector:
         self._magnitude = 0
         self.elements = elements or []
 
+    def __iter__(self):
+        return iter(self.elements)
+
     def position_for_index(self, index):
         """Calculates the position within the vector to insert a given index.
 

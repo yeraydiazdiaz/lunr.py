@@ -247,11 +247,11 @@ class Index:
 
         field_vectors = {
             ref: Vector(elements)
-            for ref, elements in serialized_index['field_vectors']}
+            for ref, elements in serialized_index['fieldVectors']}
 
         tokenset_builder = TokenSetBuilder()
         inverted_index = {}
-        for term, posting in serialized_index['inverted_index']:
+        for term, posting in serialized_index['invertedIndex']:
             tokenset_builder.insert(term)
             inverted_index[term] = posting
 

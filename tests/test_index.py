@@ -26,4 +26,4 @@ class TestIndex:
         assert serialized_index['fields'] == index.fields
         for ref, vector in serialized_index['fieldVectors']:
             assert ref in index.field_vectors
-            assert_vectors_equal(vector, index[ref])
+            assert_vectors_equal(vector, index.field_vectors[ref])

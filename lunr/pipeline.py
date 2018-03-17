@@ -24,6 +24,10 @@ class Pipeline:
     def __len__(self):
         return len(self._stack)
 
+    def __repr__(self):
+        return '<Pipeline stack="{}">'.format(
+            ','.join(fn.name for fn in self._stack))
+
     # TODO: add iterator methods?
 
     @classmethod
