@@ -6,11 +6,13 @@ import json
 import os
 import re
 import subprocess
+import tempfile
 
 import pytest
 
 from lunr import lunr
-from tests.utils import assert_field_vectors_equal, DEFAULT_TOLERANCE
+from lunr.index import Index
+from tests.utils import DEFAULT_TOLERANCE
 
 
 PATTERN = r'([^\ ]+) "([^\"]+)" \[([\d\.]*)\]'
@@ -29,18 +31,14 @@ def _create_mkdocs_index():
     )
 
 
-def _run_node_script(filename):
+def _run_node_script(filename, *args):
     js_path = os.path.join(os.path.dirname(__file__), filename)
-    js_output = subprocess.check_output(['node', js_path])
+    js_output = subprocess.check_output(['node', js_path] + list(args))
     return js_output.decode().strip()
 
 
-def test_mkdocs_produces_same_results():
-    js_results = _run_node_script('test_mkdocs_results.js').split('\n')
-    index = _create_mkdocs_index()
-    results = index.search('plugins')
+def _assert_results_match(results, js_results):
     assert len(results) == len(js_results)
-
     for js_result, result in zip(js_results, results):
         location, title, score = re.match(PATTERN, js_result).groups()
         assert result['ref'] == location
@@ -48,18 +46,32 @@ def test_mkdocs_produces_same_results():
             float(score), rel=DEFAULT_TOLERANCE)
 
 
-def test_serialized_json_matches():
+def test_mkdocs_produces_same_results():
+    js_results = _run_node_script('test_mkdocs_results.js').split('\n')
+    index = _create_mkdocs_index()
+    results = index.search('plugins')
+    _assert_results_match(results, js_results)
+
+
+def test_js_serialized_index_can_be_loaded_and_produces_same_results():
     json_path = _run_node_script('test_mkdocs_serialization.js')
     with open(json_path) as fd:
         js_serialized_index = fd.read()
-        js_index = json.loads(js_serialized_index)
 
+    index = Index.load(js_serialized_index)
+    results = index.search('plugins')
+    js_results = _run_node_script('test_mkdocs_results.js').split('\n')
+    _assert_results_match(results, js_results)
+
+
+def test_serialized_index_can_be_loaded_in_js_and_produces_same_results():
     index = _create_mkdocs_index()
+    results = index.search('plugins')
     serialized_index = index.serialize()
 
-    assert sorted(serialized_index.keys()) == sorted(js_index.keys())
-    assert serialized_index['fields'] == js_index['fields']
-    assert len(
-        serialized_index['fieldVectors']) == len(js_index['fieldVectors'])
-    # TODO: contents of field vectors do not match, though results are the same
-    # TODO: missing `invertedIndex`
+    with tempfile.NamedTemporaryFile(delete=False) as fp:
+        fp.write(json.dumps(serialized_index).encode())
+
+    js_results = _run_node_script(
+        'test_mkdocs_load_serialized_index.js', fp.name).split('\n')
+    _assert_results_match(results, js_results)

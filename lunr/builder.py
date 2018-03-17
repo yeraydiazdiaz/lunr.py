@@ -171,7 +171,6 @@ class Builder:
         documents_with_field = defaultdict(int)
 
         for field_ref, length in self.field_lengths.items():
-            # TODO: this seems unnecessary, use FieldRefs as keys?
             _field_ref = FieldRef.from_string(field_ref)
             field = _field_ref.field_name
 
@@ -186,15 +185,13 @@ class Builder:
     def _create_field_vectors(self):
         """Builds a vector space model of every document using lunr.Vector."""
         field_vectors = {}
-        field_refs = list(self.field_term_frequencies.keys())
         term_idf_cache = {}
 
-        for field_ref in field_refs:
+        for field_ref, term_frequencies in self.field_term_frequencies.items():
             _field_ref = FieldRef.from_string(field_ref)
             field = _field_ref.field_name
             field_length = self.field_lengths[field_ref]
             field_vector = Vector()
-            term_frequencies = self.field_term_frequencies[field_ref]
 
             for term, tf in term_frequencies.items():
                 term_index = self.inverted_index[term]['_index']

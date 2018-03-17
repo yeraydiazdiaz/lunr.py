@@ -7,7 +7,6 @@ def idf(posting, document_count):
     """A function to calculate the inverse document frequency for a posting.
     This is shared between the builder and the index.
     """
-    # posting is a JS object, assuming a dict
     documents_with_term = 0
     for field_name in posting:
         if field_name == '_index':

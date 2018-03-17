@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import json
 import logging
 
 from builtins import str, dict  # noqa
@@ -238,12 +239,17 @@ class Index:
 
     @classmethod
     def load(cls, serialized_index):
-        from lunr import __VERSION__
-        if serialized_index['version'] != __VERSION__:
+        """Load a serialized index"""
+        from lunr import __TARGET_JS_VERSION__
+        if isinstance(serialized_index, str):
+            serialized_index = json.loads(serialized_index)
+
+        if serialized_index['version'] != __TARGET_JS_VERSION__:
             logger.warning(
                 'Version mismatch when loading serialized index. '
                 'Current version of lunr {} does not match that of serialized '
-                'index {}'.format(__VERSION__, serialized_index['version']))
+                'index {}'.format(
+                    __TARGET_JS_VERSION__, serialized_index['version']))
 
         field_vectors = {
             ref: Vector(elements)
