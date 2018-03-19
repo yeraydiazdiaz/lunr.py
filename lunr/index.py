@@ -76,7 +76,7 @@ class Index:
 
         return Query(fields)
 
-    def query(self, query):
+    def query(self, query=None, callback=None):
         """Performs a query against the index using the passed lunr.Query
         object.
 
@@ -85,8 +85,25 @@ class Index:
         parsing overhead.
 
         Args:
-            lunr.Query: A preconfigured Query to perform the search against.
+            lunr.Query: A configured Query to perform the search against, use
+                `create_query` to get a preconfigured object or use `callback`
+                for convenience.
+            callable: An optional function taking a single Query object result
+                of `create_query` for further configuration.
         """
+        if query is None:
+            query = self.create_query()
+
+        if callback is not None:
+            callback(query)
+
+        if len(query.clauses) == 0:
+            logger.warning(
+                'Attempting a query with no clauses. Please add clauses by '
+                'either using the `callback` argument or using `create_query` '
+                'to create a preconfigured Query, manually adding clauses and '
+                'passing it as the `query` argument.')
+
         # for each query clause
         # * process terms
         # * expand terms from token set
