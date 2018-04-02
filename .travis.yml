@@ -5,6 +5,8 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
+  - "pypy2.7-5.8.0"
+  - "pypy3.5"
 
 before_install:
   - nvm install 8.9
