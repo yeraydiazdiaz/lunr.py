@@ -46,6 +46,9 @@ setup(
         'future==0.16.0',
         'six==1.11.0',
     ],
+    extras_require={
+        'languages': ['nltk==3.2.5']
+    },
     keywords='lunr full text search',
     classifiers=[
         'Development Status :: 3 - Alpha',

@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 
 class Pipeline:
-    """lunr.Pipelines maintain a list of functions to be applied to all tockens
+    """lunr.Pipelines maintain a list of functions to be applied to all tokens
     in documents entering the search index and queries ran agains the index.
 
     """
@@ -26,7 +26,7 @@ class Pipeline:
 
     def __repr__(self):
         return '<Pipeline stack="{}">'.format(
-            ','.join(fn.name for fn in self._stack))
+            ','.join(fn.label for fn in self._stack))
 
     # TODO: add iterator methods?
 
@@ -55,7 +55,13 @@ class Pipeline:
         return pipeline
 
     def add(self, *args):
-        """Adds new functions to the end of the pipeline."""
+        """Adds new functions to the end of the pipeline.
+
+        Functions must accept three arguments:
+        - Token: A lunr.Token object which will be updated
+        - i: The index of the token in the set
+        - tokens: A list of tokens representing the set
+        """
         for fn in args:
             self.warn_if_function_not_registered(fn)
             self._stack.append(fn)
@@ -70,9 +76,7 @@ class Pipeline:
 
     def after(self, existing_fn, new_fn):
         """Adds a single function after a function that already exists in the
-        pipeline.
-
-        """
+        pipeline."""
         self.warn_if_function_not_registered(new_fn)
         try:
             index = self._stack.index(existing_fn)
@@ -100,8 +104,8 @@ class Pipeline:
             pass
 
     def run(self, tokens):
-        """Runs the current list of functions that make up the pipeline against the
-        passed tokens."""
+        """Runs the current list of functions that make up the pipeline against
+        the passed tokens."""
         for fn in self._stack:
             results = []
             for i, token in enumerate(tokens):
@@ -120,9 +124,9 @@ class Pipeline:
         return tokens
 
     def run_string(self, string):
-        """Convenience method for passing a string through a pipeline and getting
-        strings out. This method takes care of wrapping the passed string in a
-        token and mapping the resulting tokens back to strings."""
+        """Convenience method for passing a string through a pipeline and
+        getting strings out. This method takes care of wrapping the passed
+        string in a token and mapping the resulting tokens back to strings."""
         token = Token(string)
         return [str(tkn) for tkn in self.run([token])]
 
