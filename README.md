@@ -2,6 +2,7 @@
 [![codecov](https://codecov.io/gh/yeraydiazdiaz/lunr.py/branch/master/graph/badge.svg)](https://codecov.io/gh/yeraydiazdiaz/lunr.py)
 [![Supported Python Versions](https://img.shields.io/pypi/pyversions/lunr.svg)](https://pypi.org/project/lunr/)
 [![PyPI](https://img.shields.io/pypi/v/lunr.svg)](https://pypi.org/project/lunr/)
+[![Read the Docs](https://img.shields.io/readthedocs/lunr.svg)](http://lunr.readthedocs.io/en/latest/)
 
 # Lunr.py
 
@@ -11,7 +12,7 @@ A Python implementation of [Lunr.js](https://lunrjs.com) by [Oliver Nightingale]
 
 This Python version of Lunr.js aims to bring the simple and powerful full text search capabilities into Python guaranteeing results as close as the original implementation as possible.
 
-[Documentation](http://lunr.readthedocs.io/en/latest/)
+- [Documentation](http://lunr.readthedocs.io/en/latest/)
 
 ## What does this even do?
 
@@ -59,3 +60,5 @@ Lunr provides a convenience `lunr` function to quickly index this set of documen
 >>> idx.search('study')
 [{'ref': 'b', 'score': 0.23576799568081389, 'match_data': <MatchData "studi">}, {'ref': 'a', 'score': 0.2236629211724517, 'match_data': <MatchData "studi">}]
 ```
+
+Please refer to the [documentation](http://lunr.readthedocs.io/en/latest/) for more usage examples.
