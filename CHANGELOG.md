@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0 (Unreleased)
+
+- Support for languages via NLTK
+
 ## 0.1.2
 
 - Add serialization tests passing serialized index from Python to JS and producing same results.

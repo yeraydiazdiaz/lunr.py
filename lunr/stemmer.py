@@ -363,6 +363,14 @@ porter_stemmer = PorterStemmer()
 
 
 def stemmer(token, i=None, tokens=None):
+    """Wrapper around the PorterStemmer for inclusion in pipeline.
+
+    Args:
+        language (str): ISO-639-1 code of the language.
+        token (lunr.Token): The token to stem.
+        i (int): The index of the token in a set.
+        tokens (list): A list of tokens representing the set.
+    """
     return token.update(porter_stemmer.stem)
 
 
