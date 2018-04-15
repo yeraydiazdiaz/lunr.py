@@ -1,10 +1,11 @@
 import json
 import os
+import re
 import subprocess
 
 import pytest
 
-
+PATTERN = r'([^\ ]+) "([^\"]+)" \[([\d\.]*)\]'
 DEFAULT_TOLERANCE = 1e-2
 
 
@@ -19,10 +20,18 @@ def assert_vectors_equal(a, b, tol=DEFAULT_TOLERANCE):
         assert x == pytest.approx(y, rel=tol)
 
 
-def read_mkdocs_data():
+def assert_results_match(results, js_results, tol=DEFAULT_TOLERANCE):
+    assert len(results) == len(js_results)
+    for js_result, result in zip(js_results, results):
+        id_, title, score = re.match(PATTERN, js_result).groups()
+        assert result['ref'] == id_
+        assert result['score'] == pytest.approx(float(score), rel=tol)
+
+
+def read_json_fixture(filename):
     fixture_path = os.path.join(
         os.path.dirname(__file__),
-        'acceptance_tests', 'fixtures', 'search_index.json')
+        'acceptance_tests', 'fixtures', filename)
     with open(fixture_path) as f:
         return json.loads(f.read())
 
@@ -31,4 +40,4 @@ def run_node_script(filename, *args):
     js_path = os.path.join(
         os.path.dirname(__file__), 'acceptance_tests', filename)
     js_output = subprocess.check_output(['node', js_path] + list(args))
-    return js_output.decode().strip()
+    return js_output.decode('utf-8').strip()

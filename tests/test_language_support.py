@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 import pytest
@@ -25,6 +26,7 @@ documents = [
 
 
 def test_lunr_function_raises_if_unsupported_language():
+    assert LANGUAGE_SUPPORT is True
     with pytest.raises(RuntimeError):
         lunr('id', ['title', 'text'], documents, 'foo')
 
@@ -36,6 +38,7 @@ def test_lunr_function_registers_nltk_stemmer():
 
 
 def test_search_stems_search_terms():
+    assert LANGUAGE_SUPPORT is True
     idx = lunr('id', ['title', 'text'], documents, 'es')
     results = idx.search('inventando')  # stemmed to "invent"
     assert len(results) == 2

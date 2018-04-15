@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "lunr": "2.1.5",
+    "lunr-languages": "1.0.0",
     "tmp": "0.0.33"
   },
   "devDependencies": {
