@@ -28,7 +28,7 @@ Of course you could also use Lunr.py to power full text search in desktop applic
 
 ## Current state
 
-Each version of lunr.py [targets a specific version of lunr.js](https://github.com/yeraydiazdiaz/lunr.py/blob/master/lunr/__init__.py#L12) and produces the same results as it both in Python 2.7 and 3 for [non-trivial corpus of documents](https://github.com/yeraydiazdiaz/lunr.py/blob/master/tests/acceptance_tests/fixtures/search_index.json).
+Each version of lunr.py [targets a specific version of lunr.js](https://github.com/yeraydiazdiaz/lunr.py/blob/master/lunr/__init__.py#L12) and produces the same results as it both in Python 2.7 and 3 for [non-trivial corpus of documents](https://github.com/yeraydiazdiaz/lunr.py/blob/master/tests/acceptance_tests/fixtures/mkdocs_index.json).
 
 Lunr.py also serializes `Index` instances respecting the [`lunr-schema`](https://github.com/olivernn/lunr-schema) which are consumable by Lunr.js and viceversa.
 

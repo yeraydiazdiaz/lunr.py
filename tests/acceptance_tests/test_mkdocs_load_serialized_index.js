@@ -3,10 +3,10 @@ const lunr = require('lunr')
 
 // Read the documents only to retrieve the title for the results
 const data = JSON.parse(
-  fs.readFileSync(__dirname + '/fixtures/search_index.json'))
+  fs.readFileSync(__dirname + '/fixtures/mkdocs_index.json'))
 let documents = {}
 for (doc of data.docs) {
-  documents[doc.location] = doc
+  documents[doc.id] = doc
 }
 
 // Load the index from the serialized path produced from Python
