@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.2.0 (Unreleased)
+## 0.2.0
 
-- Support for languages via NLTK
+- Experimental support for languages via NLTK, currently supported languages are arabic, danish, dutch, english, finnish, french, german, hungarian, italian, norwegian, portuguese, romanian, russian, spanish and swedish. Note compatibility with Lunr.js and lunr-languages is reduced.
 
 ## 0.1.2
 

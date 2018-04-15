@@ -35,7 +35,7 @@ setup(
     name='lunr',
     version=find_version(),
     url='https://github.com/yeraydiazdiaz/lunr.py',
-    license='BSD',
+    license='MIT',
     description='A Python implementation of Lunr.js',
     long_description=LONG_DESCRIPTION,
     author='Yeray Diaz Diaz',
@@ -53,7 +53,7 @@ setup(
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
