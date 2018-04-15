@@ -26,6 +26,16 @@ Lunr.py provides a backend solution, allowing you to parse the documents ahead o
 
 Of course you could also use Lunr.py to power full text search in desktop applications or backend services to search on your documents mimicking Elasticsearch.
 
+## Installation
+
+Simply `pip install lunr` for the english only, best compatibility with Lunr.js version.
+
+An optional and experimental support for other languages via the [Natural Language Toolkit](http://www.nltk.org/) stemmers is also available via `pip install lunr[languages]`.
+
+Supported languages are arabic, danish, dutch, english, finnish, french, german, hungarian, italian, norwegian, portuguese, romanian, russian, spanish and swedish.
+
+Note the compatibility with Lunr.js is not guaranteed at the moment when using this experimental feature.
+
 ## Current state
 
 Each version of lunr.py [targets a specific version of lunr.js](https://github.com/yeraydiazdiaz/lunr.py/blob/master/lunr/__init__.py#L12) and produces the same results as it both in Python 2.7 and 3 for [non-trivial corpus of documents](https://github.com/yeraydiazdiaz/lunr.py/blob/master/tests/acceptance_tests/fixtures/mkdocs_index.json).
