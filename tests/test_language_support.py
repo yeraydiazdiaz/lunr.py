@@ -34,7 +34,7 @@ def test_lunr_function_raises_if_unsupported_language():
 def test_lunr_function_registers_nltk_stemmer():
     assert LANGUAGE_SUPPORT is True
     lunr('id', ['title', 'text'], documents, 'en')
-    assert 'stemmer_en' in Pipeline.registered_functions
+    assert 'stemmer-en' in Pipeline.registered_functions
 
 
 def test_search_stems_search_terms():

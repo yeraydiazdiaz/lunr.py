@@ -1,9 +1,11 @@
 const fs = require('fs')
 const lunr = require('lunr')
+require("lunr-languages/lunr.stemmer.support")(lunr)
+require("lunr-languages/lunr.es")(lunr)
 
 // Read the documents only to retrieve the title for the results
 const data = JSON.parse(
-  fs.readFileSync(__dirname + '/fixtures/mkdocs_index.json'))
+  fs.readFileSync(__dirname + '/../fixtures/lang_es.json'))
 let documents = {}
 for (doc of data.docs) {
   documents[doc.id] = doc
@@ -12,7 +14,7 @@ for (doc of data.docs) {
 // Load the index from the serialized path produced from Python
 const serializedIndex = JSON.parse(fs.readFileSync(process.argv[2]))
 let idx = lunr.Index.load(serializedIndex)
-let results = idx.search('plugins')
+let results = idx.search(process.argv[3])
 for (result of results) {
   process.stdout.write(`${result.ref} "${documents[result.ref].title}" [${result.score}]\n`)
 }

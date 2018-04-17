@@ -1,20 +1,16 @@
 from __future__ import unicode_literals
 
-from functools import partial
-
 from lunr.builder import Builder
 from lunr.trimmer import trimmer
 from lunr.stop_word_filter import stop_word_filter
 from lunr.stemmer import stemmer
-from lunr.stemmer_languages import (
-    LANGUAGE_SUPPORT, SUPPORTED_LANGUAGES, get_language_stemmer, nltk_stemmer)
+from lunr.stemmer_languages import LANGUAGE_SUPPORT, SUPPORTED_LANGUAGES
 from lunr.pipeline import Pipeline
 
 
 def _get_nltk_builder(language):
-    language_stemmer = partial(nltk_stemmer, get_language_stemmer(language))
-    Pipeline.register_function(
-        language_stemmer, 'stemmer_{}'.format(language))
+    language_stemmer = Pipeline.registered_functions[
+        'stemmer-{}'.format(language)]
 
     builder = Builder()
     builder.pipeline.add(trimmer, language_stemmer)

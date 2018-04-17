@@ -4,6 +4,7 @@ import json
 import logging
 
 from builtins import str, dict  # noqa
+from past.builtins import basestring
 
 from lunr.exceptions import BaseLunrException
 from lunr.field_ref import FieldRef
@@ -258,7 +259,7 @@ class Index:
     def load(cls, serialized_index):
         """Load a serialized index"""
         from lunr import __TARGET_JS_VERSION__
-        if isinstance(serialized_index, str):
+        if isinstance(serialized_index, basestring):
             serialized_index = json.loads(serialized_index)
 
         if serialized_index['version'] != __TARGET_JS_VERSION__:

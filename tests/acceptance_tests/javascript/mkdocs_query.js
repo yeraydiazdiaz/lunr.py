@@ -1,9 +1,8 @@
 const fs = require('fs')
-const tmp = require('tmp')
 const lunr = require('lunr')
 
 const data = JSON.parse(
-  fs.readFileSync(__dirname + '/fixtures/mkdocs_index.json'))
+  fs.readFileSync(__dirname + '/../fixtures/mkdocs_index.json'))
 let documents = {}
 const idx = lunr(function () {
   this.field('title')
@@ -15,6 +14,8 @@ const idx = lunr(function () {
   }
 })
 
-const tmpFile = tmp.fileSync({keep: true})
-fs.writeFileSync(tmpFile.fd, JSON.stringify(idx))
-process.stdout.write(tmpFile.name)
+let results = idx.search(process.argv[2])
+for (result of results) {
+  let doc = documents[result.ref]
+  process.stdout.write(`${result.ref} "${doc.title}" [${result.score}]\n`)
+}

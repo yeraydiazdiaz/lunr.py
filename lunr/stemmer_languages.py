@@ -1,5 +1,9 @@
 from __future__ import unicode_literals
 
+from functools import partial
+
+from lunr.pipeline import Pipeline
+
 # map from ISO-639-1 codes to SnowballStemmer.languages
 SUPPORTED_LANGUAGES = {
     'ar': 'arabic',
@@ -49,3 +53,15 @@ def nltk_stemmer(stemmer, token, i=None, tokens=None):
         return stemmer.stem(token)
 
     return token.update(wrapped_stem)
+
+
+if LANGUAGE_SUPPORT:
+    # TODO: registering all possible stemmers feels unnecessary but it solves
+    # deserializing with arbitrary language functions. Ideally the schema would
+    # provide the language(s) for the index and we could register the stemmers
+    # as needed
+    for language in SUPPORTED_LANGUAGES:
+        language_stemmer = partial(
+            nltk_stemmer, get_language_stemmer(language))
+        Pipeline.register_function(
+            language_stemmer, 'stemmer-{}'.format(language))

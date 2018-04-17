@@ -21,7 +21,7 @@ def assert_vectors_equal(a, b, tol=DEFAULT_TOLERANCE):
 
 
 def assert_results_match(results, js_results, tol=DEFAULT_TOLERANCE):
-    assert len(results) == len(js_results)
+    assert len(results) == len(js_results) != 0
     for js_result, result in zip(js_results, results):
         id_, title, score = re.match(PATTERN, js_result).groups()
         assert result['ref'] == id_
@@ -38,6 +38,6 @@ def read_json_fixture(filename):
 
 def run_node_script(filename, *args):
     js_path = os.path.join(
-        os.path.dirname(__file__), 'acceptance_tests', filename)
+        os.path.dirname(__file__), 'acceptance_tests', 'javascript', filename)
     js_output = subprocess.check_output(['node', js_path] + list(args))
     return js_output.decode('utf-8').strip()
