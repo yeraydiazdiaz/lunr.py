@@ -15,7 +15,7 @@ before_install:
 install:
   - pip install tox-travis
   - pip install codecov
-  - cd tests/acceptance_tests/ && npm install
+  - cd tests/acceptance_tests/javascript/ && npm install
 
 script: tox
 
