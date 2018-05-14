@@ -119,27 +119,28 @@ class Builder:
 
             for term in terms:
                 # TODO: term is a Token, should we allow Tokens as keys?
-                term = str(term)
+                term_key = str(term)
 
-                field_terms[term] += 1
-                if term not in self.inverted_index:
+                field_terms[term_key] += 1
+                if term_key not in self.inverted_index:
                     posting = {_field_name: {} for _field_name in self._fields}
                     posting['_index'] = self.term_index
                     self.term_index += 1
-                    self.inverted_index[term] = posting
+                    self.inverted_index[term_key] = posting
 
-                if doc_ref not in self.inverted_index[term][field_name]:
-                    self.inverted_index[term][field_name][doc_ref] = {}
+                if doc_ref not in self.inverted_index[term_key][field_name]:
+                    self.inverted_index[term_key][field_name][doc_ref] = {}
 
                 for metadata_key in self.metadata_whitelist:
                     metadata = term.metadata[metadata_key]
 
-                    if metadata_key not in self.inverted_index[term][doc_ref]:
-                        self.inverted_index[term][field_name][doc_ref][
-                            metadata_key] = []
+                    term_entry = (
+                        self.inverted_index[term_key][field_name][doc_ref])
+                    if metadata_key not in term_entry:
+                        term_entry[metadata_key] = []
 
-                    self.inverted_index[term][field_name][doc_ref][
-                        metadata_key].push(metadata)
+                    self.inverted_index[term_key][field_name][doc_ref][
+                        metadata_key].append(metadata)
 
     def build(self):
         """Builds the index, creating an instance of `lunr.Index`.

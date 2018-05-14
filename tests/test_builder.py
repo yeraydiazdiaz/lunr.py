@@ -52,6 +52,25 @@ class TestBuilderBuild:
         assert isinstance(self.index, Index)
 
 
+class TestBuilderAdd:
+
+    def test_builder_metadata_whitelist_includes_metadata_in_index(self):
+        self.builder = Builder()
+        self.builder.ref('id')
+        self.builder.field('title')
+        self.builder.metadata_whitelist = ['position']
+
+        self.builder.add(dict(id='a', title='test', body='missing'))
+        self.builder.add(dict(id='b', title='another test', body='missing'))
+
+        self.builder.inverted_index['test']['title']['a'] == {
+            'position': [[0, 4]]
+        }
+        self.builder.inverted_index['test']['title']['b'] == {
+            'position': [[8, 12]]
+        }
+
+
 class TestBuilderUse:
 
     def setup_method(self, method):
