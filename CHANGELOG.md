@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.2
+
+- Fix bug on whitelisting metadata in Builder.
+
+## 0.2.1
+
+- Refactor of multilanguage support.
+
 ## 0.2.0
 
 - Experimental support for languages via NLTK, currently supported languages are arabic, danish, dutch, english, finnish, french, german, hungarian, italian, norwegian, portuguese, romanian, russian, spanish and swedish. Note compatibility with Lunr.js and lunr-languages is reduced.
