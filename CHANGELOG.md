@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.3
+
+- Compatibility with Lunr.js v2.1.6
+
 ## 0.2.2
 
 - Fix bug on whitelisting metadata in Builder.
