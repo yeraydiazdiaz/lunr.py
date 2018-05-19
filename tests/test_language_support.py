@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import pytest
 
 from lunr import lunr
-from lunr.stemmer_languages import LANGUAGE_SUPPORT
+from lunr.stemmer_languages import LANGUAGE_SUPPORT, SUPPORTED_LANGUAGES
 from lunr.pipeline import Pipeline
 
 documents = [
@@ -26,19 +26,30 @@ documents = [
 
 
 def test_lunr_function_raises_if_unsupported_language():
-    assert LANGUAGE_SUPPORT is True
+    assert LANGUAGE_SUPPORT is True, (
+        'NLTK not found, please run `pip install -e .[languages]`')
     with pytest.raises(RuntimeError):
         lunr('id', ['title', 'text'], documents, 'foo')
 
 
 def test_lunr_function_registers_nltk_stemmer():
-    assert LANGUAGE_SUPPORT is True
+    assert LANGUAGE_SUPPORT is True, (
+        'NLTK not found, please run `pip install -e .[languages]`')
     lunr('id', ['title', 'text'], documents, 'en')
     assert 'stemmer-en' in Pipeline.registered_functions
 
 
 def test_search_stems_search_terms():
-    assert LANGUAGE_SUPPORT is True
+    assert LANGUAGE_SUPPORT is True, (
+        'NLTK not found, please run `pip install -e .[languages]`')
     idx = lunr('id', ['title', 'text'], documents, 'es')
     results = idx.search('inventando')  # stemmed to "invent"
     assert len(results) == 2
+
+
+def test_register_languages():
+    assert LANGUAGE_SUPPORT is True, (
+        'NLTK not found, please run `pip install -e .[languages]`')
+
+    for lang in SUPPORTED_LANGUAGES:
+        assert 'stemmer-{}'.format(lang) in Pipeline.registered_functions

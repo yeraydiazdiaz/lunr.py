@@ -15,6 +15,10 @@ def parse(q):
 
 class TestQueryParser:
 
+    def test_parse_empty_string(self):
+        clauses = parse('')
+        assert len(clauses) == 0
+
     def test_parse_single_term(self):
         clauses = parse('foo')
         assert len(clauses) == 1
@@ -44,9 +48,17 @@ class TestQueryParser:
         assert clauses[0].term == 'foo'
         assert clauses[1].term == 'bar'
 
-    def test_field_without_a_term(self):
+    def test_unknown_field(self):
         with pytest.raises(QueryParseError):
             parse('unknown:foo')
+
+    def test_field_without_a_term(self):
+        with pytest.raises(QueryParseError):
+            parse('title:')
+
+    def test_field_twice(self):
+        with pytest.raises(QueryParseError):
+            parse('title:title:')
 
     def test_term_with_field(self):
         clauses = parse('title:foo')

@@ -18,7 +18,8 @@ class MatchData:
         }
 
     def __repr__(self):
-        return '<MatchData "{}">'.format(','.join(self.metadata.keys()))
+        return '<MatchData "{}">'.format(
+            ','.join(sorted(self.metadata.keys())))
 
     def combine(self, other):
         """An instance of lunr.MatchData will be created for every term that

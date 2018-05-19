@@ -23,10 +23,10 @@ SUPPORTED_LANGUAGES = {
     'sv': 'swedish'
 }
 
-try:
+try:  # pragma: no cover
     from nltk.stem.snowball import SnowballStemmer
     LANGUAGE_SUPPORT = True
-except ImportError:
+except ImportError:  # pragma: no cover
     LANGUAGE_SUPPORT = False
 
 
@@ -55,13 +55,18 @@ def nltk_stemmer(stemmer, token, i=None, tokens=None):
     return token.update(wrapped_stem)
 
 
-if LANGUAGE_SUPPORT:
-    # TODO: registering all possible stemmers feels unnecessary but it solves
-    # deserializing with arbitrary language functions. Ideally the schema would
-    # provide the language(s) for the index and we could register the stemmers
-    # as needed
+def register_languages():
+    """Register all supported languages to ensure compatibility."""
     for language in SUPPORTED_LANGUAGES:
         language_stemmer = partial(
             nltk_stemmer, get_language_stemmer(language))
         Pipeline.register_function(
             language_stemmer, 'stemmer-{}'.format(language))
+
+
+if LANGUAGE_SUPPORT:  # pragma: no cover
+    # TODO: registering all possible stemmers feels unnecessary but it solves
+    # deserializing with arbitrary language functions. Ideally the schema would
+    # provide the language(s) for the index and we could register the stemmers
+    # as needed
+    register_languages()

@@ -13,7 +13,7 @@ class TestMatchData:
             MatchData('baz', 'body', {'position': [4]}))
 
     def test_repr(self):
-        assert repr(self.match) == '<MatchData "foo,bar,baz">'
+        assert repr(self.match) == '<MatchData "bar,baz,foo">'
 
     def test_combine_terms(self):
         assert sorted(
