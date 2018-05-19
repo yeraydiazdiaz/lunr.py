@@ -18,7 +18,7 @@ class MatchData:
         }
 
     def __repr__(self):
-        return '<MatchData "{}">'.format(', '.join(self.metadata.keys()))
+        return '<MatchData "{}">'.format(','.join(self.metadata.keys()))
 
     def combine(self, other):
         """An instance of lunr.MatchData will be created for every term that
@@ -58,7 +58,7 @@ class MatchData:
 
         for key in metadata.keys():
             if key in self.metadata[term][field]:
-                self.metadata[term][field][key] += metadata[key]
+                self.metadata[term][field][key].extend(metadata[key])
             else:
                 self.metadata[term][field][key] = metadata[key]
 
