@@ -12,6 +12,9 @@ class TestMatchData:
         self.match.combine(
             MatchData('baz', 'body', {'position': [4]}))
 
+    def test_repr(self):
+        assert repr(self.match) == '<MatchData "foo,bar,baz">'
+
     def test_combine_terms(self):
         assert sorted(
             list(self.match.metadata.keys())) == ['bar', 'baz', 'foo']
@@ -29,3 +32,27 @@ class TestMatchData:
         match_data1.combine(match_data2)
 
         assert metadata['foo'] == [1]
+
+    def test_add_metadata_for_missing_term(self):
+        self.match.add('spam', 'title', {'position': [5]})
+
+        assert self.match.metadata['spam']['title']['position'] == [5]
+
+    def test_add_metadata_for_missing_field(self):
+        self.match.add('foo', 'body', {'position': [6]})
+
+        assert self.match.metadata['foo']['body']['position'] == [6]
+
+    def test_add_metadata_for_existing_term_field_and_metadata_key(self):
+        self.match.add('foo', 'title', {'position': [7]})
+
+        assert self.match.metadata['foo']['title']['position'] == [1, 7]
+
+    def test_add_metadata_for_existing_term_and_field_and_missing_metadata_key(
+            self):
+        self.match.add('foo', 'title', {'weight': [7]})
+
+        assert self.match.metadata['foo']['title'] == {
+            'position': [1],
+            'weight': [7],
+        }
