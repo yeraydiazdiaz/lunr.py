@@ -63,8 +63,6 @@ class QueryParser:
     @classmethod
     def parse_field(cls, parser):
         lexeme = parser.consume_lexeme()
-        if lexeme is None:
-            return
 
         if lexeme['string'] not in parser.query.all_fields:
             raise QueryParseError(
@@ -87,8 +85,6 @@ class QueryParser:
     @classmethod
     def parse_term(cls, parser):
         lexeme = parser.consume_lexeme()
-        if lexeme is None:
-            return
 
         parser.current_clause.term = lexeme['string'].lower()
         if '*' in lexeme['string']:
@@ -99,8 +95,6 @@ class QueryParser:
     @classmethod
     def parse_edit_distance(cls, parser):
         lexeme = parser.consume_lexeme()
-        if lexeme is None:
-            return
 
         try:
             edit_distance = int(lexeme['string'])
@@ -115,8 +109,6 @@ class QueryParser:
     @classmethod
     def parse_boost(cls, parser):
         lexeme = parser.consume_lexeme()
-        if lexeme is None:
-            return
 
         try:
             boost = int(lexeme['string'])

@@ -1,6 +1,7 @@
 
 tests:
-	pytest -m "not acceptance"
+	coverage run -m pytest -m "not acceptance"
+	coverage report
 
 tests-acceptance:
 	pytest -m "acceptance"
