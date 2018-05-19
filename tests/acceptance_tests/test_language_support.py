@@ -3,12 +3,15 @@ from __future__ import unicode_literals
 import json
 import tempfile
 
+import pytest
+
 from lunr import lunr
 from lunr.index import Index
 from tests.utils import (
     read_json_fixture, run_node_script, assert_results_match)
 
 
+@pytest.mark.acceptance
 def test_languages_query_results_match_javascript_results():
     query_string = 'imperio'
     js_results = run_node_script(
@@ -24,6 +27,7 @@ def test_languages_query_results_match_javascript_results():
     assert_results_match(results, js_results, tol=0.1)
 
 
+@pytest.mark.acceptance
 def test_js_serialized_lang_index_can_be_loaded_and_produces_same_results():
     json_path = run_node_script('language_serialize_index.js')
     with open(json_path) as fd:
@@ -37,6 +41,7 @@ def test_js_serialized_lang_index_can_be_loaded_and_produces_same_results():
     assert_results_match(results, js_results)
 
 
+@pytest.mark.acceptance
 def test_serialized_lang_index_can_be_loaded_in_js_and_produces_same_results():
     data = read_json_fixture('lang_es.json')
     index = lunr(
