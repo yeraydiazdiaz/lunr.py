@@ -1,36 +1,14 @@
 from __future__ import unicode_literals
 
 
-class Clause(object):
-    """A single clause in a `lunr.Query` contains a term and details on
-    how to match that term against a `lunr.Index`
+from enum import Enum
 
-    Args:
-        term (str, optional): The term for the clause.
-        field (iterable, optional): The fields for the term to be searched
-            against.
-        edit_distance (int, optional): The character distance to use, defaults
-            to 0.
-        use_pipeline (bool, optional): Whether the clause should be pre
-            processed by the index's pipeline, default to True.
-        boost (int, optional): Boost to apply to the clause, defaults to 1.
-        wildcard (Query.WILDCARD_*): Any of the Query.WILDCARD constants
-            defining if a wildcard is to be used and how, defaults to
-            Query.WILDCARD_NONE.
-    """
-    def __init__(
-            self, term=None, fields=None, edit_distance=0,
-            use_pipeline=True, boost=1, wildcard=None):
-        super(Clause, self).__init__()
-        self.term = term
-        self.fields = fields or []
-        self.edit_distance = edit_distance
-        self.use_pipeline = use_pipeline
-        self.boost = boost
-        self.wildcard = wildcard or Query.WILDCARD_NONE
 
-    def __repr__(self):
-        return '<Clause term="{}">'.format(self.term)
+class QueryPresence(Enum):
+    """Defines possible behaviours for the term's presence in a document."""
+    OPTIONAL = 1  # default
+    REQUIRED = 2
+    PROHIBITED = 3  # documents that contain this term will not be returned
 
 
 class Query(object):
@@ -90,3 +68,70 @@ class Query(object):
 
         self.clauses.append(clause)
         return self
+
+    def term(self, term, **kwargs):
+        """Adds a term to the current query, creating a Clause and adds it to
+        the list of clauses making up this Query.
+
+        The term is not tokenized and used "as is". Any conversion to token
+        or token-like strings should be performed before calling this method.
+
+        For example:
+            query.term(lunr.Tokenizer("foo bar"))
+
+        Args:
+            term (Token or iterable): Token or iterable of tokens to add.
+            kwargs (dict): Additional properties to add to the Clause.
+        """
+        if isinstance(term, (list, tuple)):
+            for t in term:
+                self.term(t, **kwargs)
+        else:
+            self.clauses.append(Clause(str(term), **kwargs))
+
+        return self
+
+    def is_negated(self):
+        """A negated query is one in which every clause has a presence of
+        prohibited. These queries require some special processing to return
+        the expected results.
+        """
+        return all(
+            clause.presence == QueryPresence.PROHIBITED
+            for clause in self.clauses)
+
+
+class Clause(object):
+    """A single clause in a `lunr.Query` contains a term and details on
+    how to match that term against a `lunr.Index`
+
+    Args:
+        term (str, optional): The term for the clause.
+        field (iterable, optional): The fields for the term to be searched
+            against.
+        edit_distance (int, optional): The character distance to use, defaults
+            to 0.
+        use_pipeline (bool, optional): Whether the clause should be pre
+            processed by the index's pipeline, default to True.
+        boost (int, optional): Boost to apply to the clause, defaults to 1.
+        wildcard (Query.WILDCARD_*, optional): Any of the Query.WILDCARD
+            constants defining if a wildcard is to be used and how, defaults
+            to Query.WILDCARD_NONE.
+        presence (QueryPresence, optional): Behaviour for a terms presence
+            in a document.
+    """
+    def __init__(
+            self, term=None, fields=None, edit_distance=0,
+            use_pipeline=True, boost=1, wildcard=Query.WILDCARD_NONE,
+            presence=QueryPresence.OPTIONAL):
+        super(Clause, self).__init__()
+        self.term = term
+        self.fields = fields or []
+        self.edit_distance = edit_distance
+        self.use_pipeline = use_pipeline
+        self.boost = boost
+        self.wildcard = wildcard
+        self.presence = presence
+
+    def __repr__(self):
+        return '<Clause term="{}">'.format(self.term)

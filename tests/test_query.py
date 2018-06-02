@@ -1,13 +1,47 @@
 import pytest
 
-from lunr.query import Query
+from lunr.query import Query, QueryPresence
+from lunr.token import Token
+from lunr.tokenizer import Tokenizer
 
 
-class TestQueryClause:
+class BaseQuerySuite:
     ALL_FIELDS = ['title', 'body']
 
     def setup_method(self, method):
         self.query = Query(self.ALL_FIELDS)
+
+
+class TestQueryTerm(BaseQuerySuite):
+
+    def test_single_string_term_adds_single_clause(self):
+        self.query.clause(term='foo')
+
+        assert len(self.query.clauses) == 1
+        assert self.query.clauses[0].term == 'foo'
+
+    def test_single_token_term_adds_single_clause(self):
+        self.query.term(Token('foo'))
+
+        assert len(self.query.clauses) == 1
+        assert self.query.clauses[0].term == 'foo'
+
+    def test_multiple_string_terms_adds_multiple_clauses(self):
+        self.query.term(['foo', 'bar'])
+
+        assert len(self.query.clauses) == 2
+        assert self.query.clauses[0].term == 'foo'
+        assert self.query.clauses[1].term == 'bar'
+
+    def test_multiple_token_terms_adds_multiple_clauses(self):
+        self.query.term(Tokenizer('foo bar'))
+
+        assert len(self.query.clauses) == 2
+        assert self.query.clauses[0].term == 'foo'
+        assert self.query.clauses[1].term == 'bar'
+
+
+class TestQueryClause(BaseQuerySuite):
 
     def test_clause_defaults(self):
         self.query.clause(term='foo')
@@ -51,3 +85,24 @@ class TestQueryClause:
         self.clause = self.query.clauses[0]
 
         assert self.clause.term == '*foo*'
+
+
+class TestQueryIsNegated(BaseQuerySuite):
+
+    def test_all_prohibited(self):
+        self.query.term('foo', presence=QueryPresence.PROHIBITED)
+        self.query.term('bar', presence=QueryPresence.PROHIBITED)
+
+        assert self.query.is_negated() is True
+
+    def test_some_prohibited(self):
+        self.query.term('foo', presence=QueryPresence.PROHIBITED)
+        self.query.term('bar', presence=QueryPresence.REQUIRED)
+
+        assert self.query.is_negated() is False
+
+    def test_nome_prohibited(self):
+        self.query.term('foo', presence=QueryPresence.OPTIONAL)
+        self.query.term('bar', presence=QueryPresence.REQUIRED)
+
+        assert self.query.is_negated() is False

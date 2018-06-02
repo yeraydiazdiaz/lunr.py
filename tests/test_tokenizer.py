@@ -76,3 +76,8 @@ class TestTokenizer:
         tokens = Tokenizer('foo bar')
         assert tokens[0].metadata['position'] == [0, 3]
         assert tokens[1].metadata['position'] == [4, 3]
+
+    def test_providing_additional_metadata(self):
+        tokens = Tokenizer('foo bar', {'hurp': 'durp'})
+        assert tokens[0].metadata['hurp'] == 'durp'
+        assert tokens[1].metadata['hurp'] == 'durp'
