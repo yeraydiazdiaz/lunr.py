@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import six
 
 from lunr.query_lexer import QueryLexer
-from lunr.query import Clause
+from lunr.query import Clause, QueryPresence
 from lunr.exceptions import QueryParseError
 
 
@@ -19,7 +19,7 @@ class QueryParser:
         self.lexer.run()
         self.lexemes = self.lexer.lexemes
 
-        state = self.__class__.parse_field_or_term
+        state = self.__class__.parse_clause
 
         while state:
             state = state(self)
@@ -42,7 +42,7 @@ class QueryParser:
         self.current_clause = Clause()
 
     @classmethod
-    def parse_field_or_term(cls, parser):
+    def parse_clause(cls, parser):
         lexeme = parser.peek_lexeme()
         if lexeme is None:
             return
@@ -51,6 +51,8 @@ class QueryParser:
             return cls.parse_field
         elif lexeme['type'] == QueryLexer.TERM:
             return cls.parse_term
+        elif lexeme['type'] == QueryLexer.PRESENCE:
+            return cls.parse_presence
         else:
             raise QueryParseError(
                 "Expected either a field or a term, found {}{}".format(
@@ -91,6 +93,36 @@ class QueryParser:
             parser.current_clause.use_pipeline = False
 
         return cls._peek_next_lexeme(parser)
+
+    @classmethod
+    def parse_presence(cls, parser):
+        lexeme = parser.consume_lexeme()
+
+        if lexeme is None:
+            return
+
+        if lexeme['string'] == '-':
+            parser.current_clause.presence = QueryPresence.PROHIBITED
+        elif lexeme['string'] == '+':
+            parser.current_clause.presence = QueryPresence.REQUIRED
+        else:
+            raise QueryParseError(
+                "Unrecognized parser operator: {}, expected `+` or `-`".format(
+                    lexeme.str))
+
+        next_lexeme = parser.peek_lexeme()
+        if next_lexeme is None:
+            raise QueryParseError(
+                "Expected either a field or a term, found nothing")
+
+        if next_lexeme['type'] == QueryLexer.FIELD:
+            return cls.parse_field
+        elif next_lexeme['type'] == QueryLexer.TERM:
+            return cls.parse_term
+        else:
+            raise QueryParseError(
+                "Expected either a field or a term, found {}".format(
+                    lexeme['type']))
 
     @classmethod
     def parse_edit_distance(cls, parser):
@@ -137,6 +169,9 @@ class QueryParser:
             return cls.parse_edit_distance
         elif next_lexeme['type'] == QueryLexer.BOOST:
             return cls.parse_boost
+        elif next_lexeme['type'] == QueryLexer.PRESENCE:
+            parser.next_clause()
+            return cls.parse_presence
         else:
             raise QueryParseError('Unexpected lexeme type {}'.format(
                 next_lexeme['type']))
