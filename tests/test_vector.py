@@ -57,11 +57,27 @@ def test_dot_calculates_dot_product_of_two_vectors():
     assert v1.dot(v2) == 3
 
 
-def test_similarity_calculates_the_similarity_between_two_vectors():
-    v1 = _vector_from_args(1, 3, -5)
-    v2 = _vector_from_args(4, -2, -1)
+class TestSimilarity:
 
-    assert v1.similarity(v2) == pytest.approx(0.1106, 0.001)
+    def test_similarity_calculates_the_similarity_between_two_vectors(self):
+        v1 = _vector_from_args(1, 3, -5)
+        v2 = _vector_from_args(4, -2, -1)
+
+        assert v1.similarity(v2) == pytest.approx(0.1106, 0.001)
+
+    def test_empty_vector(self):
+        v_empty = Vector()
+        v1 = _vector_from_args(1)
+
+        assert v1.similarity(v_empty) == 0
+        assert v_empty.similarity(v1) == 0
+
+    def test_non_overlapping_vector(self):
+        v1 = Vector([1, 1])
+        v2 = Vector([2, 1])
+
+        assert v1.similarity(v2) == 0
+        assert v2.similarity(v1) == 0
 
 
 class TestVectorInsert:

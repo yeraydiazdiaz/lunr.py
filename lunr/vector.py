@@ -139,4 +139,7 @@ class Vector:
     def similarity(self, other):
         """Calculates the cosine similarity between this vector and another
         vector."""
+        if self.magnitude == 0 or other.magnitude == 0:
+            return 0
+
         return self.dot(other) / (self.magnitude * other.magnitude)
