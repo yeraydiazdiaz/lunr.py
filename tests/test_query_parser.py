@@ -1,6 +1,6 @@
 import pytest
 
-from lunr.query import Query
+from lunr.query import Query, QueryPresence
 from lunr.query_parser import QueryParser
 from lunr.exceptions import QueryParseError
 
@@ -26,6 +26,7 @@ class TestQueryParser:
         assert clause.term == 'foo'
         assert clause.fields == ['title', 'body']
         assert clause.use_pipeline is True
+        assert clause.presence is QueryPresence.OPTIONAL
 
     def test_parse_single_term_uppercase(self):
         clauses = parse('FOO')
@@ -44,6 +45,44 @@ class TestQueryParser:
 
     def test_multiple_terms(self):
         clauses = parse('foo bar')
+        assert len(clauses) == 2
+        assert clauses[0].term == 'foo'
+        assert clauses[1].term == 'bar'
+
+    def test_term_with_presence_required_adds_required_clause(self):
+        clauses = parse('+foo')
+        assert len(clauses) == 1
+        assert clauses[0].term == 'foo'
+        assert clauses[0].boost == 1
+        assert clauses[0].fields == ['title', 'body']
+        assert clauses[0].presence == QueryPresence.REQUIRED
+
+    def test_term_with_presence_required_adds_prohibited_clause(self):
+        clauses = parse('-foo')
+        assert len(clauses) == 1
+        assert clauses[0].term == 'foo'
+        assert clauses[0].boost == 1
+        assert clauses[0].fields == ['title', 'body']
+        assert clauses[0].presence == QueryPresence.PROHIBITED
+
+    def test_term_scoped_by_field_with_presence_required(self):
+        clauses = parse('+title:foo')
+        assert len(clauses) == 1
+        assert clauses[0].term == 'foo'
+        assert clauses[0].boost == 1
+        assert clauses[0].fields == ['title']
+        assert clauses[0].presence == QueryPresence.REQUIRED
+
+    def test_term_scoped_by_field_with_presence_prohibited(self):
+        clauses = parse('-title:foo')
+        assert len(clauses) == 1
+        assert clauses[0].term == 'foo'
+        assert clauses[0].boost == 1
+        assert clauses[0].fields == ['title']
+        assert clauses[0].presence == QueryPresence.PROHIBITED
+
+    def test_multiple_terms_with_presence_creates_two_clauses(self):
+        clauses = parse('+foo +bar')
         assert len(clauses) == 2
         assert clauses[0].term == 'foo'
         assert clauses[1].term == 'bar'

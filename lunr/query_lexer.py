@@ -13,6 +13,7 @@ class QueryLexer:
     EDIT_DISTANCE = 'EDIT_DISTANCE'
     BOOST = 'BOOST'
     TERM_SEPARATOR = SEPARATOR
+    PRESENCE = 'PRESENCE'
 
     def __init__(self, string):
         self.lexemes = []
@@ -150,6 +151,17 @@ class QueryLexer:
                     lexer.emit(cls.TERM)
 
                 return cls.lex_boost
+
+            # '+' indicates term presence is required, check for length to
+            # ensure only a leading '+' is considered
+            if char == '+' and lexer.width == 1:
+                lexer.emit(cls.PRESENCE)
+                return cls.lex_text
+
+            # '-' indicates term presence is prohibited
+            if char == '-' and lexer.width == 1:
+                lexer.emit(cls.PRESENCE)
+                return cls.lex_text
 
             if re.match(cls.TERM_SEPARATOR, char):
                 return cls.lex_term
