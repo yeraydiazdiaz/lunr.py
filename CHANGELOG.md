@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0
+
+- Compatibility with Lunr.js v2.2.1. Including:
+    + Add support for queries with term presence, e.g. required terms and prohibited terms.
+    + Add support for using the output of `lunr.Tokenizer` directly with `lunr.Query.term`.
+    + Add field name metadata to tokens in build and search pipelines.
+
 ## 0.2.3
 
 - Compatibility with Lunr.js v2.1.6
