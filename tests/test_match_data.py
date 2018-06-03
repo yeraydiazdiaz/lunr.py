@@ -15,6 +15,15 @@ class TestMatchData:
     def test_repr(self):
         assert repr(self.match) == '<MatchData "bar,baz,foo">'
 
+    def test_create_empty_match_data(self):
+        assert MatchData().metadata == {}
+
+    def test_create_missing_field(self):
+        assert MatchData('foo').metadata['foo'] == {}
+
+    def test_create_missing_metadata(self):
+        assert MatchData('foo', 'title').metadata['foo']['title'] == {}
+
     def test_combine_terms(self):
         assert sorted(
             list(self.match.metadata.keys())) == ['bar', 'baz', 'foo']

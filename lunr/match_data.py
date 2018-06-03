@@ -10,12 +10,13 @@ class MatchData:
     lunr.Index.Result.
     """
 
-    def __init__(self, term, field, metadata):
-        self.metadata = {
-            term: {
-                field: deepcopy(metadata)
-            }
-        }
+    def __init__(self, term=None, field=None, metadata=None):
+        self.metadata = {}
+        if term is not None:
+            self.metadata[term] = {}
+            if field is not None:
+                self.metadata[term][field] = (
+                    deepcopy(metadata) if metadata is not None else {})
 
     def __repr__(self):
         return '<MatchData "{}">'.format(
