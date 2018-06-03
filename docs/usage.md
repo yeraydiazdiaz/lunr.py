@@ -127,3 +127,54 @@ You can also use fuzzy matching for terms that are likely to be misspelled:
 ```
 
 The positive integer after `~` represents the edit distance, in this case 1 character, either by addition, removal or transposition.
+
+### Term presence (new in 0.3.0)
+
+As mentioned above, Lunr defaults to searching for logical OR on terms, but it is possible to specify the presence of each term in matching documents. The default OR behaviour is represented by the term's presence being *optional* in a matching document, to specify that a term must be present in matching document the term must be prefixed with a `+`. On the other hand to specify that a term must *not* be included in a matching document the term must be prefixed with a `-`.
+
+The below example searches for documents that must contain "green", might contain "plant" and must not contain "study":
+
+```python
+>>> idx.search("+green plant -study")
+[{'ref': 'c',
+  'score': 0.08090317236904906,
+  'match_data': <MatchData "green,plant">}]
+```
+
+Contrast this with the default behaviour:
+
+```python
+>>> idx.search('green plant study')
+[{'ref': 'b',
+  'score': 0.5178296383103647,
+  'match_data': <MatchData "green,plant,studi">},
+ {'ref': 'a',
+  'score': 0.22147889214939157,
+  'match_data': <MatchData "green,studi">},
+ {'ref': 'c',
+  'score': 0.06605716362553504,
+  'match_data': <MatchData "green,plant">}]
+```
+
+To simulate a logical AND search of "green AND plant" mark both terms as required:
+
+```python
+>>> idx.search('+yellow +plant')
+[{'ref': 'b',
+  'score': 0.8915374700737615,
+  'match_data': <MatchData "plant,yellow">}]
+```
+
+As opposed to the default:
+
+```python
+>>> idx.search('yellow plant')
+[{'ref': 'b',
+  'score': 0.8915374700737615,
+  'match_data': <MatchData "plant,yellow">},
+ {'ref': 'c',
+  'score': 0.045333674172311975,
+  'match_data': <MatchData "plant">}]
+```
+
+Note presence can also be combined with any of the other modifiers described above.
