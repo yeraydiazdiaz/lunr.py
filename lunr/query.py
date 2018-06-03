@@ -87,7 +87,7 @@ class Query(object):
             for t in term:
                 self.term(t, **kwargs)
         else:
-            self.clauses.append(Clause(str(term), **kwargs))
+            self.clause(str(term), **kwargs)
 
         return self
 

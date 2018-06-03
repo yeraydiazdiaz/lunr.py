@@ -123,11 +123,11 @@ class Pipeline:
 
         return tokens
 
-    def run_string(self, string):
+    def run_string(self, string, metadata=None):
         """Convenience method for passing a string through a pipeline and
         getting strings out. This method takes care of wrapping the passed
         string in a token and mapping the resulting tokens back to strings."""
-        token = Token(string)
+        token = Token(string, metadata)
         return [str(tkn) for tkn in self.run([token])]
 
     def reset(self):

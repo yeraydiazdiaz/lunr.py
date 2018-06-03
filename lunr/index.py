@@ -12,8 +12,9 @@ from lunr.match_data import MatchData
 from lunr.token_set import TokenSet
 from lunr.token_set_builder import TokenSetBuilder
 from lunr.pipeline import Pipeline
-from lunr.query import Query
+from lunr.query import Query, QueryPresence
 from lunr.query_parser import QueryParser
+from lunr.utils import CompleteSet
 from lunr.vector import Vector
 
 logger = logging.getLogger(__name__)
@@ -86,11 +87,11 @@ class Index:
         parsing overhead.
 
         Args:
-            lunr.Query: A configured Query to perform the search against, use
-                `create_query` to get a preconfigured object or use `callback`
-                for convenience.
-            callable: An optional function taking a single Query object result
-                of `create_query` for further configuration.
+            query (lunr.Query): A configured Query to perform the search
+                against, use `create_query` to get a preconfigured object
+                or use `callback` for convenience.
+            callback (callable): An optional function taking a single Query
+                object result of `create_query` for further configuration.
         """
         if query is None:
             query = self.create_query()
@@ -104,6 +105,7 @@ class Index:
                 'either using the `callback` argument or using `create_query` '
                 'to create a preconfigured Query, manually adding clauses and '
                 'passing it as the `query` argument.')
+            return []
 
         # for each query clause
         # * process terms
@@ -113,10 +115,12 @@ class Index:
         # * score documents
 
         matching_fields = {}
-        query_vectors = {}
+        query_vectors = {field: Vector() for field in self.fields}
         term_field_cache = {}
+        required_matches = {}
+        prohibited_matches = {}
 
-        for i, clause in enumerate(query.clauses):
+        for clause in query.clauses:
             # Unless the pipeline has been disabled for this term, which is
             # the case for terms with wildcards, we need to pass the clause
             # term through the search pipeline. A pipeline returns an array
@@ -124,9 +128,12 @@ class Index:
             # term, which means we may end up performing multiple index lookups
             # for a single query term.
             if clause.use_pipeline:
-                terms = self.pipeline.run_string(clause.term)
+                terms = self.pipeline.run_string(
+                    clause.term, {'fields': clause.fields})
             else:
                 terms = [clause.term]
+
+            clause_matches = CompleteSet()
 
             for term in terms:
                 # Each term returned from the pipeline needs to use the same
@@ -141,6 +148,16 @@ class Index:
                 term_token_set = TokenSet.from_clause(clause)
                 expanded_terms = self.token_set.intersect(
                     term_token_set).to_list()
+
+                # If a term marked as required does not exist in the TokenSet
+                # it is impossible for the search to return any matches.
+                # We set all the field-scoped required matches set to empty
+                # and stop examining further clauses
+                if (len(expanded_terms) == 0 and
+                        clause.presence == QueryPresence.REQUIRED):
+                    for field in clause.fields:
+                        required_matches[field] = CompleteSet()
+                    break
 
                 for expanded_term in expanded_terms:
                     posting = self.inverted_index[expanded_term]
@@ -157,17 +174,39 @@ class Index:
                         field_posting = posting[field]
                         matching_document_refs = field_posting.keys()
                         term_field = expanded_term + '/' + field
+                        matching_documents_set = set(matching_document_refs)
 
-                        # To support field level boosts a query vector is
-                        # created per field. This vector is populated using the
-                        # termIndex found for the term and a unit value with
-                        # the appropriate boost applied.
-                        #
-                        # If the query vector for this field does not exist yet
-                        # it needs to be created.
-                        if field not in query_vectors:
-                            query_vectors[field] = Vector()
+                        # If the presence of this term is required, ensure that
+                        # the matching documents are added to the set of
+                        # required matches for this clause.
+                        if clause.presence == QueryPresence.REQUIRED:
+                            clause_matches = clause_matches.union(
+                                matching_documents_set)
 
+                            if field not in required_matches:
+                                required_matches[field] = CompleteSet()
+
+                        # If the presence of this term is prohibited,
+                        # ensure that the matching documents are added to the
+                        # set of prohibited matches for this field, creating
+                        # that set if it does not exist yet.
+                        elif clause.presence == QueryPresence.PROHIBITED:
+                            if field not in prohibited_matches:
+                                prohibited_matches[field] = set()
+
+                            prohibited_matches[field] = (
+                                prohibited_matches[field].union(
+                                    matching_documents_set))
+
+                            # prohibited matches should not be part of the
+                            # query vector used for similarity scoring and no
+                            # metadata should be extracted so we continue
+                            # to the next field
+                            continue
+
+                        # The query field vector is populated using the
+                        # term_index found for the term an a unit value with
+                        # the appropriate boost
                         # Using upsert because there could already be an entry
                         # in the vector for the term we are working with.
                         # In that case we just add the scores together.
@@ -204,9 +243,44 @@ class Index:
 
                         term_field_cache[term_field] = True
 
+            # if the presence was required we need to update the required
+            # matches field sets, we do this after all fields for the term
+            # have collected their matches because the clause terms presence
+            # is required in _any_ of the fields, not _all_ of the fields
+            if clause.presence == QueryPresence.REQUIRED:
+                for field in clause.fields:
+                    required_matches[field] = (
+                        required_matches[field].intersection(clause_matches)
+                    )
+
+        # We need to combine the field scoped required and prohibited
+        # matching documents inot a global set of required and prohibited
+        # matches
+        all_required_matches = CompleteSet()
+        all_prohibited_matches = set()
+        for field in self.fields:
+            if field in required_matches:
+                all_required_matches = all_required_matches.intersection(
+                    required_matches[field])
+            if field in prohibited_matches:
+                all_prohibited_matches = all_prohibited_matches.union(
+                    prohibited_matches[field])
+
         matching_field_refs = matching_fields.keys()
         results = []
         matches = {}
+
+        # If the query is negated (only contains prohibited terms)
+        # we need to get _all_ field_refs currently existing in the index.
+        # This to avoid any costs of getting all field regs unnecessarily
+        # Additionally, blank match data must be created to correctly populate
+        # the results
+        if query.is_negated():
+            matching_field_refs = list(self.field_vectors.keys())
+
+            for matching_field_ref in matching_field_refs:
+                field_ref = FieldRef.from_string(matching_field_ref)
+                matching_fields[matching_field_ref] = MatchData()
 
         for matching_field_ref in matching_field_refs:
             # Currently we have document fields that match the query, but we
@@ -215,10 +289,15 @@ class Index:
             #
             # Scores are calculated by field, using the query vectors created
             # above, and combined into a final document score using addition.
-            _field_ref = FieldRef.from_string(matching_field_ref)
-            doc_ref = _field_ref.doc_ref
+            field_ref = FieldRef.from_string(matching_field_ref)
+            doc_ref = field_ref.doc_ref
+
+            if (doc_ref not in all_required_matches
+                    or doc_ref in all_prohibited_matches):
+                continue
+
             field_vector = self.field_vectors[matching_field_ref]
-            score = query_vectors[_field_ref.field_name].similarity(
+            score = query_vectors[field_ref.field_name].similarity(
                 field_vector)
 
             try:
