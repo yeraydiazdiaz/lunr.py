@@ -211,10 +211,7 @@ class Index:
                         # in the vector for the term we are working with.
                         # In that case we just add the scores together.
                         query_vectors[field].upsert(
-                            term_index,
-                            1 * clause.boost,
-                            lambda a, b: a + b
-                        )
+                            term_index, clause.boost, lambda a, b: a + b)
 
                         # If we've already seen this term, field combo then
                         # we've already collected the matching documents and

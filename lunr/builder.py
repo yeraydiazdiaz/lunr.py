@@ -13,6 +13,21 @@ from lunr.vector import Vector
 from lunr.idf import idf as Idf
 
 
+class Field:
+    """Represents a field with boost and extractor functions."""
+
+    def __init__(self, field_name, boost=1, extractor=None):
+        self.name = field_name
+        self.boost = boost
+        self.extractor = extractor
+
+    def __repr__(self):
+        return '<Field "{0.name}" boost="{0.boost}">'.format(self)
+
+    def __hash__(self):
+        return hash(self.name)
+
+
 class Builder:
     """Performs indexing on a set of documents and returns instances of
     lunr.Index ready for querying.
@@ -24,12 +39,13 @@ class Builder:
 
     def __init__(self):
         self._ref = "id"
-        self._fields = []
+        self._fields = {}
         self.inverted_index = {}
         self.field_term_frequencies = {}
         self.field_lengths = {}
         self.pipeline = Pipeline()
         self.search_pipeline = Pipeline()
+        self._documents = {}
         self.document_count = 0
         self._b = 0.75
         self._k1 = 1.2
@@ -47,11 +63,10 @@ class Builder:
         indexing, it should be set before any documents are added to the index.
         Changing it during indexing can lead to inconsistent results.
 
-        TODO: use setter?
         """
         self._ref = ref
 
-    def field(self, field):
+    def field(self, field_name, boost=1, extractor=None):
         """Adds a field to the list of document fields that will be indexed.
 
         Every document being indexed should have this field. None values for
@@ -62,9 +77,25 @@ class Builder:
         fields after a document has been indexed will have no effect on already
         indexed documents.
 
-        TODO: rename to `add_field`?
+        Fields can be boosted at build time. This allows terms within that
+        field to have more importance on search results. Use a field boost to
+        specify that matches within one field are more important that other
+        fields.
+
+        Args:
+            field_name (str): Name of the field to be added, must not include
+                a forward slash '/'.
+            boost (int): Optional boost factor to apply to field.
+            extractor (callable): Optional function to extract a field from
+                the document.
+
+        Raises:
+            ValueError: If the field name contains a `/`.
         """
-        self._fields.append(field)
+        if '/' in field_name:
+            raise ValueError('Field {} contains illegal character `/`')
+
+        self._fields[field_name] = Field(field_name, boost, extractor)
 
     def b(self, number):
         """A parameter to tune the amount of field length normalisation that is
@@ -91,7 +122,7 @@ class Builder:
         """
         self._k1 = number
 
-    def add(self, doc):
+    def add(self, doc, attributes=None):
         """Adds a document to the index.
 
         Before adding documents to the index it should have been fully
@@ -101,13 +132,22 @@ class Builder:
         The document must have a field name as specified by the ref (by default
         this is 'id') and it should have all fields defined for indexing,
         though None values will not cause errors.
+
+        Args:
+            - doc (dict): The document to be added to the index.
+            - attributes (dict, optional): A set of attributes corresponding
+            to the document, currently a single `boost` -> int will be
+            taken into account.
         """
         doc_ref = doc[self._ref]
+        self._documents[doc_ref] = attributes or {}
         self.document_count += 1
 
-        for field_name in self._fields:
-            field = doc[field_name]
-            tokens = Tokenizer(field)
+        for field_name, field in self._fields.items():
+            extractor = field.extractor
+            field_value = (
+                doc[field_name] if extractor is None else extractor(doc))
+            tokens = Tokenizer(field_value)
             terms = self.pipeline.run(tokens)
             field_ref = FieldRef(doc_ref, field_name)
             field_terms = defaultdict(int)
@@ -156,7 +196,7 @@ class Builder:
             'inverted_index': self.inverted_index,
             'field_vectors': self.field_vectors,
             'token_set': self.token_set,
-            'fields': self._fields,
+            'fields': list(self._fields.keys()),
             'pipeline': self.search_pipeline,
         })
 
@@ -178,8 +218,8 @@ class Builder:
             documents_with_field[field] += 1
             accumulator[field] += length
 
-        for field in self._fields:
-            accumulator[field] /= documents_with_field[field]
+        for field_name in self._fields:
+            accumulator[field_name] /= documents_with_field[field_name]
 
         self.average_field_length = accumulator
 
@@ -190,9 +230,11 @@ class Builder:
 
         for field_ref, term_frequencies in self.field_term_frequencies.items():
             _field_ref = FieldRef.from_string(field_ref)
-            field = _field_ref.field_name
+            field_name = _field_ref.field_name
             field_length = self.field_lengths[field_ref]
             field_vector = Vector()
+            field_boost = self._fields[field_name].boost
+            doc_boost = self._documents[_field_ref.doc_ref].get('boost', 1)
 
             for term, tf in term_frequencies.items():
                 term_index = self.inverted_index[term]['_index']
@@ -206,8 +248,11 @@ class Builder:
                 score = idf * ((self._k1 + 1) * tf) / (
                     self._k1 * (
                         1 - self._b + self._b * (
-                            field_length / self.average_field_length[field])
+                            field_length /
+                            self.average_field_length[field_name])
                         ) + tf)
+                score *= field_boost
+                score *= doc_boost
                 score_with_precision = round(score, 3)
 
                 field_vector.insert(term_index, score_with_precision)

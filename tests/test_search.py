@@ -1,5 +1,6 @@
 import pytest
 
+from lunr import lunr
 from lunr.query import Query, QueryPresence
 from lunr.exceptions import QueryParseError
 
@@ -427,3 +428,52 @@ class TestTermPresence:
             results[0]['match_data'].metadata.keys()
         ) == {'green', 'plant'}
         assert results[0]['ref'] == 'b'
+
+
+class TestBuildTimeFieldBoost:
+
+    @pytest.mark.parametrize('query_or_search', ['query', 'search'])
+    def test_no_query_boosts_build_boost_ranks_higher(
+            self, documents, query_or_search):
+        idx = lunr(
+            ref='id',
+            fields=['title', {
+                'field_name': 'body',
+                'boost': 10,
+            }],
+            documents=documents
+        )
+
+        if query_or_search == 'search':
+            results = idx.search('professor')
+        else:
+            query = Query(idx.fields)
+            query.term('professor')
+            results = idx.query(query)
+
+        assert results[0]['ref'] == 'b'
+
+
+class TestBuildTimeDocumentBoost:
+
+    @pytest.mark.parametrize('query_or_search', ['query', 'search'])
+    def test_no_query_boosts_document_boost_ranks_higher(
+                self, documents, query_or_search):
+        documents_with_boost = [
+            (document, {'boost': 10 if document['id'] == 'c' else 1})
+            for document in documents
+        ]
+        idx = lunr(
+            ref='id',
+            fields=('title', 'body'),
+            documents=documents_with_boost
+        )
+
+        if query_or_search == 'search':
+            results = idx.search('plumb')
+        else:
+            query = Query(idx.fields)
+            query.term('plumb')
+            results = idx.query(query)
+
+        assert results[0]['ref'] == 'c'

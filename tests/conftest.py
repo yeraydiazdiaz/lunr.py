@@ -4,8 +4,8 @@ from lunr import lunr
 
 
 @pytest.fixture
-def index():
-    documents = [{
+def documents():
+    return [{
         'id': 'a',
         'title': 'Mr. Green kills Colonel Mustard',
         'body': """Mr. Green killed Colonel Mustard in the study with the
@@ -23,6 +23,10 @@ candlestick. Mr. Green is not a very nice fellow.""",
 while he was away from his office last week.""",
         'word_count': 16
     }]
+
+
+@pytest.fixture
+def index(documents):
     return lunr(
         ref='id',
         fields=('title', 'body'),
