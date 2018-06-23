@@ -63,7 +63,7 @@ class TestSimilarity:
         v1 = _vector_from_args(1, 3, -5)
         v2 = _vector_from_args(4, -2, -1)
 
-        assert v1.similarity(v2) == pytest.approx(0.1106, 0.001)
+        assert v1.similarity(v2) == pytest.approx(0.5, 0.1)
 
     def test_empty_vector(self):
         v_empty = Vector()

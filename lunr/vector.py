@@ -28,6 +28,9 @@ class Vector:
         self._magnitude = 0
         self.elements = elements or []
 
+    def __repr__(self):
+        return '<Vector magnitude={}>'.format(self.magnitude)
+
     def __iter__(self):
         return iter(self.elements)
 
@@ -142,4 +145,4 @@ class Vector:
         if self.magnitude == 0 or other.magnitude == 0:
             return 0
 
-        return self.dot(other) / (self.magnitude * other.magnitude)
+        return self.dot(other) / self.magnitude

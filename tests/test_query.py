@@ -40,6 +40,13 @@ class TestQueryTerm(BaseQuerySuite):
         assert self.query.clauses[0].term == 'foo'
         assert self.query.clauses[1].term == 'bar'
 
+    def test_multiple_string_terms_with_options(self):
+        self.query.term(['foo', 'bar'], use_pipeline=False)
+
+        assert len(self.query.clauses) == 2
+        assert self.query.clauses[0].term == 'foo'
+        assert self.query.clauses[1].term == 'bar'
+
 
 class TestQueryClause(BaseQuerySuite):
 

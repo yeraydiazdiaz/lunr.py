@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 
 from builtins import str
 
+import pytest
+
 from lunr.builder import Builder
 from lunr.token_set import TokenSet
 from lunr.index import Index
@@ -63,12 +65,31 @@ class TestBuilderAdd:
         self.builder.add(dict(id='a', title='test', body='missing'))
         self.builder.add(dict(id='b', title='another test', body='missing'))
 
-        self.builder.inverted_index['test']['title']['a'] == {
+        assert self.builder.inverted_index['test']['title']['a'] == {
             'position': [[0, 4]]
         }
-        self.builder.inverted_index['test']['title']['b'] == {
-            'position': [[8, 12]]
+        assert self.builder.inverted_index['test']['title']['b'] == {
+            'position': [[8, 4]]
         }
+
+    def test_builder_field_raises_if_contains_slash(self):
+        self.builder = Builder()
+
+        with pytest.raises(ValueError):
+            self.builder.field('foo/bar')
+
+    def test_builder_extracts_nested_properties_from_document(self):
+        self.builder = Builder()
+        self.builder.field('name', extractor=lambda d: d['person']['name'])
+
+        self.builder.add({
+            'id': 'id',
+            'person': {
+                'name': 'bob'
+            }
+        })
+
+        assert self.builder.inverted_index['bob']['name']['id'] == {}
 
 
 class TestBuilderUse:
@@ -147,4 +168,7 @@ class TestBuilderField:
     def test_define_fields_to_index(self):
         builder = Builder()
         builder.field('foo')
-        assert 'foo' in builder._fields
+        assert len(builder._fields) == 1
+        assert builder._fields['foo'].name == 'foo'
+        assert builder._fields['foo'].boost == 1
+        assert builder._fields['foo'].extractor is None

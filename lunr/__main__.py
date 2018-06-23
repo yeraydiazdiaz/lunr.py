@@ -24,8 +24,15 @@ def lunr(ref, fields, documents, language=None):
 
     Args:
         ref (str): The key in the documents to be used a the reference.
-        fields (list): A list of keys in the documents to index.
-        documents (list): The list of dictonaries to index.
+        fields (list): A list of strings defining fields in the documents to
+            index. Optionally a list of dictionaries with three keys:
+            `field_name` defining the document's field, `boost` an integer
+            defining a boost to be applied to the field, and `extractor`
+            a callable taking the document as a single argument and returning
+            a string located in the document in a particular way.
+        documents (list): The list of dictonaries representing the documents
+            to index. Optionally a 2-tuple of dicts, the first one being
+            the document and the second the associated attributes to it.
         language (str, optional): The language to use if using NLTK language
             support, ignored if NLTK is not available.
 
@@ -46,9 +53,15 @@ def lunr(ref, fields, documents, language=None):
 
     builder.ref(ref)
     for field in fields:
-        builder.field(field)
+        if isinstance(field, dict):
+            builder.field(**field)
+        else:
+            builder.field(field)
 
     for document in documents:
-        builder.add(document)
+        if isinstance(document, (tuple, list)):
+            builder.add(document[0], attributes=document[1])
+        else:
+            builder.add(document)
 
     return builder.build()
