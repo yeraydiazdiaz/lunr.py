@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "lunr": "2.1.6",
+    "lunr": "2.2.1",
     "lunr-languages": "1.0.0",
     "tmp": "0.0.33"
   },
