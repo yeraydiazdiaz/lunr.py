@@ -13,7 +13,7 @@ from tests.utils import (
 
 @pytest.mark.acceptance
 def test_languages_query_results_match_javascript_results():
-    query_string = 'imperio'
+    query_string = 'resistencia'
     js_results = run_node_script(
         'language_query.js', query_string).split('\n')
     data = read_json_fixture('lang_es.json')
