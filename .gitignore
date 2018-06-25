@@ -9,7 +9,6 @@ htmlcov/
 **/node_modules
 dist/
 build/
-.state/
 
 .vscode/
 *.code-workspace
