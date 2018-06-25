@@ -5,8 +5,7 @@
 - Compatibility with Lunr.js v2.3.0. Including:
     + Add support for build time field and document boosts.
     + Add support for indexing nested document fields using field extractors.
-    + Prevent usage of problematic characters in field names?
-    + Fix bug when using an array of tokens in a single query term?
+    + Prevent usage of problematic characters in field names
 
 ## 0.3.0
 
