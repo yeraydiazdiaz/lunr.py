@@ -3,4 +3,5 @@ site_name: Lunr.py
 pages:
   - Home: index.md
   - Searching: usage.md
+  - Building indices: indices.md
   - Languages: languages.md
