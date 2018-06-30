@@ -35,7 +35,7 @@ class Query(object):
         self.all_fields = all_fields
 
     def __repr__(self):
-        return '<Query terms="{}" clauses="{}">'.format(
+        return '<Query fields="{}" clauses="{}">'.format(
             ','.join(self.all_fields), ','.join(c.term for c in self.clauses))
 
     def clause(self, *args, **kwargs):

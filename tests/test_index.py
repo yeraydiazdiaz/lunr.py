@@ -1,8 +1,10 @@
-from mock import MagicMock
+import json
+from mock import MagicMock, patch
 
 import pytest
 
 from lunr import __TARGET_JS_VERSION__
+from lunr.index import Index
 from lunr.exceptions import BaseLunrException
 
 from tests.utils import assert_vectors_equal
@@ -46,6 +48,9 @@ class TestIndex:
         assert results[0]['ref'] == 'b'
         assert results[1]['ref'] == 'a'
 
+
+class TestIndexSerialization:
+
     def test_serialization(self, index):
         serialized_index = index.serialize()
         assert serialized_index['version'] == __TARGET_JS_VERSION__
@@ -53,3 +58,19 @@ class TestIndex:
         for ref, vector in serialized_index['fieldVectors']:
             assert ref in index.field_vectors
             assert_vectors_equal(vector, index.field_vectors[ref])
+
+    def test_json_deserialization(self, index):
+        serialized_index = index.serialize()
+        json_serialized_index = json.dumps(serialized_index)
+
+        idx = Index.load(json_serialized_index)
+
+        assert idx == index
+
+    def test_load_warns_on_js_version_mismatch(self, index):
+        serialized_index = index.serialize()
+        serialized_index['version'] = '1.0.0'
+
+        with patch('lunr.index.logger') as mock_log:
+            Index.load(serialized_index)
+            mock_log.warning.assert_called_once()

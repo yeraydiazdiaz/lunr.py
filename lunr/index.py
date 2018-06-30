@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from collections import defaultdict
 import json
 import logging
 
@@ -36,6 +37,13 @@ class Index:
         self.token_set = attrs['token_set']
         self.fields = attrs['fields']
         self.pipeline = attrs['pipeline']
+
+    def __eq__(self, other):
+        # TODO: extend equality to other attributes
+        return (
+            self.inverted_index == other.inverted_index and
+            self.fields == other.fields
+        )
 
     def search(self, query_string):
         """Performs a search against the index using lunr query syntax.
@@ -118,7 +126,7 @@ class Index:
         query_vectors = {field: Vector() for field in self.fields}
         term_field_cache = {}
         required_matches = {}
-        prohibited_matches = {}
+        prohibited_matches = defaultdict(set)
 
         for clause in query.clauses:
             # Unless the pipeline has been disabled for this term, which is
@@ -191,9 +199,6 @@ class Index:
                         # set of prohibited matches for this field, creating
                         # that set if it does not exist yet.
                         elif clause.presence == QueryPresence.PROHIBITED:
-                            if field not in prohibited_matches:
-                                prohibited_matches[field] = set()
-
                             prohibited_matches[field] = (
                                 prohibited_matches[field].union(
                                     matching_documents_set))
