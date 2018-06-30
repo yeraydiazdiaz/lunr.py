@@ -169,16 +169,11 @@ class Builder:
                     self.inverted_index[term_key] = posting
 
                 if doc_ref not in self.inverted_index[term_key][field_name]:
-                    self.inverted_index[term_key][field_name][doc_ref] = {}
+                    self.inverted_index[term_key][field_name][doc_ref] = (
+                        defaultdict(list))
 
                 for metadata_key in self.metadata_whitelist:
                     metadata = term.metadata[metadata_key]
-
-                    term_entry = (
-                        self.inverted_index[term_key][field_name][doc_ref])
-                    if metadata_key not in term_entry:
-                        term_entry[metadata_key] = []
-
                     self.inverted_index[term_key][field_name][doc_ref][
                         metadata_key].append(metadata)
 

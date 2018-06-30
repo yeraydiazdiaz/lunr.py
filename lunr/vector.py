@@ -81,8 +81,17 @@ class Vector:
         self.upsert(insert_index, val, prevent_duplicates)
 
     def upsert(self, insert_index, val, fn=None):
-        """Inserts or updates an existing index within the vector."""
-        fn = fn or (lambda *args, **kwargs: None)
+        """Inserts or updates an existing index within the vector.
+
+        Args:
+            - insert_index (int): The index at which teh element should be
+                inserted.
+            - val (int|float): The value to be inserted into the vector.
+            - fn (callable, optional): An optional callable taking two
+                arguments, the current value and the passed value to generate
+                the final inserted value at the position in case of collision.
+        """
+        fn = fn or (lambda current, passed: passed)
         self._magnitude = 0
         position = self.position_for_index(insert_index)
         if (position < len(self.elements) and

@@ -16,6 +16,7 @@ class TestFieldRef:
         field_ref = FieldRef(document_ref, field_name)
 
         assert str(field_ref) == 'title/123'
+        assert repr(field_ref) == '<FieldRef field="title" ref="123">'
 
     def test_from_string_splits_string_into_parts(self):
         field_ref = FieldRef.from_string('title/123')

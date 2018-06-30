@@ -13,6 +13,11 @@ def _vector_from_args(*args):
     return vector
 
 
+def test_vector_repr():
+    vector = _vector_from_args(1, 3, -5)
+    assert repr(vector) == '<Vector magnitude={}>'.format(vector.magnitude)
+
+
 class TestVectorPositionForIndex:
 
     vector = Vector([1, 'a', 2, 'b', 4, 'c', 7, 'd', 11, 'e'])
@@ -131,3 +136,10 @@ class TestVectorUpsert:
             0, 4, lambda current, passed: current + passed)
 
         assert vector.to_list() == [8, 5, 6]
+
+    def test_upsert_defaults_to_passed_value_on_duplicate(self):
+        vector = _vector_from_args(4, 5, 6)
+
+        vector.upsert(0, 3)
+
+        assert vector.to_list() == [3, 5, 6]
