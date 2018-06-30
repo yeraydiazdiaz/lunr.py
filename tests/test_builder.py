@@ -172,3 +172,5 @@ class TestBuilderField:
         assert builder._fields['foo'].name == 'foo'
         assert builder._fields['foo'].boost == 1
         assert builder._fields['foo'].extractor is None
+        assert repr(builder._fields['foo']) == '<Field "foo" boost="1">'
+        assert hash(builder._fields['foo']) == hash('foo')

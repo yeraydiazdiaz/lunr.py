@@ -16,8 +16,8 @@ class FieldRef:
         self._string_value = string_value
 
     def __repr__(self):
-        return '<FieldRef ref="{}" field="{}">'.format(
-            self.doc_ref, self.field_name)
+        return '<FieldRef field="{}" ref="{}">'.format(
+             self.field_name, self.doc_ref)
 
     @classmethod
     def from_string(cls, string):
