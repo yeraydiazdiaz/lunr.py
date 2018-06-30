@@ -1,4 +1,7 @@
-.state/acceptance-npm:
+.state:
+	mkdir .state
+
+.state/acceptance-npm: .state
 	cd tests/acceptance_tests/javascript && \
 		npm install && \
 		cd ../../../
