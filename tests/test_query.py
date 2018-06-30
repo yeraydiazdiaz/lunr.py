@@ -19,6 +19,8 @@ class TestQueryTerm(BaseQuerySuite):
 
         assert len(self.query.clauses) == 1
         assert self.query.clauses[0].term == 'foo'
+        assert repr(self.query) == '<Query fields="title,body" clauses="foo">'
+        assert repr(self.query.clauses[0]) == '<Clause term="foo">'
 
     def test_single_token_term_adds_single_clause(self):
         self.query.term(Token('foo'))
@@ -32,6 +34,8 @@ class TestQueryTerm(BaseQuerySuite):
         assert len(self.query.clauses) == 2
         assert self.query.clauses[0].term == 'foo'
         assert self.query.clauses[1].term == 'bar'
+        assert repr(self.query) == (
+            '<Query fields="title,body" clauses="foo,bar">')
 
     def test_multiple_token_terms_adds_multiple_clauses(self):
         self.query.term(Tokenizer('foo bar'))

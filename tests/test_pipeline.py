@@ -1,3 +1,5 @@
+from mock import patch
+
 import pytest
 
 from lunr.exceptions import BaseLunrException
@@ -30,6 +32,12 @@ class TestAdd(BaseTestPipeline):
     def test_add_multiple_functions_to_pipeline(self):
         self.pipeline.add(noop, noop)
         assert len(self.pipeline) == 2
+
+    def test_add_warns_if_function_not_registered(self, monkeypatch):
+        monkeypatch.undo()
+        with patch('lunr.pipeline.log') as mock_log:
+            self.pipeline.add(lambda x: x)
+            mock_log.warning.assert_called_once()
 
 
 class TestRemove(BaseTestPipeline):
@@ -198,6 +206,7 @@ class TestSerialize(BaseTestPipeline):
         self.pipeline.add(fn)
 
         assert self.pipeline.serialize() == ['fn']
+        assert repr(self.pipeline) == '<Pipeline stack="fn">'
 
 
 class TestRegisterFunction(BaseTestPipeline):
@@ -218,6 +227,14 @@ class TestRegisterFunction(BaseTestPipeline):
         Pipeline.register_function(self.fn, 'fn')
 
         assert Pipeline.registered_functions['fn'] == self.fn
+
+    def test_register_function_warns_when_adding_function_with_same_label(
+            self):
+        Pipeline.register_function(self.fn, 'fn')
+        with patch('lunr.pipeline.log') as mock_log:
+            Pipeline.register_function(self.fn, 'fn')
+
+            mock_log.warning.assert_called_once()
 
 
 class TestLoad(BaseTestPipeline):

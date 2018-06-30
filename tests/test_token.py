@@ -1,9 +1,10 @@
 from lunr.token import Token
 
 
-def test_str():
+def test_str_repr():
     token = Token('foo')
     assert str(token) == 'foo'
+    assert repr(token) == '<Token "foo">'
 
 
 class TestMetadata:
