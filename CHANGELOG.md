@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1
+
+- Added support for Python 3.7
+
 ## 0.4.0
 
 - Compatibility with Lunr.js v2.3.0. Including:

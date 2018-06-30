@@ -5,15 +5,6 @@ from setuptools import setup
 
 PATH = os.path.abspath(os.path.dirname(__file__))
 
-LONG_DESCRIPTION = (
-    "A Python implementation of Lunr.js (https://lunrjs.com) by Oliver "
-    "Nightingale.\n\n"
-    "   A bit like Solr, but much smaller and not as bright.\n\n"
-    "This Python version of Lunr.js aims to bring the simple and powerful "
-    "full text search capabilities into Python guaranteeing results as close "
-    "as the original implementation as possible."
-)
-
 
 def read_file(filepath):
     with open(filepath, 'r') as fd:
@@ -37,7 +28,8 @@ setup(
     url='https://github.com/yeraydiazdiaz/lunr.py',
     license='MIT',
     description='A Python implementation of Lunr.js',
-    long_description=LONG_DESCRIPTION,
+    long_description=read_file('README.md'),
+    long_description_content_type='text/markdown',
     author='Yeray Diaz Diaz',
     author_email='yeraydiazdiaz@gmail.com',
     packages=['lunr'],
@@ -62,6 +54,7 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Text Processing',
