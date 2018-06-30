@@ -44,14 +44,10 @@ class QueryLexer:
         if char != self.EOS:
             self.backup()
 
-    @property
-    def more(self):
-        return self.pos < self.length
-
     def run(self):
-        state = self.__class__.lex_text(self)
+        state = self.lex_text()
         while state:
-            state = state(self)
+            state = state()
 
     def slice_string(self):
         subslices = []
@@ -87,81 +83,74 @@ class QueryLexer:
         self.escape_char_positions.append(self.pos - 1)
         self.pos += 1
 
-    @classmethod
-    def lex_field(cls, lexer):
-        lexer.backup()
-        lexer.emit(cls.FIELD)
-        lexer.ignore()
-        return cls.lex_text
+    def lex_field(self):
+        self.backup()
+        self.emit(self.FIELD)
+        self.ignore()
+        return self.lex_text
 
-    @classmethod
-    def lex_term(cls, lexer):
-        if lexer.width > 1:
-            lexer.backup()
-            lexer.emit(cls.TERM)
+    def lex_term(self):
+        if self.width > 1:
+            self.backup()
+            self.emit(self.TERM)
 
-        lexer.ignore()
+        self.ignore()
 
-        if lexer.more:
-            return cls.lex_text
+        return self.lex_text
 
-    @classmethod
-    def lex_edit_distance(cls, lexer):
-        lexer.ignore()
-        lexer.accept_digit_run()
-        lexer.emit(cls.EDIT_DISTANCE)
-        return cls.lex_text
+    def lex_edit_distance(self):
+        self.ignore()
+        self.accept_digit_run()
+        self.emit(self.EDIT_DISTANCE)
+        return self.lex_text
 
-    @classmethod
-    def lex_boost(cls, lexer):
-        lexer.ignore()
-        lexer.accept_digit_run()
-        lexer.emit(cls.BOOST)
-        return cls.lex_text
+    def lex_boost(self):
+        self.ignore()
+        self.accept_digit_run()
+        self.emit(self.BOOST)
+        return self.lex_text
 
-    @classmethod
-    def lex_EOS(cls, lexer):
-        if lexer.width > 0:
-            lexer.emit(cls.TERM)
+    def lex_EOS(self):
+        if self.width > 0:
+            self.emit(self.TERM)
 
-    @classmethod
-    def lex_text(cls, lexer):
+    def lex_text(self):
         while True:
-            char = lexer.next()
-            if char == cls.EOS:
-                return cls.lex_EOS
+            char = self.next()
+            if char == self.EOS:
+                return self.lex_EOS
 
             if ord(char) == 92:  # Escape character is '\'
-                lexer.escape_character()
+                self.escape_character()
                 continue
 
             if char == ':':
-                return cls.lex_field
+                return self.lex_field
 
             if char == '~':
-                lexer.backup()
-                if lexer.width > 0:
-                    lexer.emit(cls.TERM)
+                self.backup()
+                if self.width > 0:
+                    self.emit(self.TERM)
 
-                return cls.lex_edit_distance
+                return self.lex_edit_distance
 
             if char == '^':
-                lexer.backup()
-                if lexer.width > 0:
-                    lexer.emit(cls.TERM)
+                self.backup()
+                if self.width > 0:
+                    self.emit(self.TERM)
 
-                return cls.lex_boost
+                return self.lex_boost
 
             # '+' indicates term presence is required, check for length to
             # ensure only a leading '+' is considered
-            if char == '+' and lexer.width == 1:
-                lexer.emit(cls.PRESENCE)
-                return cls.lex_text
+            if char == '+' and self.width == 1:
+                self.emit(self.PRESENCE)
+                return self.lex_text
 
             # '-' indicates term presence is prohibited
-            if char == '-' and lexer.width == 1:
-                lexer.emit(cls.PRESENCE)
-                return cls.lex_text
+            if char == '-' and self.width == 1:
+                self.emit(self.PRESENCE)
+                return self.lex_text
 
-            if re.match(cls.TERM_SEPARATOR, char):
-                return cls.lex_term
+            if re.match(self.TERM_SEPARATOR, char):
+                return self.lex_term
