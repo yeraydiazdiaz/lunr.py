@@ -19,4 +19,7 @@ tests-acceptance: .state/acceptance-npm
 
 tests-full: tests tests-acceptance
 
+tests-benchmark:
+	pytest tests/benchmarks.py --benchmark-warmup=on
+
 .PHONY: tests tests-acceptance tests-full
