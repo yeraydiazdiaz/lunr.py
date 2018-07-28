@@ -139,7 +139,7 @@ class Builder:
             to the document, currently a single `boost` -> int will be
             taken into account.
         """
-        doc_ref = doc[self._ref]
+        doc_ref = str(doc[self._ref])
         self._documents[doc_ref] = attributes or {}
         self.document_count += 1
 
