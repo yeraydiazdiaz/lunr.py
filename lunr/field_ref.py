@@ -28,6 +28,7 @@ class FieldRef:
 
     def __str__(self):
         if self._string_value is None:
-            self._string_value = self.field_name + self.JOINER + self.doc_ref
+            self._string_value = (
+                self.field_name + self.JOINER + str(self.doc_ref))
 
         return self._string_value

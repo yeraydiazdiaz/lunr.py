@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.2
+
+- Target Lunr.js v2.3.1
+- Fix crash when using non-string document references.
+
 ## 0.4.1
 
 - Added support for Python 3.7

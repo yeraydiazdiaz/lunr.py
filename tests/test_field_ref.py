@@ -12,7 +12,7 @@ class TestFieldRef:
 
     def test_str_combines_document_ref_and_field_name(self):
         field_name = 'title'
-        document_ref = '123'
+        document_ref = 123
         field_ref = FieldRef(document_ref, field_name)
 
         assert str(field_ref) == 'title/123'

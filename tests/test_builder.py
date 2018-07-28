@@ -56,6 +56,15 @@ class TestBuilderBuild:
 
 class TestBuilderAdd:
 
+    def test_builder_casts_docrefs_to_strings(self):
+        self.builder = Builder()
+        self.builder.ref('id')
+        self.builder.field('title')
+
+        self.builder.add(dict(id=123, title='test', body='missing'))
+
+        _assert_deep_keys(self.builder.inverted_index, 'test.title.123')
+
     def test_builder_metadata_whitelist_includes_metadata_in_index(self):
         self.builder = Builder()
         self.builder.ref('id')
