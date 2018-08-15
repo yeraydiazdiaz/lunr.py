@@ -57,7 +57,7 @@ def nltk_stemmer(stemmer, token, i=None, tokens=None):
 
 def register_languages():
     """Register all supported languages to ensure compatibility."""
-    for language in SUPPORTED_LANGUAGES:
+    for language in set(SUPPORTED_LANGUAGES) - {'en'}:
         language_stemmer = partial(
             nltk_stemmer, get_language_stemmer(language))
         Pipeline.register_function(
