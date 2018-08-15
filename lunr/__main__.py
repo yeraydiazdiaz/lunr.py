@@ -1,20 +1,58 @@
 from __future__ import unicode_literals
 
 from lunr.builder import Builder
-from lunr.trimmer import trimmer
-from lunr.stop_word_filter import stop_word_filter
+from lunr.trimmer import trimmer, generate_trimmer
+from lunr.stop_word_filter import stop_word_filter, generate_stop_word_filter
 from lunr.stemmer import stemmer
 from lunr.stemmer_languages import LANGUAGE_SUPPORT, SUPPORTED_LANGUAGES
 from lunr.pipeline import Pipeline
 
 
-def _get_nltk_builder(language):
-    language_stemmer = Pipeline.registered_functions[
-        'stemmer-{}'.format(language)]
+def _get_stopwords_and_word_characters(language):
+    # TODO: add the stopword filter using stopwords for languages
+    # Move to languages module?
+    import nltk
+    nltk.download('stopwords')
+
+    verbose_language = SUPPORTED_LANGUAGES[language]
+    stopwords = nltk.corpus.stopwords.words(verbose_language)
+    # TODO: search for a more exhaustive list of word characters
+    word_characters = {c for word in stopwords for c in word}
+
+    return stopwords, word_characters
+
+
+def _get_nltk_builder(languages):
+    """Returns a builder with stemmers for all languages added to it.
+
+    Args:
+        languages (list): A list of supported languages.
+    """
+    stemmers = []
+    stopwords_filters = []
+    word_characters = {}
+
+    for language in languages:
+        if language == 'en':
+            # use Lunr's defaults
+            stemmers.append(stemmer)
+            stopwords_filters.append(stop_word_filter)
+            word_characters.update({'\W'})
+        else:
+            stopwords, word_characters = (
+                _get_stopwords_and_word_characters(language))
+            stemmers.append(
+                Pipeline.registered_functions['stemmer-{}'.format(language)])
+            stopwords_filters.append(generate_stop_word_filter(stopwords))
+            word_characters.update(word_characters)
 
     builder = Builder()
-    builder.pipeline.add(trimmer, language_stemmer)
-    builder.search_pipeline.add(language_stemmer)
+    multi_trimmer = generate_trimmer(''.join(sorted(word_characters)))
+    Pipeline.register_function(
+        multi_trimmer, 'lunr-multi-trimmer-{}'.format('-'.join(languages)))
+    builder.pipeline.reset()
+    builder.pipeline.add(multi_trimmer, *stopwords_filters, *stemmers)
+    builder.search_pipeline.add(*stemmers)
 
     return builder
 
@@ -39,12 +77,17 @@ def lunr(ref, fields, documents, languages=None):
     Returns:
         Index: The populated Index ready to search against.
     """
-    if languages and LANGUAGE_SUPPORT:
-        if languages not in SUPPORTED_LANGUAGES:
+    if languages is not None and LANGUAGE_SUPPORT:
+        if isinstance(languages, str):
+            languages = [languages]
+
+        unsupported_languages = set(languages) - set(SUPPORTED_LANGUAGES)
+        if unsupported_languages:
             raise RuntimeError(
-                '"{}" is not a supported language, '
+                'The specified languages {} are not supported, '
                 'please choose one of {}'.format(
-                    languages, ', '.join(SUPPORTED_LANGUAGES.keys())))
+                    ', '.join(unsupported_languages),
+                    ', '.join(SUPPORTED_LANGUAGES.keys())))
         builder = _get_nltk_builder(languages)
     else:
         builder = Builder()
