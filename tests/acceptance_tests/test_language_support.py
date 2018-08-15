@@ -21,7 +21,7 @@ def test_languages_query_results_match_javascript_results():
         ref='id',
         fields=('title', 'text'),
         documents=data['docs'],
-        language='es',
+        languages='es',
     )
     results = index.search(query_string)
     assert_results_match(results, js_results, tol=0.1)
@@ -48,7 +48,7 @@ def test_serialized_lang_index_can_be_loaded_in_js_and_produces_same_results():
         ref='id',
         fields=('title', 'text'),
         documents=data['docs'],
-        language='es'
+        languages='es'
     )
     query_string = 'imperio'
     results = index.search(query_string)
