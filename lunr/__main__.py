@@ -19,7 +19,7 @@ def _get_nltk_builder(language):
     return builder
 
 
-def lunr(ref, fields, documents, language=None):
+def lunr(ref, fields, documents, languages=None):
     """A convenience function to configure and construct a lunr.Index.
 
     Args:
@@ -33,19 +33,19 @@ def lunr(ref, fields, documents, language=None):
         documents (list): The list of dictonaries representing the documents
             to index. Optionally a 2-tuple of dicts, the first one being
             the document and the second the associated attributes to it.
-        language (str, optional): The language to use if using NLTK language
-            support, ignored if NLTK is not available.
+        languages (str or list, optional): The languages to use if using
+            NLTK language support, ignored if NLTK is not available.
 
     Returns:
         Index: The populated Index ready to search against.
     """
-    if language and LANGUAGE_SUPPORT:
-        if language not in SUPPORTED_LANGUAGES:
+    if languages and LANGUAGE_SUPPORT:
+        if languages not in SUPPORTED_LANGUAGES:
             raise RuntimeError(
                 '"{}" is not a supported language, '
                 'please choose one of {}'.format(
-                    language, ', '.join(SUPPORTED_LANGUAGES.keys())))
-        builder = _get_nltk_builder(language)
+                    languages, ', '.join(SUPPORTED_LANGUAGES.keys())))
+        builder = _get_nltk_builder(languages)
     else:
         builder = Builder()
         builder.pipeline.add(trimmer, stop_word_filter, stemmer)
