@@ -188,3 +188,35 @@ class TestQueryLexer:
         assert bar_presence_lexeme['string'] == '+'
         assert bar_presence_lexeme['start'] == 5
         assert bar_presence_lexeme['end'] == 6
+
+    def test_multiple_terms_with_presence_and_fuzz(self):
+        lexer = _lex('+foo~1 +bar')
+        assert len(lexer.lexemes) == 5
+
+        (foo_presence_lexeme, foo_term_lexeme, foo_fuzz_lexeme,
+         bar_presence_lexeme, bar_term_lexeme) = lexer.lexemes
+
+        assert foo_presence_lexeme['type'] == QueryLexer.PRESENCE
+        assert foo_presence_lexeme['string'] == '+'
+        assert foo_presence_lexeme['start'] == 0
+        assert foo_presence_lexeme['end'] == 1
+
+        assert foo_term_lexeme['type'] == QueryLexer.TERM
+        assert foo_term_lexeme['string'] == 'foo'
+        assert foo_term_lexeme['start'] == 1
+        assert foo_term_lexeme['end'] == 4
+
+        assert foo_fuzz_lexeme['type'] == QueryLexer.EDIT_DISTANCE
+        assert foo_fuzz_lexeme['string'] == '1'
+        assert foo_fuzz_lexeme['start'] == 5
+        assert foo_fuzz_lexeme['end'] == 6
+
+        assert bar_presence_lexeme['type'] == QueryLexer.PRESENCE
+        assert bar_presence_lexeme['string'] == '+'
+        assert bar_presence_lexeme['start'] == 7
+        assert bar_presence_lexeme['end'] == 8
+
+        assert bar_term_lexeme['type'] == QueryLexer.TERM
+        assert bar_term_lexeme['string'] == 'bar'
+        assert bar_term_lexeme['start'] == 8
+        assert bar_term_lexeme['end'] == 11
