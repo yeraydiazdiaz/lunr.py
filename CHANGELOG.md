@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.3
+
+- Target Lunr.js v2.3.2
+
 ## 0.4.2
 
 - Target Lunr.js v2.3.1
