@@ -86,6 +86,8 @@ class TestQueryParser:
         assert len(clauses) == 2
         assert clauses[0].term == 'foo'
         assert clauses[1].term == 'bar'
+        assert clauses[0].presence == QueryPresence.REQUIRED
+        assert clauses[1].presence == QueryPresence.REQUIRED
 
     def test_unknown_field(self):
         with pytest.raises(QueryParseError):
@@ -207,3 +209,37 @@ class TestQueryParser:
         assert clauses[0].fields == ['title', 'body']
         assert clauses[0].edit_distance == 3
         assert clauses[0].boost == 2
+
+    def test_edit_distance_followed_by_presence(self):
+        clauses = parse('foo~10 +bar')
+
+        assert len(clauses) == 2
+
+        assert clauses[0].fields == ['title', 'body']
+        assert clauses[1].fields == ['title', 'body']
+
+        assert clauses[0].term == 'foo'
+        assert clauses[1].term == 'bar'
+
+        assert clauses[0].edit_distance == 10
+        assert clauses[1].edit_distance == 0
+
+        assert clauses[0].presence == QueryPresence.OPTIONAL
+        assert clauses[1].presence == QueryPresence.REQUIRED
+
+    def test_boost_followed_by_presence(self):
+        clauses = parse('foo^10 +bar')
+
+        assert len(clauses) == 2
+
+        assert clauses[0].fields == ['title', 'body']
+        assert clauses[1].fields == ['title', 'body']
+
+        assert clauses[0].term == 'foo'
+        assert clauses[1].term == 'bar'
+
+        assert clauses[0].boost == 10
+        assert clauses[1].boost == 1
+
+        assert clauses[0].presence == QueryPresence.OPTIONAL
+        assert clauses[1].presence == QueryPresence.REQUIRED
