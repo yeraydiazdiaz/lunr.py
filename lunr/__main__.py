@@ -1,5 +1,9 @@
 from __future__ import unicode_literals
 
+from itertools import chain
+
+from past.builtins import basestring
+
 from lunr.builder import Builder
 from lunr.trimmer import trimmer, generate_trimmer
 from lunr.stop_word_filter import stop_word_filter, generate_stop_word_filter
@@ -51,8 +55,11 @@ def _get_nltk_builder(languages):
     Pipeline.register_function(
         multi_trimmer, 'lunr-multi-trimmer-{}'.format('-'.join(languages)))
     builder.pipeline.reset()
-    builder.pipeline.add(multi_trimmer, *stopwords_filters, *stemmers)
-    builder.search_pipeline.add(*stemmers)
+
+    for fn in chain([multi_trimmer], stopwords_filters, stemmers):
+        builder.pipeline.add(fn)
+    for fn in stemmers:
+        builder.search_pipeline.add(fn)
 
     return builder
 
@@ -78,7 +85,7 @@ def lunr(ref, fields, documents, languages=None):
         Index: The populated Index ready to search against.
     """
     if languages is not None and LANGUAGE_SUPPORT:
-        if isinstance(languages, str):
+        if isinstance(languages, basestring):
             languages = [languages]
 
         unsupported_languages = set(languages) - set(SUPPORTED_LANGUAGES)

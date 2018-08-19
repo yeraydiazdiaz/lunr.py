@@ -4,8 +4,9 @@ require("lunr-languages/lunr.stemmer.support")(lunr)
 require("lunr-languages/lunr.es")(lunr)
 
 // Read the documents only to retrieve the title for the results
-const data = JSON.parse(
-  fs.readFileSync(__dirname + '/../fixtures/lang_es.json'))
+const fixtureName = process.argv[4] ||  'lang_es.json'
+const fixturePath = __dirname + '/../fixtures/' + fixtureName
+const data = JSON.parse(fs.readFileSync(fixturePath))
 let documents = {}
 for (doc of data.docs) {
   documents[doc.id] = doc
