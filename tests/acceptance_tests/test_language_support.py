@@ -61,3 +61,25 @@ def test_serialized_lang_index_can_be_loaded_in_js_and_produces_same_results():
         'language_load_serialized_index_and_search.js',
         fp.name, query_string).split('\n')
     assert_results_match(results, js_results)
+
+
+@pytest.mark.acceptance
+def test_serialized_multilang_index_can_be_loaded_in_js_and_results_equal():
+    data = read_json_fixture('lang_es_en.json')
+    index = lunr(
+        ref='id',
+        fields=('title', 'text'),
+        documents=data['docs'],
+        languages=['es', 'en']
+    )
+    query_string = 'taxation'
+    results = index.search(query_string)
+    serialized_index = index.serialize()
+
+    with tempfile.NamedTemporaryFile(delete=False) as fp:
+        fp.write(json.dumps(serialized_index).encode())
+
+    js_results = run_node_script(
+        'language_load_serialized_index_and_search.js',
+        fp.name, query_string, 'lang_es_en.json').split('\n')
+    assert_results_match(results, js_results)
