@@ -39,14 +39,38 @@ Assuming you have a set of documents in one of the supported languages:
 ... ]
 ```
 
-Simply define specify the [ISO-639-1 code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) for the language of you documents as a parameter to the `lunr` function:
+> New in 0.5.0: `lunr` now accepts more than one language
+
+Simply define specify one or more [ISO-639-1 codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) for the language(s) of you documents in the `languages` parameter to the `lunr` function.
+
+> Deprecation warning: `lunr` now accepts more than one language in the `languages` argument, when using previous versions the parameter's name is `language` and accepted as single string.
+
+You may pass a single string to `languages`:
 
 ```python
 >>> from lunr import lunr
->>> idx = lunr('id', ['title', 'text'], documents, language='es')
+>>> idx = lunr('id', ['title', 'text'], documents, languages='es')
 >>> idx.search('inventando')
-[{'ref': 'a', 'score': 0.1300928764641503, 'match_data': <MatchData "invent">},
-{'ref': 'b', 'score': 0.08967151299297255, 'match_data': <MatchData "invent">}]
+[{'ref': 'a', 'score': 0.130, 'match_data': <MatchData "invent">},
+{'ref': 'b', 'score': 0.089, 'match_data': <MatchData "invent">}]
 ```
 
-Please note compatibility with Lunr.js might be affected when using this feature.
+> Note: in order to construct stemmers, trimmers and stop word filters Lunr imports corpus data from NLTK which fetches it from Github and caches it in your home directory under `nltk_data` by default. You may see some logging indicating such activity during the creation of the index.
+
+Or a list of languages:
+
+```python
+>>> documents.append({
+     "id": "c",
+     "text": "Let's say you also have documents written in English",
+     "title": "A document in English"
+ })
+>>> idx = lunr('id', ['title', 'text'], documents, languages=['es', 'en'])
+>>> idx.search('english')
+[{'ref': 'c', 'score': 1.106, 'match_data': <MatchData "english">}]
+```
+
+## Notes language support
+
+- Compatibility with Lunr.js is ensured for languages that supported by both platforms, however results might differ slightly.
+- Please note that using multiple languages means the terms will be stemmed twice according to the definitions on each language. This can yield unexpected results.

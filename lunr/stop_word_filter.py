@@ -127,7 +127,7 @@ WORDS = [
 ]
 
 
-def generate_stop_word_filter(stop_words):
+def generate_stop_word_filter(stop_words, language=None):
     """Builds a stopWordFilter function from the provided list of stop words.
 
     The built in `stop_word_filter` is built using this factory and can be used
@@ -141,8 +141,12 @@ def generate_stop_word_filter(stop_words):
         if token and words.get(str(token)) != str(token):
             return token
 
+    # camelCased for for compatibility with lunr.js
+    label = (
+        'stopWordFilter-{}'.format(language) if language is not None
+        else 'stopWordFilter')
+    Pipeline.register_function(stop_word_filter, label)
     return stop_word_filter
 
 
 stop_word_filter = generate_stop_word_filter(WORDS)
-Pipeline.register_function(stop_word_filter, 'stop_word_filter')

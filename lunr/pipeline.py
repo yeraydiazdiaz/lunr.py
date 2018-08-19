@@ -71,8 +71,9 @@ class Pipeline:
             return fn.label in self.registered_functions
         except AttributeError:
             log.warning(
-                'Function is not registered with pipeline.'
-                'This may cause problems when serialising the index.')
+                'Function "{}" is not registered with pipeline. '
+                'This may cause problems when serialising the index.'.format(
+                    getattr(fn, 'label', fn)))
 
     def after(self, existing_fn, new_fn):
         """Adds a single function after a function that already exists in the
