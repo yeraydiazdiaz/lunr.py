@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.0
+
+- Added multilanguage support
+- Improved language support
+
+### Deprecation warning
+
+- The `language` argument to the `lunr` has been renamed to `languages` to accomodate for multilanguage support. The `languages` argument accepts a string or an iterable of ISO-639-1 languages codes. If you're calling `lunr` with keyword arguments please update such calls accordingly.
+
 ## 0.4.3
 
 - Target Lunr.js v2.3.2

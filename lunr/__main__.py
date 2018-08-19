@@ -32,33 +32,34 @@ def _get_nltk_builder(languages):
     Args:
         languages (list): A list of supported languages.
     """
-    stemmers = []
-    stopwords_filters = []
-    word_characters = {}
+    all_stemmers = []
+    all_stopwords_filters = []
+    all_word_characters = set()
 
     for language in languages:
         if language == 'en':
             # use Lunr's defaults
-            stemmers.append(stemmer)
-            stopwords_filters.append(stop_word_filter)
-            word_characters.update({'\W'})
+            all_stemmers.append(stemmer)
+            all_stopwords_filters.append(stop_word_filter)
+            all_word_characters.update({'\w'})
         else:
             stopwords, word_characters = (
                 _get_stopwords_and_word_characters(language))
-            stemmers.append(
+            all_stemmers.append(
                 Pipeline.registered_functions['stemmer-{}'.format(language)])
-            stopwords_filters.append(generate_stop_word_filter(stopwords))
-            word_characters.update(word_characters)
+            all_stopwords_filters.append(
+                generate_stop_word_filter(stopwords, language=language))
+            all_word_characters.update(word_characters)
 
     builder = Builder()
-    multi_trimmer = generate_trimmer(''.join(sorted(word_characters)))
+    multi_trimmer = generate_trimmer(''.join(sorted(all_word_characters)))
     Pipeline.register_function(
         multi_trimmer, 'lunr-multi-trimmer-{}'.format('-'.join(languages)))
     builder.pipeline.reset()
 
-    for fn in chain([multi_trimmer], stopwords_filters, stemmers):
+    for fn in chain([multi_trimmer], all_stopwords_filters, all_stemmers):
         builder.pipeline.add(fn)
-    for fn in stemmers:
+    for fn in all_stemmers:
         builder.search_pipeline.add(fn)
 
     return builder
