@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import pytest
 
 from lunr import lunr
-from lunr.stemmer_languages import LANGUAGE_SUPPORT, SUPPORTED_LANGUAGES
+from lunr.languages import LANGUAGE_SUPPORT, SUPPORTED_LANGUAGES
 from lunr.pipeline import Pipeline
 
 documents = [
