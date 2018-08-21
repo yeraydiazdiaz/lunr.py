@@ -43,7 +43,8 @@ Assuming you have a set of documents in one of the supported languages:
 
 Simply define specify one or more [ISO-639-1 codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) for the language(s) of you documents in the `languages` parameter to the `lunr` function.
 
-> Deprecation warning: `lunr` now accepts more than one language in the `languages` argument, when using previous versions the parameter's name is `language` and accepted as single string.
+!!! Note
+    In previous versions of Lunr the parameter's name is `language` and accepted a single string.
 
 You may pass a single string to `languages`:
 
@@ -55,7 +56,8 @@ You may pass a single string to `languages`:
 {'ref': 'b', 'score': 0.089, 'match_data': <MatchData "invent">}]
 ```
 
-> Note: in order to construct stemmers, trimmers and stop word filters Lunr imports corpus data from NLTK which fetches it from Github and caches it in your home directory under `nltk_data` by default. You may see some logging indicating such activity during the creation of the index.
+!!! Note
+    In order to construct stemmers, trimmers and stop word filters Lunr imports corpus data from NLTK which fetches it from Github and caches it in your home directory under `nltk_data` by default. You may see some logging indicating such activity during the creation of the index.
 
 Or a list of languages:
 
@@ -70,7 +72,13 @@ Or a list of languages:
 [{'ref': 'c', 'score': 1.106, 'match_data': <MatchData "english">}]
 ```
 
-## Notes language support
+## Notes on language support
 
-- Compatibility with Lunr.js is ensured for languages that supported by both platforms, however results might differ slightly.
 - Please note that using multiple languages means the terms will be stemmed twice according to the definitions on each language. This can yield unexpected results.
+- Compatibility with Lunr.js is ensured for languages that supported by both platforms, however results might differ slightly.
+    + Languages not supported by NLTK but by lunr.js:
+        * Thai
+        * Japanese
+        * Turkish
+    + Languages upported by NLTK but not lunr.js:
+        * Arabic

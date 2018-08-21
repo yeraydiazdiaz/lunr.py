@@ -5,3 +5,6 @@ pages:
   - Searching: usage.md
   - Building indices: indices.md
   - Languages: languages.md
+
+markdown_extensions:
+  - admonition
