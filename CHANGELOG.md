@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.5.0
+## 0.5.1
 
 - Added multilanguage support
 - Improved language support

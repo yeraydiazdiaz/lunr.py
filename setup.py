@@ -1,6 +1,6 @@
 import os
 import re
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 PATH = os.path.abspath(os.path.dirname(__file__))
@@ -32,7 +32,7 @@ setup(
     long_description_content_type='text/markdown',
     author='Yeray Diaz Diaz',
     author_email='yeraydiazdiaz@gmail.com',
-    packages=['lunr'],
+    packages=find_packages(exclude=('tests',)),
     include_package_data=True,
     install_requires=[
         'future>=0.16.0',
