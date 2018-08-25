@@ -3,6 +3,7 @@
 [![Supported Python Versions](https://img.shields.io/pypi/pyversions/lunr.svg)](https://pypi.org/project/lunr/)
 [![PyPI](https://img.shields.io/pypi/v/lunr.svg)](https://pypi.org/project/lunr/)
 [![Read the Docs](https://img.shields.io/readthedocs/lunr.svg)](http://lunr.readthedocs.io/en/latest/)
+[![Downloads](http://pepy.tech/badge/lunr)](http://pepy.tech/project/lunr)
 
 # Lunr.py
 
