@@ -39,7 +39,8 @@ setup(
         'six>=1.11.0',
     ],
     extras_require={
-        'languages': ['nltk>=3.2.5']
+        'languages': ['nltk>=3.2.5'],
+        ":python_version<'3.3'": ['enum34'],
     },
     keywords='lunr full text search',
     classifiers=[

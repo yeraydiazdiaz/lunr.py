@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.2
+
+- Fix Python 2.7 support
+
 ## 0.5.1
 
 - Added multilanguage support
