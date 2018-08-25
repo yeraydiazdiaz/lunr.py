@@ -6,5 +6,7 @@ pages:
   - Building indices: indices.md
   - Languages: languages.md
 
+theme: readthedocs
+
 markdown_extensions:
   - admonition

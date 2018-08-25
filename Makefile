@@ -1,3 +1,5 @@
+.PHONY: tests tests-acceptance tests-full install-dev
+
 .state:
 	mkdir .state
 
@@ -10,6 +12,9 @@
 clean:
 	rm .state/*
 
+install-dev:
+	pip install -r requirements/dev.txt
+
 tests:
 	coverage run -m pytest -m "not acceptance"
 	coverage report
@@ -21,5 +26,3 @@ tests-full: tests tests-acceptance
 
 tests-benchmark:
 	pytest tests/benchmarks.py --benchmark-warmup=on
-
-.PHONY: tests tests-acceptance tests-full

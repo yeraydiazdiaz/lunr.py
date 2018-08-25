@@ -1,24 +1,24 @@
 # Language support
 
-An optional and experimental support for other languages via the [Natural Language Toolkit](http://www.nltk.org/) stemmers. To install Lunr with this feature use `pip install lunr[languages]`.
+Lunr includes optional and experimental support for languages other than English via the [Natural Language Toolkit](http://www.nltk.org/). To install Lunr with this feature use `pip install lunr[languages]`.
 
-Assuming you have a set of documents in one of the supported languages:
+The currently supported languages are:
 
-- arabic
-- danish
-- dutch
-- english
-- finnish
-- french
-- german
-- hungarian
-- italian
-- norwegian
-- portuguese
-- romanian
-- russian
-- spanish
-- swedish
+- Arabic
+- Danish
+- Dutch
+- English
+- Finnish
+- French
+- German
+- Hungarian
+- Italian
+- Norwegian
+- Portuguese
+- Romanian
+- Russian
+- Spanish
+- Swedish
 
 ```python
 >>> documents = [
@@ -39,14 +39,14 @@ Assuming you have a set of documents in one of the supported languages:
 ... ]
 ```
 
-> New in 0.5.0: `lunr` now accepts more than one language
+> New in 0.5.0: the `lunr` function now accepts more than one language
 
-Simply define specify one or more [ISO-639-1 codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) for the language(s) of you documents in the `languages` parameter to the `lunr` function.
+Simply define specify one or more [ISO-639-1 codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) for the language(s) of your documents in the `languages` parameter to the `lunr` function.
 
 !!! Note
-    In previous versions of Lunr the parameter's name is `language` and accepted a single string.
+    In versions of Lunr prior to 0.5.0 the parameter's name is `language` and accepted a single string.
 
-You may pass a single string to `languages`:
+If you have a single language you can pass the language code in `languages`:
 
 ```python
 >>> from lunr import lunr
@@ -57,9 +57,9 @@ You may pass a single string to `languages`:
 ```
 
 !!! Note
-    In order to construct stemmers, trimmers and stop word filters Lunr imports corpus data from NLTK which fetches it from Github and caches it in your home directory under `nltk_data` by default. You may see some logging indicating such activity during the creation of the index.
+    In order to construct stemmers, trimmers and stop word filters Lunr imports corpus data from NLTK which fetches data from Github and caches it in your home directory under `nltk_data` by default. You may see some logging indicating such activity during the creation of the index.
 
-Or a list of languages:
+If you have documents in multiple language pass a list of language codes:
 
 ```python
 >>> documents.append({
@@ -74,11 +74,11 @@ Or a list of languages:
 
 ## Notes on language support
 
-- Please note that using multiple languages means the terms will be stemmed twice according to the definitions on each language. This can yield unexpected results.
+- Using multiple languages means the terms will be stemmed once per language. This can yield unexpected results.
 - Compatibility with Lunr.js is ensured for languages that supported by both platforms, however results might differ slightly.
-    + Languages not supported by NLTK but by lunr.js:
+    + Languages supported by Lunr.js but not by Lunr.py:
         * Thai
         * Japanese
         * Turkish
-    + Languages upported by NLTK but not lunr.js:
+    + Languages supported by Lunr.py but not Lunr.js:
         * Arabic

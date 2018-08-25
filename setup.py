@@ -35,11 +35,11 @@ setup(
     packages=['lunr'],
     include_package_data=True,
     install_requires=[
-        'future==0.16.0',
-        'six==1.11.0',
+        'future>=0.16.0',
+        'six>=1.11.0',
     ],
     extras_require={
-        'languages': ['nltk==3.2.5']
+        'languages': ['nltk>=3.2.5']
     },
     keywords='lunr full text search',
     classifiers=[
