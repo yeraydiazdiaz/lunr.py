@@ -39,7 +39,7 @@ The currently supported languages are:
 ... ]
 ```
 
-> New in 0.5.0: the `lunr` function now accepts more than one language
+> New in 0.5.1: the `lunr` function now accepts more than one language
 
 Simply define specify one or more [ISO-639-1 codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) for the language(s) of your documents in the `languages` parameter to the `lunr` function.
 
