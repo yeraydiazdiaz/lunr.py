@@ -4,11 +4,14 @@ import re
 
 from lunr.pipeline import Pipeline
 
+start_re = re.compile(r'^\W+')
+end_re = re.compile(r'\W+$')
+
 
 def trimmer(token, i=None, tokens=None):
     def trim(s, metadata=None):
-        s = re.sub(r'^\W+', '', s)
-        s = re.sub(r'\W+$', '', s)
+        s = start_re.sub('', s)
+        s = end_re.sub('', s)
         return s
 
     return token.update(trim)
