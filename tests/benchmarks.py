@@ -66,3 +66,8 @@ class TestPipelineBenchmarks:
         token_to_token_array_pipeline = Pipeline()
         token_to_token_array_pipeline.add(self.token_to_token_array)
         benchmark(token_to_token_array_pipeline.run, many_tokens)
+
+
+if __name__ == '__main__':
+    data = read_json_fixture('mkdocs_index.json')
+    index_mkdocs_data(data)
