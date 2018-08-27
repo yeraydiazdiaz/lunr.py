@@ -4,7 +4,7 @@ from builtins import str
 
 from lunr.pipeline import Pipeline
 
-WORDS = [
+WORDS = {
     'a',
     'able',
     'about',
@@ -124,7 +124,7 @@ WORDS = [
     'yet',
     'you',
     'your'
-]
+}
 
 
 def generate_stop_word_filter(stop_words, language=None):
@@ -134,11 +134,9 @@ def generate_stop_word_filter(stop_words, language=None):
     to generate custom `stop_word_filter` for applications or non English
     languages.
     """
-    # TODO: do we need this dict?
-    words = {word: word for word in stop_words}
 
     def stop_word_filter(token, i=None, tokens=None):
-        if token and words.get(str(token)) != str(token):
+        if token and str(token) not in stop_words:
             return token
 
     # camelCased for for compatibility with lunr.js
