@@ -2,4 +2,4 @@
 twine
 mkdocs
 pytest-benchmark
-wheel
+wheel==0.31.1
