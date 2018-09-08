@@ -1,5 +1,5 @@
 -r test.txt
 twine
 mkdocs
-pytest-benchmark
+pytest-benchmark==3.1.1
 wheel
