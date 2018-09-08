@@ -1,5 +1,5 @@
 -r test.txt
 twine
-mkdocs
+mkdocs==1.0.4
 pytest-benchmark
 wheel
