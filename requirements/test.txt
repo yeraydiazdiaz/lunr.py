@@ -3,5 +3,5 @@ pytest
 pytest-timeout
 mock
 tox
-flake8
+flake8==3.5.0
 coverage
