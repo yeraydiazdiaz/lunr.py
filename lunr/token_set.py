@@ -61,14 +61,21 @@ class TokenSet:
 
     @classmethod
     def from_string(self, string):
+        """Creates a TokenSet from a string.
+
+        The string may contain one or more wildcard characters (*) that will
+        allow wildcard matching when intersecting with another TokenSet
+        """
         node = TokenSet()
         root = node
-        wildcard_found = False
 
+        # Iterates throough all characters in the passed string appending
+        # a node for each character.
+        # When a wildcard character is found then a self referencing edge
+        # is introduced to continually match any number of characters
         for i, char in enumerate(string):
             final = i == len(string) - 1
             if char == '*':
-                wildcard_found = True
                 node.edges[char] = node
                 node.final = final
             else:
@@ -76,9 +83,6 @@ class TokenSet:
                 next_.final = final
                 node.edges[char] = next_
                 node = next_
-
-                if wildcard_found:
-                    node.edges['*'] = root
 
         return root
 

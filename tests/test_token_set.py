@@ -98,70 +98,70 @@ class TestTokenSetToList:
 
 class TestTokenSetIntersect:
 
-    def test_intersect_no_intersection(self):
+    def test_no_intersection(self):
         x = TokenSet.from_string('cat')
         y = TokenSet.from_string('bar')
         z = x.intersect(y)
 
         assert len(z.to_list()) == 0
 
-    def test_intersect_simple_intersection(self):
+    def test_simple_intersection(self):
         x = TokenSet.from_string('cat')
         y = TokenSet.from_string('cat')
         z = x.intersect(y)
 
         assert {'cat'} == set(z.to_list())
 
-    def test_intersect_trailing_wildcard_intersection(self):
+    def test_trailing_wildcard_intersection(self):
         x = TokenSet.from_string('cat')
         y = TokenSet.from_string('c*')
         z = x.intersect(y)
 
         assert {'cat'} == set(z.to_list())
 
-    def test_intersect_trailing_wildcard_no_intersection(self):
+    def test_trailing_wildcard_no_intersection(self):
         x = TokenSet.from_string('cat')
         y = TokenSet.from_string('b*')
         z = x.intersect(y)
 
         assert len(z.to_list()) == 0
 
-    def test_intersect_leading_wildcard_intersection(self):
+    def test_leading_wildcard_intersection(self):
         x = TokenSet.from_string('cat')
         y = TokenSet.from_string('*t')
         z = x.intersect(y)
 
         assert {'cat'} == set(z.to_list())
 
-    def test_intersect_leading_wildcard_no_intersection(self):
+    def test_leading_wildcard_no_intersection(self):
         x = TokenSet.from_string('cat')
         y = TokenSet.from_string('*r')
         z = x.intersect(y)
 
         assert len(z.to_list()) == 0
 
-    def test_intersect_contained_wildcard_intersection(self):
+    def test_contained_wildcard_intersection(self):
         x = TokenSet.from_string('foo')
         y = TokenSet.from_string('f*o')
         z = x.intersect(y)
 
         assert {'foo'} == set(z.to_list())
 
-    def test_intersect_contained_wildcard_no_intersection(self):
+    def test_contained_wildcard_no_intersection(self):
         x = TokenSet.from_string('foo')
         y = TokenSet.from_string('b*r')
         z = x.intersect(y)
 
         assert len(z.to_list()) == 0
 
-    def test_intersect_wildcard_zero_or_more_characters(self):
+    def test_wildcard_zero_or_more_characters(self):
         x = TokenSet.from_string('foo')
         y = TokenSet.from_string('foo*')
         z = x.intersect(y)
 
         assert {'foo'} == set(z.to_list())
 
-    def test_intersect_with_fuzzy_string_subtitution(self):
+    def test_with_fuzzy_string_subtitution(self):
         x1 = TokenSet.from_string('bar')
         x2 = TokenSet.from_string('cur')
         x3 = TokenSet.from_string('cat')
@@ -175,7 +175,7 @@ class TestTokenSetIntersect:
         assert x4.intersect(y).to_list() == ['car']
         assert x5.intersect(y).to_list() == []
 
-    def test_intersect_with_fuzzy_string_deletion(self):
+    def test_with_fuzzy_string_deletion(self):
         x1 = TokenSet.from_string('ar')
         x2 = TokenSet.from_string('br')
         x3 = TokenSet.from_string('ba')
@@ -189,7 +189,7 @@ class TestTokenSetIntersect:
         assert x4.intersect(y).to_list() == ['bar']
         assert x5.intersect(y).to_list() == []
 
-    def test_intersect_with_fuzzy_string_insertion(self):
+    def test_with_fuzzy_string_insertion(self):
         x1 = TokenSet.from_string('bbar')
         x2 = TokenSet.from_string('baar')
         x3 = TokenSet.from_string('barr')
@@ -205,7 +205,7 @@ class TestTokenSetIntersect:
         assert x5.intersect(y).to_list() == ['ba']
         assert x6.intersect(y).to_list() == []
 
-    def test_intersect_with_fuzzy_string_transpose(self):
+    def test_with_fuzzy_string_transpose(self):
         x1 = TokenSet.from_string('abr')
         x2 = TokenSet.from_string('bra')
         x3 = TokenSet.from_string('foo')
@@ -214,3 +214,46 @@ class TestTokenSetIntersect:
         assert x1.intersect(y).to_list() == ['abr']
         assert x2.intersect(y).to_list() == ['bra']
         assert x3.intersect(y).to_list() == []
+
+    def test_leading_wildcard_backtracking_intersection(self):
+        x = TokenSet.from_string('aaacbab')
+        y = TokenSet.from_string('*ab')
+
+        assert x.intersect(y).to_list() == ['aaacbab']
+
+    def test_leading_wildcard_backtracking_no_intersection(self):
+        x = TokenSet.from_string('aaacbab')
+        y = TokenSet.from_string('*abc')
+
+        assert x.intersect(y).to_list() == []
+
+    def test_contained_wildcard_backtracking_intersection(self):
+        x = TokenSet.from_string('ababc')
+        y = TokenSet.from_string('a*bc')
+
+        assert x.intersect(y).to_list() == ['ababc']
+
+    def test_contained_wildcard_backtracking_no_intersection(self):
+        x = TokenSet.from_string('ababc')
+        y = TokenSet.from_string('a*ac')
+
+        assert x.intersect(y).to_list() == []
+
+    @pytest.mark.timeout(2)
+    def test_catastrophic_backtracking_with_leading_characters(self):
+        x = TokenSet.from_string('f' * 100)
+        y = TokenSet.from_string('*f')
+
+        assert len(x.intersect(y).to_list()) == 1
+
+    def test_leading_atrailing_wildcard_backtracking_intersection(self):
+        x = TokenSet.from_string('acbaabab')
+        y = TokenSet.from_string('*ab*')
+
+        assert x.intersect(y).to_list() == ['acbaabab']
+
+    def test_leading_atrailing_wildcard_backtracking_intersection(self):
+        x = TokenSet.from_string('acbaabab')
+        y = TokenSet.from_string('a*ba*b')
+
+        assert x.intersect(y).to_list() == ['acbaabab']

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.3
+
+- Performance improvements on indexing
+- Compatibility with Lunr.js 2.3.3:
+    - Fixes catastrophic backtracking on leading wildcards
+
 ## 0.5.2
 
 - Fix Python 2.7 support
