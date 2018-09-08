@@ -31,11 +31,8 @@ Of course you could also use Lunr.py to power full text search in desktop applic
 
 Simply `pip install lunr` for the english only, best compatibility with Lunr.js version.
 
-An optional and experimental support for other languages via the [Natural Language Toolkit](http://www.nltk.org/) stemmers is also available via `pip install lunr[languages]`.
+An optional and experimental support for other languages via the [Natural Language Toolkit](http://www.nltk.org/) stemmers is also available via `pip install lunr[languages]`. Please refer to the [documentation page on languages](https://lunr.readthedocs.io/en/latest/languages/) for more information.
 
-Supported languages are arabic, danish, dutch, english, finnish, french, german, hungarian, italian, norwegian, portuguese, romanian, russian, spanish and swedish.
-
-Note the compatibility with Lunr.js is not guaranteed at the moment when using this experimental feature.
 
 ## Current state
 

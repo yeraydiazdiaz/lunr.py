@@ -82,3 +82,4 @@ If you have documents in multiple language pass a list of language codes:
         * Turkish
     + Languages supported by Lunr.py but not Lunr.js:
         * Arabic
+- The usage of the language feature is subject to [NTLK corpus licensing clauses](https://github.com/nltk/nltk#redistributing)
