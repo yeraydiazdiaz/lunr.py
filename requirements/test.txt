@@ -2,6 +2,6 @@
 pytest
 pytest-timeout
 mock
-tox
+tox==3.2.1
 flake8
 coverage
