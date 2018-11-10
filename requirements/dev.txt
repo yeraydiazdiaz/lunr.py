@@ -1,5 +1,5 @@
 -r test.txt
-twine
+twine==1.12.1
 mkdocs
 pytest-benchmark
 wheel
