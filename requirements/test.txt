@@ -1,6 +1,6 @@
 -e .[languages]
 pytest==3.10.0
-pytest-timeout
+pytest-timeout==1.3.2
 mock
 tox
 flake8
