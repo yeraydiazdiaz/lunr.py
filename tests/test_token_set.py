@@ -196,6 +196,7 @@ class TestTokenSetIntersect:
         x4 = TokenSet.from_string('bar')
         x5 = TokenSet.from_string('ba')
         x6 = TokenSet.from_string('foo')
+        x7 = TokenSet.from_string('bara')
         y = TokenSet.from_fuzzy_string('bar', 1)
 
         assert x1.intersect(y).to_list() == ['bbar']
@@ -204,6 +205,7 @@ class TestTokenSetIntersect:
         assert x4.intersect(y).to_list() == ['bar']
         assert x5.intersect(y).to_list() == ['ba']
         assert x6.intersect(y).to_list() == []
+        assert x7.intersect(y).to_list() == ['bara']
 
     def test_with_fuzzy_string_transpose(self):
         x1 = TokenSet.from_string('abr')
