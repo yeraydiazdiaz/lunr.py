@@ -9,15 +9,11 @@ from lunr.pipeline import Pipeline
 
 
 def index_mkdocs_data(data):
-    lunr(
-        ref='id',
-        fields=('title', 'text'),
-        documents=data['docs']
-    )
+    lunr(ref="id", fields=("title", "text"), documents=data["docs"])
 
 
 def test_index_mkdocs(benchmark):
-    data = read_json_fixture('mkdocs_index.json')
+    data = read_json_fixture("mkdocs_index.json")
     benchmark(index_mkdocs_data, data)
 
 
@@ -26,16 +22,17 @@ class TestPipelineBenchmarks:
     FEW_COUNT = 50
     MANY_COUNT = 1000
 
-    @pytest.fixture(scope='session')
+    @pytest.fixture(scope="session")
     def many_tokens(self):
-        path = os.path.join(os.path.dirname(__file__), 'fixtures/words.txt')
+        path = os.path.join(os.path.dirname(__file__), "fixtures/words.txt")
         with open(path) as words:
             self.many_tokens = [
-                words.readline().strip() for _ in range(self.MANY_COUNT)]
-        self.few_tokens = self.many_tokens[:self.FEW_COUNT]
+                words.readline().strip() for _ in range(self.MANY_COUNT)
+            ]
+        self.few_tokens = self.many_tokens[: self.FEW_COUNT]
         yield self.many_tokens
 
-    @pytest.fixture(scope='session')
+    @pytest.fixture(scope="session")
     def few_tokens(self, many_tokens):
         yield self.few_tokens
 
@@ -68,6 +65,6 @@ class TestPipelineBenchmarks:
         benchmark(token_to_token_array_pipeline.run, many_tokens)
 
 
-if __name__ == '__main__':
-    data = read_json_fixture('mkdocs_index.json')
+if __name__ == "__main__":
+    data = read_json_fixture("mkdocs_index.json")
     index_mkdocs_data(data)

@@ -8,7 +8,7 @@ import re
 from lunr.token import Token
 from lunr.utils import as_string
 
-SEPARATOR = re.compile(r'[\s\-]+')
+SEPARATOR = re.compile(r"[\s\-]+")
 
 
 def Tokenizer(obj, metadata=None):
@@ -33,8 +33,8 @@ def Tokenizer(obj, metadata=None):
 
     if isinstance(obj, (list, tuple)):
         return [
-            Token(as_string(element).lower(), deepcopy(metadata))
-            for element in obj]
+            Token(as_string(element).lower(), deepcopy(metadata)) for element in obj
+        ]
 
     string = str(obj).strip().lower()
     length = len(string)
@@ -45,16 +45,14 @@ def Tokenizer(obj, metadata=None):
         slice_length = slice_end - slice_start
         if SEPARATOR.match(char) or slice_end == length - 1:
             if slice_length > 0:
-                sl = slice(
-                    slice_start,
-                    slice_end if slice_end < length - 1 else None)
+                sl = slice(slice_start, slice_end if slice_end < length - 1 else None)
 
                 token_metadata = {}
-                token_metadata['position'] = [
+                token_metadata["position"] = [
                     slice_start,
-                    slice_length
-                    if slice_end < length - 1 else slice_length + 1]
-                token_metadata['index'] = len(tokens)
+                    slice_length if slice_end < length - 1 else slice_length + 1,
+                ]
+                token_metadata["index"] = len(tokens)
                 token_metadata.update(metadata)
 
                 tokens.append(Token(string[sl], token_metadata))

@@ -12,97 +12,85 @@ from lunr.vector import Vector
 
 def _assert_deep_keys(dict_, keys):
     d = dict_
-    for key in keys.split('.'):
+    for key in keys.split("."):
         d_keys_as_str = [str(k) for k in d]
         assert key in d_keys_as_str
         d = d[key]
 
 
 class TestBuilderBuild:
-
     def setup_method(self, method):
         self.builder = Builder()
-        doc = {
-            'id': 'id',
-            'title': 'test',
-            'body': 'missing'
-        }
+        doc = {"id": "id", "title": "test", "body": "missing"}
 
-        self.builder.ref('id')
-        self.builder.field('title')
+        self.builder.ref("id")
+        self.builder.field("title")
         self.builder.add(doc)
         self.index = self.builder.build()
 
     def test_adds_tokens_to_inverted_index(self):
-        _assert_deep_keys(self.builder.inverted_index, 'test.title.id')
+        _assert_deep_keys(self.builder.inverted_index, "test.title.id")
 
     def test_builds_vector_space_of_the_document_fields(self):
-        assert 'title/id' in self.builder.field_vectors
-        assert isinstance(self.builder.field_vectors['title/id'], Vector)
+        assert "title/id" in self.builder.field_vectors
+        assert isinstance(self.builder.field_vectors["title/id"], Vector)
 
     def test_skips_fields_not_defined_for_indexing(self):
-        assert 'missing' not in self.builder.inverted_index
+        assert "missing" not in self.builder.inverted_index
 
     def test_builds_a_token_set_for_the_corpus(self):
-        needle = TokenSet.from_string('test')
-        assert 'test' in self.builder.token_set.intersect(needle).to_list()
+        needle = TokenSet.from_string("test")
+        assert "test" in self.builder.token_set.intersect(needle).to_list()
 
     def test_calculates_document_count(self):
-        assert self.builder.average_field_length['title'] == 1
+        assert self.builder.average_field_length["title"] == 1
 
     def test_index_is_returned(self):
         assert isinstance(self.index, Index)
 
 
 class TestBuilderAdd:
-
     def test_builder_casts_docrefs_to_strings(self):
         self.builder = Builder()
-        self.builder.ref('id')
-        self.builder.field('title')
+        self.builder.ref("id")
+        self.builder.field("title")
 
-        self.builder.add(dict(id=123, title='test', body='missing'))
+        self.builder.add(dict(id=123, title="test", body="missing"))
 
-        _assert_deep_keys(self.builder.inverted_index, 'test.title.123')
+        _assert_deep_keys(self.builder.inverted_index, "test.title.123")
 
     def test_builder_metadata_whitelist_includes_metadata_in_index(self):
         self.builder = Builder()
-        self.builder.ref('id')
-        self.builder.field('title')
-        self.builder.metadata_whitelist = ['position']
+        self.builder.ref("id")
+        self.builder.field("title")
+        self.builder.metadata_whitelist = ["position"]
 
-        self.builder.add(dict(id='a', title='test', body='missing'))
-        self.builder.add(dict(id='b', title='another test', body='missing'))
+        self.builder.add(dict(id="a", title="test", body="missing"))
+        self.builder.add(dict(id="b", title="another test", body="missing"))
 
-        assert self.builder.inverted_index['test']['title']['a'] == {
-            'position': [[0, 4]]
+        assert self.builder.inverted_index["test"]["title"]["a"] == {
+            "position": [[0, 4]]
         }
-        assert self.builder.inverted_index['test']['title']['b'] == {
-            'position': [[8, 4]]
+        assert self.builder.inverted_index["test"]["title"]["b"] == {
+            "position": [[8, 4]]
         }
 
     def test_builder_field_raises_if_contains_slash(self):
         self.builder = Builder()
 
         with pytest.raises(ValueError):
-            self.builder.field('foo/bar')
+            self.builder.field("foo/bar")
 
     def test_builder_extracts_nested_properties_from_document(self):
         self.builder = Builder()
-        self.builder.field('name', extractor=lambda d: d['person']['name'])
+        self.builder.field("name", extractor=lambda d: d["person"]["name"])
 
-        self.builder.add({
-            'id': 'id',
-            'person': {
-                'name': 'bob'
-            }
-        })
+        self.builder.add({"id": "id", "person": {"name": "bob"}})
 
-        assert self.builder.inverted_index['bob']['name']['id'] == {}
+        assert self.builder.inverted_index["bob"]["name"]["id"] == {}
 
 
 class TestBuilderUse:
-
     def setup_method(self, method):
         self.builder = Builder()
 
@@ -121,13 +109,12 @@ class TestBuilderUse:
     def test_forwards_arguments_to_the_plugin(self):
         def plugin(builder, *args, **kwargs):
             assert args == (1, 2, 3)
-            assert kwargs == {'foo': 'bar'}
+            assert kwargs == {"foo": "bar"}
 
-        self.builder.use(plugin, 1, 2, 3, foo='bar')
+        self.builder.use(plugin, 1, 2, 3, foo="bar")
 
 
 class TestBuilderK1:
-
     def test_k1_default_value(self):
         builder = Builder()
         assert builder._k1 == 1.2
@@ -139,7 +126,6 @@ class TestBuilderK1:
 
 
 class TestBuilderB:
-
     def test_b_default_value(self):
         builder = Builder()
         assert builder._b == 0.75
@@ -161,25 +147,23 @@ class TestBuilderB:
 
 
 class TestBuilerRef:
-
     def test_default_reference(self):
         builder = Builder()
-        assert builder._ref == 'id'
+        assert builder._ref == "id"
 
     def test_defining_a_reference_field(self):
         builder = Builder()
-        builder.ref('foo')
-        assert builder._ref == 'foo'
+        builder.ref("foo")
+        assert builder._ref == "foo"
 
 
 class TestBuilderField:
-
     def test_define_fields_to_index(self):
         builder = Builder()
-        builder.field('foo')
+        builder.field("foo")
         assert len(builder._fields) == 1
-        assert builder._fields['foo'].name == 'foo'
-        assert builder._fields['foo'].boost == 1
-        assert builder._fields['foo'].extractor is None
-        assert repr(builder._fields['foo']) == '<Field "foo" boost="1">'
-        assert hash(builder._fields['foo']) == hash('foo')
+        assert builder._fields["foo"].name == "foo"
+        assert builder._fields["foo"].boost == 1
+        assert builder._fields["foo"].extractor is None
+        assert repr(builder._fields["foo"]) == '<Field "foo" boost="1">'
+        assert hash(builder._fields["foo"]) == hash("foo")

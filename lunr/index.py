@@ -32,17 +32,16 @@ class Index:
     """
 
     def __init__(self, attrs):
-        self.inverted_index = attrs['inverted_index']
-        self.field_vectors = attrs['field_vectors']
-        self.token_set = attrs['token_set']
-        self.fields = attrs['fields']
-        self.pipeline = attrs['pipeline']
+        self.inverted_index = attrs["inverted_index"]
+        self.field_vectors = attrs["field_vectors"]
+        self.token_set = attrs["token_set"]
+        self.fields = attrs["fields"]
+        self.pipeline = attrs["pipeline"]
 
     def __eq__(self, other):
         # TODO: extend equality to other attributes
         return (
-            self.inverted_index == other.inverted_index and
-            self.fields == other.fields
+            self.inverted_index == other.inverted_index and self.fields == other.fields
         )
 
     def search(self, query_string):
@@ -81,8 +80,8 @@ class Index:
         non_contained_fields = set(fields) - set(self.fields)
         if non_contained_fields:
             raise BaseLunrException(
-                'Fields {} are not part of the index',
-                non_contained_fields)
+                "Fields {} are not part of the index", non_contained_fields
+            )
 
         return Query(fields)
 
@@ -109,10 +108,11 @@ class Index:
 
         if len(query.clauses) == 0:
             logger.warning(
-                'Attempting a query with no clauses. Please add clauses by '
-                'either using the `callback` argument or using `create_query` '
-                'to create a preconfigured Query, manually adding clauses and '
-                'passing it as the `query` argument.')
+                "Attempting a query with no clauses. Please add clauses by "
+                "either using the `callback` argument or using `create_query` "
+                "to create a preconfigured Query, manually adding clauses and "
+                "passing it as the `query` argument."
+            )
             return []
 
         # for each query clause
@@ -136,8 +136,7 @@ class Index:
             # term, which means we may end up performing multiple index lookups
             # for a single query term.
             if clause.use_pipeline:
-                terms = self.pipeline.run_string(
-                    clause.term, {'fields': clause.fields})
+                terms = self.pipeline.run_string(clause.term, {"fields": clause.fields})
             else:
                 terms = [clause.term]
 
@@ -154,22 +153,23 @@ class Index:
                 # then be used to intersect the indexes token set to get a list
                 # of terms to lookup in the inverted index
                 term_token_set = TokenSet.from_clause(clause)
-                expanded_terms = self.token_set.intersect(
-                    term_token_set).to_list()
+                expanded_terms = self.token_set.intersect(term_token_set).to_list()
 
                 # If a term marked as required does not exist in the TokenSet
                 # it is impossible for the search to return any matches.
                 # We set all the field-scoped required matches set to empty
                 # and stop examining further clauses
-                if (len(expanded_terms) == 0 and
-                        clause.presence == QueryPresence.REQUIRED):
+                if (
+                    len(expanded_terms) == 0
+                    and clause.presence == QueryPresence.REQUIRED
+                ):
                     for field in clause.fields:
                         required_matches[field] = CompleteSet()
                     break
 
                 for expanded_term in expanded_terms:
                     posting = self.inverted_index[expanded_term]
-                    term_index = posting['_index']
+                    term_index = posting["_index"]
 
                     for field in clause.fields:
                         # For each field that this query term is scoped by
@@ -181,7 +181,7 @@ class Index:
                         # matching term from above.
                         field_posting = posting[field]
                         matching_document_refs = field_posting.keys()
-                        term_field = expanded_term + '/' + field
+                        term_field = expanded_term + "/" + field
                         matching_documents_set = set(matching_document_refs)
 
                         # If the presence of this term is required, ensure that
@@ -189,7 +189,8 @@ class Index:
                         # required matches for this clause.
                         if clause.presence == QueryPresence.REQUIRED:
                             clause_matches = clause_matches.union(
-                                matching_documents_set)
+                                matching_documents_set
+                            )
 
                             if field not in required_matches:
                                 required_matches[field] = CompleteSet()
@@ -199,9 +200,9 @@ class Index:
                         # set of prohibited matches for this field, creating
                         # that set if it does not exist yet.
                         elif clause.presence == QueryPresence.PROHIBITED:
-                            prohibited_matches[field] = (
-                                prohibited_matches[field].union(
-                                    matching_documents_set))
+                            prohibited_matches[field] = prohibited_matches[field].union(
+                                matching_documents_set
+                            )
 
                             # prohibited matches should not be part of the
                             # query vector used for similarity scoring and no
@@ -216,7 +217,8 @@ class Index:
                         # in the vector for the term we are working with.
                         # In that case we just add the scores together.
                         query_vectors[field].upsert(
-                            term_index, clause.boost, lambda a, b: a + b)
+                            term_index, clause.boost, lambda a, b: a + b
+                        )
 
                         # If we've already seen this term, field combo then
                         # we've already collected the matching documents and
@@ -229,19 +231,17 @@ class Index:
                             # are then extracted and collected into an instance
                             # of lunr.MatchData ready to be returned in the
                             # query results
-                            matching_field_ref = FieldRef(
-                                matching_document_ref, field)
-                            metadata = field_posting[
-                                str(matching_document_ref)]
+                            matching_field_ref = FieldRef(matching_document_ref, field)
+                            metadata = field_posting[str(matching_document_ref)]
 
                             if str(matching_field_ref) not in matching_fields:
-                                matching_fields[
-                                    str(matching_field_ref)] = MatchData(
-                                        expanded_term, field, metadata)
+                                matching_fields[str(matching_field_ref)] = MatchData(
+                                    expanded_term, field, metadata
+                                )
                             else:
-                                matching_fields[
-                                    str(matching_field_ref)].add(
-                                        expanded_term, field, metadata)
+                                matching_fields[str(matching_field_ref)].add(
+                                    expanded_term, field, metadata
+                                )
 
                         term_field_cache[term_field] = True
 
@@ -251,8 +251,8 @@ class Index:
             # is required in _any_ of the fields, not _all_ of the fields
             if clause.presence == QueryPresence.REQUIRED:
                 for field in clause.fields:
-                    required_matches[field] = (
-                        required_matches[field].intersection(clause_matches)
+                    required_matches[field] = required_matches[field].intersection(
+                        clause_matches
                     )
 
         # We need to combine the field scoped required and prohibited
@@ -263,10 +263,12 @@ class Index:
         for field in self.fields:
             if field in required_matches:
                 all_required_matches = all_required_matches.intersection(
-                    required_matches[field])
+                    required_matches[field]
+                )
             if field in prohibited_matches:
                 all_prohibited_matches = all_prohibited_matches.union(
-                    prohibited_matches[field])
+                    prohibited_matches[field]
+                )
 
         matching_field_refs = matching_fields.keys()
         results = []
@@ -294,78 +296,79 @@ class Index:
             field_ref = FieldRef.from_string(matching_field_ref)
             doc_ref = field_ref.doc_ref
 
-            if (doc_ref not in all_required_matches
-                    or doc_ref in all_prohibited_matches):
+            if doc_ref not in all_required_matches or doc_ref in all_prohibited_matches:
                 continue
 
             field_vector = self.field_vectors[matching_field_ref]
-            score = query_vectors[field_ref.field_name].similarity(
-                field_vector)
+            score = query_vectors[field_ref.field_name].similarity(field_vector)
 
             try:
                 doc_match = matches[doc_ref]
-                doc_match['score'] += score
-                doc_match['match_data'].combine(
-                    matching_fields[matching_field_ref])
+                doc_match["score"] += score
+                doc_match["match_data"].combine(matching_fields[matching_field_ref])
             except KeyError:
                 match = {
-                    'ref': doc_ref,
-                    'score': score,
-                    'match_data': matching_fields[matching_field_ref]
+                    "ref": doc_ref,
+                    "score": score,
+                    "match_data": matching_fields[matching_field_ref],
                 }
                 matches[doc_ref] = match
                 results.append(match)
 
-        return sorted(results, key=lambda a: a['score'], reverse=True)
+        return sorted(results, key=lambda a: a["score"], reverse=True)
 
     def serialize(self):
         from lunr import __TARGET_JS_VERSION__
+
         inverted_index = [
-            [term, self.inverted_index[term]]
-            for term in sorted(self.inverted_index)]
+            [term, self.inverted_index[term]] for term in sorted(self.inverted_index)
+        ]
         field_vectors = [
-            [ref, vector.serialize()]
-            for ref, vector in self.field_vectors.items()]
+            [ref, vector.serialize()] for ref, vector in self.field_vectors.items()
+        ]
 
         # CamelCased keys for compatibility with JS version
         return {
-            'version': __TARGET_JS_VERSION__,
-            'fields': self.fields,
-            'fieldVectors': field_vectors,
-            'invertedIndex': inverted_index,
-            'pipeline': self.pipeline.serialize()
+            "version": __TARGET_JS_VERSION__,
+            "fields": self.fields,
+            "fieldVectors": field_vectors,
+            "invertedIndex": inverted_index,
+            "pipeline": self.pipeline.serialize(),
         }
 
     @classmethod
     def load(cls, serialized_index):
         """Load a serialized index"""
         from lunr import __TARGET_JS_VERSION__
+
         if isinstance(serialized_index, basestring):
             serialized_index = json.loads(serialized_index)
 
-        if serialized_index['version'] != __TARGET_JS_VERSION__:
+        if serialized_index["version"] != __TARGET_JS_VERSION__:
             logger.warning(
-                'Version mismatch when loading serialized index. '
-                'Current version of lunr {} does not match that of serialized '
-                'index {}'.format(
-                    __TARGET_JS_VERSION__, serialized_index['version']))
+                "Version mismatch when loading serialized index. "
+                "Current version of lunr {} does not match that of serialized "
+                "index {}".format(__TARGET_JS_VERSION__, serialized_index["version"])
+            )
 
         field_vectors = {
-            ref: Vector(elements)
-            for ref, elements in serialized_index['fieldVectors']}
+            ref: Vector(elements) for ref, elements in serialized_index["fieldVectors"]
+        }
 
         tokenset_builder = TokenSetBuilder()
         inverted_index = {}
-        for term, posting in serialized_index['invertedIndex']:
+        for term, posting in serialized_index["invertedIndex"]:
             tokenset_builder.insert(term)
             inverted_index[term] = posting
 
         tokenset_builder.finish()
 
-        return Index({
-            'fields': serialized_index['fields'],
-            'field_vectors': field_vectors,
-            'inverted_index': inverted_index,
-            'token_set': tokenset_builder.root,
-            'pipeline': Pipeline.load(serialized_index['pipeline'])
-        })
+        return Index(
+            {
+                "fields": serialized_index["fields"],
+                "field_vectors": field_vectors,
+                "inverted_index": inverted_index,
+                "token_set": tokenset_builder.root,
+                "pipeline": Pipeline.load(serialized_index["pipeline"]),
+            }
+        )

@@ -15,12 +15,12 @@ def _vector_from_args(*args):
 
 def test_vector_repr():
     vector = _vector_from_args(1, 3, -5)
-    assert repr(vector) == '<Vector magnitude={}>'.format(vector.magnitude)
+    assert repr(vector) == "<Vector magnitude={}>".format(vector.magnitude)
 
 
 class TestVectorPositionForIndex:
 
-    vector = Vector([1, 'a', 2, 'b', 4, 'c', 7, 'd', 11, 'e'])
+    vector = Vector([1, "a", 2, "b", 4, "c", 7, "d", 11, "e"])
 
     def test_position_for_index_at_the_beggining(self):
         assert self.vector.position_for_index(0) == 0
@@ -63,7 +63,6 @@ def test_dot_calculates_dot_product_of_two_vectors():
 
 
 class TestSimilarity:
-
     def test_similarity_calculates_the_similarity_between_two_vectors(self):
         v1 = _vector_from_args(1, 3, -5)
         v2 = _vector_from_args(4, -2, -1)
@@ -86,7 +85,6 @@ class TestSimilarity:
 
 
 class TestVectorInsert:
-
     def test_insert_invalidates_magnitude_cache(self):
         vector = _vector_from_args(4, 5, 6)
         assert sqrt(77) == vector.magnitude
@@ -111,7 +109,6 @@ class TestVectorInsert:
 
 
 class TestVectorUpsert:
-
     def test_upsert_invalidates_magnitude_cache(self):
         vector = _vector_from_args(4, 5, 6)
         assert vector.magnitude == sqrt(77)
@@ -132,8 +129,7 @@ class TestVectorUpsert:
     def test_upsert_calls_fn_for_value_on_duplicate(self):
         vector = _vector_from_args(4, 5, 6)
 
-        vector.upsert(
-            0, 4, lambda current, passed: current + passed)
+        vector.upsert(0, 4, lambda current, passed: current + passed)
 
         assert vector.to_list() == [8, 5, 6]
 

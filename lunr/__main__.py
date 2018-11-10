@@ -37,10 +37,12 @@ def lunr(ref, fields, documents, languages=None):
         unsupported_languages = set(languages) - set(lang.SUPPORTED_LANGUAGES)
         if unsupported_languages:
             raise RuntimeError(
-                'The specified languages {} are not supported, '
-                'please choose one of {}'.format(
-                    ', '.join(unsupported_languages),
-                    ', '.join(lang.SUPPORTED_LANGUAGES.keys())))
+                "The specified languages {} are not supported, "
+                "please choose one of {}".format(
+                    ", ".join(unsupported_languages),
+                    ", ".join(lang.SUPPORTED_LANGUAGES.keys()),
+                )
+            )
         builder = lang.get_nltk_builder(languages)
     else:
         builder = Builder()

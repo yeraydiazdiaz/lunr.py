@@ -92,8 +92,8 @@ class Builder:
         Raises:
             ValueError: If the field name contains a `/`.
         """
-        if '/' in field_name:
-            raise ValueError('Field {} contains illegal character `/`')
+        if "/" in field_name:
+            raise ValueError("Field {} contains illegal character `/`")
 
         self._fields[field_name] = Field(field_name, boost, extractor)
 
@@ -145,8 +145,7 @@ class Builder:
 
         for field_name, field in self._fields.items():
             extractor = field.extractor
-            field_value = (
-                doc[field_name] if extractor is None else extractor(doc))
+            field_value = doc[field_name] if extractor is None else extractor(doc)
             tokens = Tokenizer(field_value)
             terms = self.pipeline.run(tokens)
             field_ref = FieldRef(doc_ref, field_name)
@@ -164,18 +163,20 @@ class Builder:
                 field_terms[term_key] += 1
                 if term_key not in self.inverted_index:
                     posting = {_field_name: {} for _field_name in self._fields}
-                    posting['_index'] = self.term_index
+                    posting["_index"] = self.term_index
                     self.term_index += 1
                     self.inverted_index[term_key] = posting
 
                 if doc_ref not in self.inverted_index[term_key][field_name]:
-                    self.inverted_index[term_key][field_name][doc_ref] = (
-                        defaultdict(list))
+                    self.inverted_index[term_key][field_name][doc_ref] = defaultdict(
+                        list
+                    )
 
                 for metadata_key in self.metadata_whitelist:
                     metadata = term.metadata[metadata_key]
                     self.inverted_index[term_key][field_name][doc_ref][
-                        metadata_key].append(metadata)
+                        metadata_key
+                    ].append(metadata)
 
     def build(self):
         """Builds the index, creating an instance of `lunr.Index`.
@@ -187,19 +188,20 @@ class Builder:
         self._create_field_vectors()
         self._create_token_set()
 
-        return Index({
-            'inverted_index': self.inverted_index,
-            'field_vectors': self.field_vectors,
-            'token_set': self.token_set,
-            'fields': list(self._fields.keys()),
-            'pipeline': self.search_pipeline,
-        })
+        return Index(
+            {
+                "inverted_index": self.inverted_index,
+                "field_vectors": self.field_vectors,
+                "token_set": self.token_set,
+                "fields": list(self._fields.keys()),
+                "pipeline": self.search_pipeline,
+            }
+        )
 
     def _create_token_set(self):
         """Creates a token set of all tokens in the index using `lunr.TokenSet`
         """
-        self.token_set = TokenSet.from_list(
-            sorted(list(self.inverted_index.keys())))
+        self.token_set = TokenSet.from_list(sorted(list(self.inverted_index.keys())))
 
     def _calculate_average_field_lenghts(self):
         """Calculates the average document length for this index"""
@@ -229,10 +231,10 @@ class Builder:
             field_length = self.field_lengths[field_ref]
             field_vector = Vector()
             field_boost = self._fields[field_name].boost
-            doc_boost = self._documents[_field_ref.doc_ref].get('boost', 1)
+            doc_boost = self._documents[_field_ref.doc_ref].get("boost", 1)
 
             for term, tf in term_frequencies.items():
-                term_index = self.inverted_index[term]['_index']
+                term_index = self.inverted_index[term]["_index"]
 
                 if term not in term_idf_cache:
                     idf = Idf(self.inverted_index[term], self.document_count)
@@ -240,12 +242,20 @@ class Builder:
                 else:
                     idf = term_idf_cache[term]
 
-                score = idf * ((self._k1 + 1) * tf) / (
-                    self._k1 * (
-                        1 - self._b + self._b * (
-                            field_length /
-                            self.average_field_length[field_name])
-                        ) + tf)
+                score = (
+                    idf
+                    * ((self._k1 + 1) * tf)
+                    / (
+                        self._k1
+                        * (
+                            1
+                            - self._b
+                            + self._b
+                            * (field_length / self.average_field_length[field_name])
+                        )
+                        + tf
+                    )
+                )
                 score *= field_boost
                 score *= doc_boost
                 score_with_precision = round(score, 3)

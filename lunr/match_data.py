@@ -16,11 +16,11 @@ class MatchData:
             self.metadata[term] = {}
             if field is not None:
                 self.metadata[term][field] = (
-                    deepcopy(metadata) if metadata is not None else {})
+                    deepcopy(metadata) if metadata is not None else {}
+                )
 
     def __repr__(self):
-        return '<MatchData "{}">'.format(
-            ','.join(sorted(self.metadata.keys())))
+        return '<MatchData "{}">'.format(",".join(sorted(self.metadata.keys())))
 
     def combine(self, other):
         """An instance of lunr.MatchData will be created for every term that
@@ -42,11 +42,13 @@ class MatchData:
                 keys = other.metadata[term][field].keys()
                 for key in keys:
                     if key not in self.metadata[term][field]:
-                        self.metadata[term][field][key] = (
-                            other.metadata[term][field][key])
+                        self.metadata[term][field][key] = other.metadata[term][field][
+                            key
+                        ]
                     else:
                         self.metadata[term][field][key].extend(
-                            other.metadata[term][field][key])
+                            other.metadata[term][field][key]
+                        )
 
     def add(self, term, field, metadata):
         """Add metadata for a term/field pair to this instance of match data"""

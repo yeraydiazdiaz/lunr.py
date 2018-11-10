@@ -4,11 +4,10 @@ from builtins import str
 
 
 def as_string(obj):
-    return '' if not obj else str(obj)
+    return "" if not obj else str(obj)
 
 
 class CompleteSet(set):
-
     def union(self, other):
         return set(other)
 

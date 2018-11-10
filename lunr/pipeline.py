@@ -16,6 +16,7 @@ class Pipeline:
     in documents entering the search index and queries ran agains the index.
 
     """
+
     registered_functions = {}
 
     def __init__(self):
@@ -25,8 +26,7 @@ class Pipeline:
         return len(self._stack)
 
     def __repr__(self):
-        return '<Pipeline stack="{}">'.format(
-            ','.join(fn.label for fn in self._stack))
+        return '<Pipeline stack="{}">'.format(",".join(fn.label for fn in self._stack))
 
     # TODO: add iterator methods?
 
@@ -34,7 +34,7 @@ class Pipeline:
     def register_function(cls, fn, label):
         """Register a function with the pipeline."""
         if label in cls.registered_functions:
-            log.warning('Overwriting existing registered function %s', label)
+            log.warning("Overwriting existing registered function %s", label)
 
         fn.label = label
         cls.registered_functions[fn.label] = fn
@@ -48,7 +48,8 @@ class Pipeline:
                 fn = cls.registered_functions[fn_name]
             except KeyError:
                 raise BaseLunrException(
-                    'Cannot load unregistered function '.format(fn_name))
+                    "Cannot load unregistered function ".format(fn_name)
+                )
             else:
                 pipeline.add(fn)
 
@@ -72,8 +73,10 @@ class Pipeline:
         except AttributeError:
             log.warning(
                 'Function "{}" is not registered with pipeline. '
-                'This may cause problems when serialising the index.'.format(
-                    getattr(fn, 'label', fn)))
+                "This may cause problems when serialising the index.".format(
+                    getattr(fn, "label", fn)
+                )
+            )
 
     def after(self, existing_fn, new_fn):
         """Adds a single function after a function that already exists in the
@@ -83,7 +86,7 @@ class Pipeline:
             index = self._stack.index(existing_fn)
             self._stack.insert(index + 1, new_fn)
         except ValueError as e:
-            six.raise_from(BaseLunrException('Cannot find existing_fn'), e)
+            six.raise_from(BaseLunrException("Cannot find existing_fn"), e)
 
     def before(self, existing_fn, new_fn):
         """Adds a single function before a function that already exists in the
@@ -95,7 +98,7 @@ class Pipeline:
             index = self._stack.index(existing_fn)
             self._stack.insert(index, new_fn)
         except ValueError as e:
-            six.raise_from(BaseLunrException('Cannot find existing_fn'), e)
+            six.raise_from(BaseLunrException("Cannot find existing_fn"), e)
 
     def remove(self, fn):
         """Removes a function from the pipeline."""
