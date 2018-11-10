@@ -3,5 +3,4 @@ pytest
 pytest-timeout
 mock
 tox
-black
 coverage

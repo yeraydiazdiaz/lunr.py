@@ -4,3 +4,4 @@ mkdocs
 pytest-benchmark
 wheel
 mypy
+black
