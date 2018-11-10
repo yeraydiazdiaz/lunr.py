@@ -1,5 +1,5 @@
 -e .[languages]
-pytest
+pytest==3.10.0
 pytest-timeout
 mock
 tox
