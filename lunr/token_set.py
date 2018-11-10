@@ -120,12 +120,12 @@ class TokenSet:
 
                 if len(frame['string']) == 1:
                     no_edit_node.final = True
-                else:
-                    stack.append({
-                        'node': no_edit_node,
-                        'edits_remaining': frame['edits_remaining'],
-                        'string': frame['string'][1:],
-                    })
+
+                stack.append({
+                    'node': no_edit_node,
+                    'edits_remaining': frame['edits_remaining'],
+                    'string': frame['string'][1:],
+                })
 
             # deletion, can only do a deletion if we have enough edits
             # remaining and if there are characters left to delte in the string

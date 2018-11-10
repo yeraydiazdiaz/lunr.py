@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.4
+
+- Compatibility with Lunr.js 2.3.5:
+    - Fix bug on fuzzy matching ignoring matches on insertions at the end of the word.
+
 ## 0.5.3
 
 - Performance improvements on indexing

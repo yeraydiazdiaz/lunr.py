@@ -62,7 +62,7 @@ def get_nltk_builder(languages):
             # use Lunr's defaults
             all_stemmers.append(lunr.stemmer.stemmer)
             all_stopwords_filters.append(stop_word_filter)
-            all_word_characters.update({'\w'})
+            all_word_characters.update({r'\w'})
         else:
             stopwords, word_characters = (
                 _get_stopwords_and_word_characters(language))

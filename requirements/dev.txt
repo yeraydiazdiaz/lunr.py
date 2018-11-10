@@ -3,3 +3,4 @@ twine
 mkdocs
 pytest-benchmark
 wheel
+mypy
