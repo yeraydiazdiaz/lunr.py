@@ -7,13 +7,13 @@ from lunr.tokenizer import SEPARATOR
 
 class QueryLexer:
     # TODO: use iteration protocol?
-    EOS = 'EOS'
-    FIELD = 'FIELD'
-    TERM = 'TERM'
-    EDIT_DISTANCE = 'EDIT_DISTANCE'
-    BOOST = 'BOOST'
+    EOS = "EOS"
+    FIELD = "FIELD"
+    TERM = "TERM"
+    EDIT_DISTANCE = "EDIT_DISTANCE"
+    BOOST = "BOOST"
     TERM_SEPARATOR = SEPARATOR
-    PRESENCE = 'PRESENCE'
+    PRESENCE = "PRESENCE"
 
     def __init__(self, string):
         self.lexemes = []
@@ -57,10 +57,10 @@ class QueryLexer:
             subslices.append(self.string[slice_start:escape_char_position])
             slice_start = escape_char_position + 1
 
-        subslices.append(self.string[slice_start:self.pos])
+        subslices.append(self.string[slice_start : self.pos])
         self.escape_char_positions = []
 
-        return ''.join(subslices)
+        return "".join(subslices)
 
     def next(self):
         if self.pos >= self.length:
@@ -71,12 +71,14 @@ class QueryLexer:
         return char
 
     def emit(self, type_):
-        self.lexemes.append({
-            'type': type_,
-            'string': self.slice_string(),
-            'start': self.start,
-            'end': self.pos
-        })
+        self.lexemes.append(
+            {
+                "type": type_,
+                "string": self.slice_string(),
+                "start": self.start,
+                "end": self.pos,
+            }
+        )
         self.start = self.pos
 
     def escape_character(self):
@@ -124,17 +126,17 @@ class QueryLexer:
                 self.escape_character()
                 continue
 
-            if char == ':':
+            if char == ":":
                 return self.lex_field
 
-            if char == '~':
+            if char == "~":
                 self.backup()
                 if self.width > 0:
                     self.emit(self.TERM)
 
                 return self.lex_edit_distance
 
-            if char == '^':
+            if char == "^":
                 self.backup()
                 if self.width > 0:
                     self.emit(self.TERM)
@@ -143,12 +145,12 @@ class QueryLexer:
 
             # '+' indicates term presence is required, check for length to
             # ensure only a leading '+' is considered
-            if char == '+' and self.width == 1:
+            if char == "+" and self.width == 1:
                 self.emit(self.PRESENCE)
                 return self.lex_text
 
             # '-' indicates term presence is prohibited
-            if char == '-' and self.width == 1:
+            if char == "-" and self.width == 1:
                 self.emit(self.PRESENCE)
                 return self.lex_text
 

@@ -43,14 +43,14 @@ class TokenSet:
         except AttributeError:
             pass
 
-        string = '1' if self.final else '0'
+        string = "1" if self.final else "0"
         for label in sorted(list(self.edges.keys())):
             node = self.edges[label]
             try:
                 node_id = str(node.id)
             except AttributeError:
                 # TODO: JS seems to rely on undefined for the id attribute?
-                node_id = ''
+                node_id = ""
 
             string = string + label + node_id
 
@@ -75,7 +75,7 @@ class TokenSet:
         # is introduced to continually match any number of characters
         for i, char in enumerate(string):
             final = i == len(string) - 1
-            if char == '*':
+            if char == "*":
                 node.edges[char] = node
                 node.final = final
             else:
@@ -100,119 +100,126 @@ class TokenSet:
         """
         root = TokenSet()
 
-        stack = [{
-            'node': root,
-            'edits_remaining': edit_distance,
-            'string': string,
-        }]
+        stack = [{"node": root, "edits_remaining": edit_distance, "string": string}]
 
         while stack:
             frame = stack.pop()
             # no edit
-            if len(frame['string']) > 0:
-                char = frame['string'][0]
+            if len(frame["string"]) > 0:
+                char = frame["string"][0]
                 no_edit_node = None
-                if char in frame['node'].edges:
-                    no_edit_node = frame['node'].edges[char]
+                if char in frame["node"].edges:
+                    no_edit_node = frame["node"].edges[char]
                 else:
                     no_edit_node = TokenSet()
-                    frame['node'].edges[char] = no_edit_node
+                    frame["node"].edges[char] = no_edit_node
 
-                if len(frame['string']) == 1:
+                if len(frame["string"]) == 1:
                     no_edit_node.final = True
 
-                stack.append({
-                    'node': no_edit_node,
-                    'edits_remaining': frame['edits_remaining'],
-                    'string': frame['string'][1:],
-                })
+                stack.append(
+                    {
+                        "node": no_edit_node,
+                        "edits_remaining": frame["edits_remaining"],
+                        "string": frame["string"][1:],
+                    }
+                )
 
             # deletion, can only do a deletion if we have enough edits
             # remaining and if there are characters left to delte in the string
-            if frame['edits_remaining'] > 0 and len(frame['string']) > 1:
-                char = frame['string'][1]
+            if frame["edits_remaining"] > 0 and len(frame["string"]) > 1:
+                char = frame["string"][1]
                 deletion_node = None
-                if char in frame['node'].edges:
-                    deletion_node = frame['node'].edges[char]
+                if char in frame["node"].edges:
+                    deletion_node = frame["node"].edges[char]
                 else:
                     deletion_node = TokenSet()
-                    frame['node'].edges[char] = deletion_node
+                    frame["node"].edges[char] = deletion_node
 
-                if len(frame['string']) <= 2:
+                if len(frame["string"]) <= 2:
                     deletion_node.final = True
                 else:
-                    stack.append({
-                        'node': deletion_node,
-                        'edits_remaining': frame['edits_remaining'] - 1,
-                        'string': frame['string'][2:],
-                    })
+                    stack.append(
+                        {
+                            "node": deletion_node,
+                            "edits_remaining": frame["edits_remaining"] - 1,
+                            "string": frame["string"][2:],
+                        }
+                    )
 
             # deletion, just removing the last character of the string
-            if frame['edits_remaining'] > 0 and len(frame['string']) == 1:
-                frame['node'].final = True
+            if frame["edits_remaining"] > 0 and len(frame["string"]) == 1:
+                frame["node"].final = True
 
             # substitution, can only do a substitution if we have enough edits
             # remaining and there are characters left to substitute
-            if frame['edits_remaining'] > 0 and len(frame['string']) >= 1:
-                if '*' in frame['node'].edges:
-                    substitution_node = frame['node'].edges['*']
+            if frame["edits_remaining"] > 0 and len(frame["string"]) >= 1:
+                if "*" in frame["node"].edges:
+                    substitution_node = frame["node"].edges["*"]
                 else:
                     substitution_node = TokenSet()
-                    frame['node'].edges['*'] = substitution_node
+                    frame["node"].edges["*"] = substitution_node
 
-                if len(frame['string']) == 1:
+                if len(frame["string"]) == 1:
                     substitution_node.final = True
                 else:
-                    stack.append({
-                        'node': substitution_node,
-                        'edits_remaining': frame['edits_remaining'] - 1,
-                        'string': frame['string'][1:],
-                    })
+                    stack.append(
+                        {
+                            "node": substitution_node,
+                            "edits_remaining": frame["edits_remaining"] - 1,
+                            "string": frame["string"][1:],
+                        }
+                    )
 
             # insertion, can only do insertion if there are edits remaining
-            if frame['edits_remaining']:
-                if '*' in frame['node'].edges:
-                    insertion_node = frame['node'].edges['*']
+            if frame["edits_remaining"]:
+                if "*" in frame["node"].edges:
+                    insertion_node = frame["node"].edges["*"]
                 else:
                     insertion_node = TokenSet()
-                    frame['node'].edges['*'] = insertion_node
+                    frame["node"].edges["*"] = insertion_node
 
-                if len(frame['string']) == 0:
+                if len(frame["string"]) == 0:
                     insertion_node.final = True
                 else:
-                    stack.append({
-                        'node': insertion_node,
-                        'edits_remaining': frame['edits_remaining'] - 1,
-                        'string': frame['string'],
-                    })
+                    stack.append(
+                        {
+                            "node": insertion_node,
+                            "edits_remaining": frame["edits_remaining"] - 1,
+                            "string": frame["string"],
+                        }
+                    )
 
             # transposition, can only do a transposition if there are edits
             # remaining and there are enough characters to transpose
-            if frame['edits_remaining'] and len(frame['string']) > 1:
-                char_a = frame['string'][0]
-                char_b = frame['string'][1]
+            if frame["edits_remaining"] and len(frame["string"]) > 1:
+                char_a = frame["string"][0]
+                char_b = frame["string"][1]
                 transpose_node = None
 
-                if char_b in frame['node'].edges:
-                    transpose_node = frame['node'].edges[char_b]
+                if char_b in frame["node"].edges:
+                    transpose_node = frame["node"].edges[char_b]
                 else:
                     transpose_node = TokenSet()
-                    frame['node'].edges[char_b] = transpose_node
+                    frame["node"].edges[char_b] = transpose_node
 
-                if len(frame['string']) == 1:
+                if len(frame["string"]) == 1:
                     transpose_node.final = True
                 else:
-                    stack.append({
-                        'node': transpose_node,
-                        'edits_remaining': frame['edits_remaining'] - 1,
-                        'string': char_a + frame['string'][2:],
-                    })
+                    stack.append(
+                        {
+                            "node": transpose_node,
+                            "edits_remaining": frame["edits_remaining"] - 1,
+                            "string": char_a + frame["string"][2:],
+                        }
+                    )
 
         return root
 
     @classmethod
     def from_list(cls, list_of_words):
         from lunr.token_set_builder import TokenSetBuilder
+
         builder = TokenSetBuilder()
         for word in list_of_words:
             builder.insert(word)
@@ -223,28 +230,26 @@ class TokenSet:
     @classmethod
     def from_clause(cls, clause):
         if clause.edit_distance:
-            return cls.from_fuzzy_string(
-                clause.term, clause.edit_distance)
+            return cls.from_fuzzy_string(clause.term, clause.edit_distance)
         else:
             return cls.from_string(clause.term)
 
     def to_list(self):
         words = []
-        stack = [{
-            'prefix': '',
-            'node': self
-        }]
+        stack = [{"prefix": "", "node": self}]
 
         while stack:
             frame = stack.pop()
-            if frame['node'].final:
-                words.append(frame['prefix'])
+            if frame["node"].final:
+                words.append(frame["prefix"])
 
-            for edge in frame['node'].edges.keys():
-                stack.append({
-                    'prefix': frame['prefix'] + str(edge),
-                    'node': frame['node'].edges[edge]
-                })
+            for edge in frame["node"].edges.keys():
+                stack.append(
+                    {
+                        "prefix": frame["prefix"] + str(edge),
+                        "node": frame["node"].edges[edge],
+                    }
+                )
 
         return words
 
@@ -256,34 +261,26 @@ class TokenSet:
         the TokenSet.
         """
         output = TokenSet()
-        stack = [{
-            'node': self,
-            'q_node': other,
-            'output': output,
-        }]
+        stack = [{"node": self, "q_node": other, "output": output}]
 
         while stack:
             frame = stack.pop()
-            for q_edge in frame['q_node'].edges.keys():
-                for n_edge in frame['node'].edges.keys():
-                    if n_edge == q_edge or q_edge == '*':
-                        node = frame['node'].edges[n_edge]
-                        q_node = frame['q_node'].edges[q_edge]
+            for q_edge in frame["q_node"].edges.keys():
+                for n_edge in frame["node"].edges.keys():
+                    if n_edge == q_edge or q_edge == "*":
+                        node = frame["node"].edges[n_edge]
+                        q_node = frame["q_node"].edges[q_edge]
                         final = node.final and q_node.final
                         next_ = None
 
-                        if n_edge in frame['output'].edges:
-                            next_ = frame['output'].edges[n_edge]
+                        if n_edge in frame["output"].edges:
+                            next_ = frame["output"].edges[n_edge]
                             next_.final = next_.final or final
                         else:
                             next_ = TokenSet()
                             next_.final = final
-                            frame['output'].edges[n_edge] = next_
+                            frame["output"].edges[n_edge] = next_
 
-                        stack.append({
-                            'node': node,
-                            'q_node': q_node,
-                            'output': next_
-                        })
+                        stack.append({"node": node, "q_node": q_node, "output": next_})
 
         return output

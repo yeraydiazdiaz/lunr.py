@@ -7,8 +7,7 @@ import six
 
 @six.python_2_unicode_compatible
 class Token:
-
-    def __init__(self, string='', metadata=None):
+    def __init__(self, string="", metadata=None):
         self.string = string
         self.metadata = metadata or {}
 

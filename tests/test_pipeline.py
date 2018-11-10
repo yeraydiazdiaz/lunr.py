@@ -15,16 +15,14 @@ def fn(*args, **kwargs):
 
 
 class BaseTestPipeline:
-
     @pytest.fixture(autouse=True)
     def setup_mock_pipline(self, monkeypatch):
-        monkeypatch.setattr(Pipeline, 'registered_functions', {})
-        monkeypatch.setattr(Pipeline, 'warn_if_function_not_registered', noop)
+        monkeypatch.setattr(Pipeline, "registered_functions", {})
+        monkeypatch.setattr(Pipeline, "warn_if_function_not_registered", noop)
         self.pipeline = Pipeline()
 
 
 class TestAdd(BaseTestPipeline):
-
     def test_add_function_to_pipeline(self):
         self.pipeline.add(noop)
         assert len(self.pipeline) == 1
@@ -35,13 +33,12 @@ class TestAdd(BaseTestPipeline):
 
     def test_add_warns_if_function_not_registered(self, monkeypatch):
         monkeypatch.undo()
-        with patch('lunr.pipeline.log') as mock_log:
+        with patch("lunr.pipeline.log") as mock_log:
             self.pipeline.add(lambda x: x)
             mock_log.warning.assert_called_once()
 
 
 class TestRemove(BaseTestPipeline):
-
     def test_remove_function_exists_in_pipeline(self):
         self.pipeline.add(noop)
         assert len(self.pipeline) == 1
@@ -59,7 +56,6 @@ class TestRemove(BaseTestPipeline):
 
 
 class TestBefore(BaseTestPipeline):
-
     def test_before_other_function_exists(self):
         self.pipeline.add(noop)
         self.pipeline.before(noop, fn)
@@ -74,7 +70,6 @@ class TestBefore(BaseTestPipeline):
 
 
 class TestAfter(BaseTestPipeline):
-
     def test_after_other_function_exists(self):
         self.pipeline.add(noop)
         self.pipeline.after(noop, fn)
@@ -89,7 +84,6 @@ class TestAfter(BaseTestPipeline):
 
 
 class TestRun(BaseTestPipeline):
-
     def test_run_calling_each_function_for_each_token(self):
         count_1 = []
         count_2 = []
@@ -110,34 +104,34 @@ class TestRun(BaseTestPipeline):
 
     def test_run_passes_token_to_pipeline_function(self):
         def fn(token, *args):
-            assert token == 'foo'
+            assert token == "foo"
 
         self.pipeline.add(fn)
-        self.pipeline.run(['foo'])
+        self.pipeline.run(["foo"])
 
     def test_run_passes_index_to_pipeline_function(self):
         def fn(_, index, *args):
             assert index == 0
 
         self.pipeline.add(fn)
-        self.pipeline.run(['foo'])
+        self.pipeline.run(["foo"])
 
     def test_run_passes_entire_token_list_to_pipeline_function(self):
         def fn(_, __, tokens):
-            assert tokens == ['foo']
+            assert tokens == ["foo"]
 
         self.pipeline.add(fn)
-        self.pipeline.run(['foo'])
+        self.pipeline.run(["foo"])
 
     def test_run_passes_output_of_one_function_as_input_to_the_next(self):
         def fn1(t, *args):
             return t.upper()
 
         def fn2(t, *args):
-            assert t == 'FOO'
+            assert t == "FOO"
 
         self.pipeline.add(fn1, fn2)
-        self.pipeline.run(['foo'])
+        self.pipeline.run(["foo"])
 
     def test_run_returns_the_results_of_the_last_function(self):
         def fn(t, *args):
@@ -145,7 +139,7 @@ class TestRun(BaseTestPipeline):
 
         self.pipeline.add(fn)
 
-        assert self.pipeline.run(['foo']) == ['FOO']
+        assert self.pipeline.run(["foo"]) == ["FOO"]
 
     def test_run_filters_out_none_values(self):
         tokens = []
@@ -161,15 +155,15 @@ class TestRun(BaseTestPipeline):
         self.pipeline.add(fn1)
         self.pipeline.add(fn2)
 
-        output = self.pipeline.run(list('abcd'))
+        output = self.pipeline.run(list("abcd"))
 
-        assert tokens == ['b', 'd']
-        assert output == ['b', 'd']
+        assert tokens == ["b", "d"]
+        assert output == ["b", "d"]
 
     def test_expanding_tokens_passed_to_output(self):
         self.pipeline.add(lambda t, *args: [t, t.upper()])
 
-        assert self.pipeline.run(['foo']) == ['foo', 'FOO']
+        assert self.pipeline.run(["foo"]) == ["foo", "FOO"]
 
     def test_expanding_tokens_not_passed_to_same_function(self):
         received = []
@@ -179,9 +173,9 @@ class TestRun(BaseTestPipeline):
             return [t, t.upper()]
 
         self.pipeline.add(fn)
-        self.pipeline.run(['foo'])
+        self.pipeline.run(["foo"])
 
-        assert received == ['foo']
+        assert received == ["foo"]
 
     def test_expanding_tokens_passed_to_the_next_pipeline_function(self):
         received = []
@@ -194,23 +188,21 @@ class TestRun(BaseTestPipeline):
 
         self.pipeline.add(fn1)
         self.pipeline.add(fn2)
-        self.pipeline.run(['foo'])
+        self.pipeline.run(["foo"])
 
-        assert received == ['foo', 'FOO']
+        assert received == ["foo", "FOO"]
 
 
 class TestSerialize(BaseTestPipeline):
-
     def test_serialize_returns_array_of_registered_function_labels(self):
-        Pipeline.register_function(fn, 'fn')
+        Pipeline.register_function(fn, "fn")
         self.pipeline.add(fn)
 
-        assert self.pipeline.serialize() == ['fn']
+        assert self.pipeline.serialize() == ["fn"]
         assert repr(self.pipeline) == '<Pipeline stack="fn">'
 
 
 class TestRegisterFunction(BaseTestPipeline):
-
     def setup_method(self, method):
         def fn(*args):
             pass
@@ -218,30 +210,27 @@ class TestRegisterFunction(BaseTestPipeline):
         self.fn = fn
 
     def test_register_function_adds_a_label_property_to_the_function(self):
-        Pipeline.register_function(self.fn, 'fn')
+        Pipeline.register_function(self.fn, "fn")
 
-        assert self.fn.label == 'fn'
+        assert self.fn.label == "fn"
 
-    def test_register_function_adds_function_to_list_of_registered_functions(
-            self):
-        Pipeline.register_function(self.fn, 'fn')
+    def test_register_function_adds_function_to_list_of_registered_functions(self):
+        Pipeline.register_function(self.fn, "fn")
 
-        assert Pipeline.registered_functions['fn'] == self.fn
+        assert Pipeline.registered_functions["fn"] == self.fn
 
-    def test_register_function_warns_when_adding_function_with_same_label(
-            self):
-        Pipeline.register_function(self.fn, 'fn')
-        with patch('lunr.pipeline.log') as mock_log:
-            Pipeline.register_function(self.fn, 'fn')
+    def test_register_function_warns_when_adding_function_with_same_label(self):
+        Pipeline.register_function(self.fn, "fn")
+        with patch("lunr.pipeline.log") as mock_log:
+            Pipeline.register_function(self.fn, "fn")
 
             mock_log.warning.assert_called_once()
 
 
 class TestLoad(BaseTestPipeline):
-
     def test_load_with_registered_functions(self):
-        serialized_pipeline = ['fn']
-        Pipeline.register_function(fn, 'fn')
+        serialized_pipeline = ["fn"]
+        Pipeline.register_function(fn, "fn")
 
         pipeline = Pipeline.load(serialized_pipeline)
 
@@ -249,13 +238,12 @@ class TestLoad(BaseTestPipeline):
         assert pipeline._stack[0] == fn
 
     def test_load_with_unregistered_functions(self):
-        serialized_pipeline = ['fn']
+        serialized_pipeline = ["fn"]
         with pytest.raises(BaseLunrException):
             Pipeline.load(serialized_pipeline)
 
 
 class TestReset(BaseTestPipeline):
-
     def test_reset_empties_the_stack(self):
         self.pipeline.add(noop)
         assert len(self.pipeline) == 1

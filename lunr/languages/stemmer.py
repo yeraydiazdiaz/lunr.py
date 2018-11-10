@@ -6,6 +6,7 @@ def get_language_stemmer(language):
     """
     from lunr.languages import SUPPORTED_LANGUAGES
     from nltk.stem.snowball import SnowballStemmer
+
     return SnowballStemmer(SUPPORTED_LANGUAGES[language])
 
 
@@ -19,6 +20,7 @@ def nltk_stemmer(stemmer, token, i=None, tokens=None):
         i (int): The index of the token in a set.
         tokens (list): A list of tokens representing the set.
     """
+
     def wrapped_stem(token, metadata=None):
         return stemmer.stem(token)
 

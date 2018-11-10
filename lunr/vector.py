@@ -29,7 +29,7 @@ class Vector:
         self.elements = elements or []
 
     def __repr__(self):
-        return '<Vector magnitude={}>'.format(self.magnitude)
+        return "<Vector magnitude={}>".format(self.magnitude)
 
     def __iter__(self):
         return iter(self.elements)
@@ -76,8 +76,10 @@ class Vector:
         Does not allow duplicates, will throw an error if there is already an
         entry for this index.
         """
+
         def prevent_duplicates(index, val):
-            raise BaseLunrException('Duplicate index')
+            raise BaseLunrException("Duplicate index")
+
         self.upsert(insert_index, val, prevent_duplicates)
 
     def upsert(self, insert_index, val, fn=None):
@@ -94,8 +96,7 @@ class Vector:
         fn = fn or (lambda current, passed: passed)
         self._magnitude = 0
         position = self.position_for_index(insert_index)
-        if (position < len(self.elements) and
-                self.elements[position] == insert_index):
+        if position < len(self.elements) and self.elements[position] == insert_index:
             self.elements[position + 1] = fn(self.elements[position + 1], val)
         else:
             self.elements.insert(position, val)
