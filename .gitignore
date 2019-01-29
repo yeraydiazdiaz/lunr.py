@@ -18,3 +18,4 @@ build/
 .benchmarks/
 *TODO.md
 tests/profiles/
+.mypy_cache/

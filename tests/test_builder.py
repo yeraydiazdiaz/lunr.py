@@ -89,6 +89,18 @@ class TestBuilderAdd:
 
         assert self.builder.inverted_index["bob"]["name"]["id"] == {}
 
+    def test_builder_field_term_frequency_and_length(self):
+        self.builder = Builder()
+        self.builder.ref("id")
+        self.builder.field("title")
+
+        self.builder.add(dict(id="a", title="test a testing test", body="missing"))
+
+        assert self.builder.field_term_frequencies == {
+            "title/a": {"test": 2, "a": 1, "testing": 1}
+        }
+        assert self.builder.field_lengths == {"title/a": 4}
+
 
 class TestBuilderUse:
     def setup_method(self, method):
