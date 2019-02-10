@@ -156,7 +156,7 @@ class TestTokenSetIntersect:
 
         assert {"foo"} == set(z.to_list())
 
-    def test_with_fuzzy_string_subtitution(self):
+    def test_with_fuzzy_string_substitution(self):
         x1 = TokenSet.from_string("bar")
         x2 = TokenSet.from_string("cur")
         x3 = TokenSet.from_string("cat")
@@ -243,7 +243,7 @@ class TestTokenSetIntersect:
 
         assert len(x.intersect(y).to_list()) == 1
 
-    def test_leading_atrailing_wildcard_backtracking_intersection(self):
+    def test_leading_trailing_wildcard_backtracking_intersection(self):
         x = TokenSet.from_string("acbaabab")
         y = TokenSet.from_string("*ab*")
 

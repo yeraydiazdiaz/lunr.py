@@ -126,7 +126,7 @@ class TokenSet:
                 )
 
             # deletion, can only do a deletion if we have enough edits
-            # remaining and if there are characters left to delte in the string
+            # remaining and if there are characters left to delete in the string
             if frame["edits_remaining"] > 0 and len(frame["string"]) > 1:
                 char = frame["string"][1]
                 deletion_node = None
