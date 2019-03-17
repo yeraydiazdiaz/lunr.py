@@ -184,7 +184,7 @@ class Builder:
         This completes the indexing process and should only be called once all
         documents have been added to the index.
         """
-        self._calculate_average_field_lenghts()
+        self._calculate_average_field_lengths()
         self._create_field_vectors()
         self._create_token_set()
 
@@ -203,7 +203,7 @@ class Builder:
         """
         self.token_set = TokenSet.from_list(sorted(list(self.inverted_index.keys())))
 
-    def _calculate_average_field_lenghts(self):
+    def _calculate_average_field_lengths(self):
         """Calculates the average document length for this index"""
         accumulator = defaultdict(int)
         documents_with_field = defaultdict(int)

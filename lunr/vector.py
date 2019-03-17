@@ -86,7 +86,7 @@ class Vector:
         """Inserts or updates an existing index within the vector.
 
         Args:
-            - insert_index (int): The index at which teh element should be
+            - insert_index (int): The index at which the element should be
                 inserted.
             - val (int|float): The value to be inserted into the vector.
             - fn (callable, optional): An optional callable taking two
