@@ -9,7 +9,7 @@
   "author": "Yeray Diaz Diaz",
   "license": "MIT",
   "dependencies": {
-    "lunr": "2.3.5",
+    "lunr": "2.3.6",
     "lunr-languages": "1.0.0",
     "tmp": "0.0.33"
   },
