@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from builtins import str
+import re
 
 import six
 
@@ -80,3 +81,10 @@ class TestTokenizer:
         tokens = Tokenizer("foo bar", {"hurp": "durp"})
         assert tokens[0].metadata["hurp"] == "durp"
         assert tokens[1].metadata["hurp"] == "durp"
+
+    def test_providing_separator(self):
+        tokens = [
+            str(token)
+            for token in Tokenizer("foo_bar-baz", separator=re.compile(r"[_\-]+"))
+        ]
+        assert tokens == ["foo", "bar", "baz"]

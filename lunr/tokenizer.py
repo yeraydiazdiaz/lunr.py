@@ -40,7 +40,7 @@ def Tokenizer(obj, metadata=None, separator=SEPARATOR):
     for slice_end in range(length):
         char = string[slice_end]
         slice_length = slice_end - slice_start
-        if SEPARATOR.match(char) or slice_end == length - 1:
+        if separator.match(char) or slice_end == length - 1:
             if slice_length > 0:
                 sl = slice(slice_start, slice_end if slice_end < length - 1 else None)
 
