@@ -212,6 +212,30 @@ class TestTokenSetIntersect:
         assert x2.intersect(y).to_list() == ["bra"]
         assert x3.intersect(y).to_list() == []
 
+    def test_fuzzy_string_insertion(self):
+        x = TokenSet.from_string("abcxx")
+        y = TokenSet.from_fuzzy_string("abc", 2)
+
+        assert x.intersect(y).to_list() == ["abcxx"]
+
+    def test_fuzzy_string_substitution(self):
+        x = TokenSet.from_string("axx")
+        y = TokenSet.from_fuzzy_string("abc", 2)
+
+        assert x.intersect(y).to_list() == ["axx"]
+
+    def test_fuzzy_string_deletion(self):
+        x = TokenSet.from_string("a")
+        y = TokenSet.from_fuzzy_string("abc", 2)
+
+        assert x.intersect(y).to_list() == ["a"]
+
+    def test_fuzzy_string_transpose(self):
+        x = TokenSet.from_string("bca")
+        y = TokenSet.from_fuzzy_string("abc", 2)
+
+        assert x.intersect(y).to_list() == ["bca"]
+
     def test_leading_wildcard_backtracking_intersection(self):
         x = TokenSet.from_string("aaacbab")
         y = TokenSet.from_string("*ab")

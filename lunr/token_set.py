@@ -125,35 +125,45 @@ class TokenSet:
                     }
                 )
 
+            if frame["edits_remaining"] == 0:
+                continue
+
+            # insertion, can only do insertion if there are edits remaining
+            if "*" in frame["node"].edges:
+                insertion_node = frame["node"].edges["*"]
+            else:
+                insertion_node = TokenSet()
+                frame["node"].edges["*"] = insertion_node
+
+            if len(frame["string"]) == 0:
+                insertion_node.final = True
+
+            stack.append(
+                {
+                    "node": insertion_node,
+                    "edits_remaining": frame["edits_remaining"] - 1,
+                    "string": frame["string"],
+                }
+            )
+
             # deletion, can only do a deletion if we have enough edits
             # remaining and if there are characters left to delete in the string
-            if frame["edits_remaining"] > 0 and len(frame["string"]) > 1:
-                char = frame["string"][1]
-                deletion_node = None
-                if char in frame["node"].edges:
-                    deletion_node = frame["node"].edges[char]
-                else:
-                    deletion_node = TokenSet()
-                    frame["node"].edges[char] = deletion_node
-
-                if len(frame["string"]) <= 2:
-                    deletion_node.final = True
-                else:
-                    stack.append(
-                        {
-                            "node": deletion_node,
-                            "edits_remaining": frame["edits_remaining"] - 1,
-                            "string": frame["string"][2:],
-                        }
-                    )
+            if len(frame["string"]) > 1:
+                stack.append(
+                    {
+                        "node": frame["node"],
+                        "edits_remaining": frame["edits_remaining"] - 1,
+                        "string": frame["string"][1:],
+                    }
+                )
 
             # deletion, just removing the last character of the string
-            if frame["edits_remaining"] > 0 and len(frame["string"]) == 1:
+            if len(frame["string"]) == 1:
                 frame["node"].final = True
 
             # substitution, can only do a substitution if we have enough edits
             # remaining and there are characters left to substitute
-            if frame["edits_remaining"] > 0 and len(frame["string"]) >= 1:
+            if len(frame["string"]) >= 1:
                 if "*" in frame["node"].edges:
                     substitution_node = frame["node"].edges["*"]
                 else:
@@ -162,33 +172,14 @@ class TokenSet:
 
                 if len(frame["string"]) == 1:
                     substitution_node.final = True
-                else:
-                    stack.append(
-                        {
-                            "node": substitution_node,
-                            "edits_remaining": frame["edits_remaining"] - 1,
-                            "string": frame["string"][1:],
-                        }
-                    )
 
-            # insertion, can only do insertion if there are edits remaining
-            if frame["edits_remaining"]:
-                if "*" in frame["node"].edges:
-                    insertion_node = frame["node"].edges["*"]
-                else:
-                    insertion_node = TokenSet()
-                    frame["node"].edges["*"] = insertion_node
-
-                if len(frame["string"]) == 0:
-                    insertion_node.final = True
-                else:
-                    stack.append(
-                        {
-                            "node": insertion_node,
-                            "edits_remaining": frame["edits_remaining"] - 1,
-                            "string": frame["string"],
-                        }
-                    )
+                stack.append(
+                    {
+                        "node": substitution_node,
+                        "edits_remaining": frame["edits_remaining"] - 1,
+                        "string": frame["string"][1:],
+                    }
+                )
 
             # transposition, can only do a transposition if there are edits
             # remaining and there are enough characters to transpose
@@ -205,14 +196,14 @@ class TokenSet:
 
                 if len(frame["string"]) == 1:
                     transpose_node.final = True
-                else:
-                    stack.append(
-                        {
-                            "node": transpose_node,
-                            "edits_remaining": frame["edits_remaining"] - 1,
-                            "string": char_a + frame["string"][2:],
-                        }
-                    )
+
+                stack.append(
+                    {
+                        "node": transpose_node,
+                        "edits_remaining": frame["edits_remaining"] - 1,
+                        "string": char_a + frame["string"][2:],
+                    }
+                )
 
         return root
 

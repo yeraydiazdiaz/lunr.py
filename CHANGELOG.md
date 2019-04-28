@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.5
+
+- Compatibility with Lunr.js 2.3.6:
+    - Fix bug with fuzzy matching that meant deletions at the end of a word would not match.
+
 ## 0.5.4
 
 - Compatibility with Lunr.js 2.3.5:
