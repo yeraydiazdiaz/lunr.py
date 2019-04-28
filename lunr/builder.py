@@ -189,13 +189,11 @@ class Builder:
         self._create_token_set()
 
         return Index(
-            {
-                "inverted_index": self.inverted_index,
-                "field_vectors": self.field_vectors,
-                "token_set": self.token_set,
-                "fields": list(self._fields.keys()),
-                "pipeline": self.search_pipeline,
-            }
+            inverted_index=self.inverted_index,
+            field_vectors=self.field_vectors,
+            token_set=self.token_set,
+            fields=list(self._fields.keys()),
+            pipeline=self.search_pipeline,
         )
 
     def _create_token_set(self):

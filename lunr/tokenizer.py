@@ -11,14 +11,11 @@ from lunr.utils import as_string
 SEPARATOR = re.compile(r"[\s\-]+")
 
 
-def Tokenizer(obj, metadata=None):
+def Tokenizer(obj, metadata=None, separator=SEPARATOR):
     """Splits a string into tokens ready to be inserted into the search index.
 
-    Uses `Tokenizer.SEPARATOR` to split strings, change the value of this
-    property to change how strings are split into tokens.
-
     This tokenizer will convert its parameter to a string by calling `str` and
-    then will split this string on the character in `Tokenizer.SEPARATOR`.
+    then will split this string on characters matching `separator`.
     Lists will have their elements converted to strings and wrapped in a lunr
     `Token`.
 

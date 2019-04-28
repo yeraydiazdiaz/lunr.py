@@ -31,12 +31,12 @@ class Index:
     serialized indexes.
     """
 
-    def __init__(self, attrs):
-        self.inverted_index = attrs["inverted_index"]
-        self.field_vectors = attrs["field_vectors"]
-        self.token_set = attrs["token_set"]
-        self.fields = attrs["fields"]
-        self.pipeline = attrs["pipeline"]
+    def __init__(self, inverted_index, field_vectors, token_set, fields, pipeline):
+        self.inverted_index = inverted_index
+        self.field_vectors = field_vectors
+        self.token_set = token_set
+        self.fields = fields
+        self.pipeline = pipeline
 
     def __eq__(self, other):
         # TODO: extend equality to other attributes
@@ -364,11 +364,9 @@ class Index:
         tokenset_builder.finish()
 
         return Index(
-            {
-                "fields": serialized_index["fields"],
-                "field_vectors": field_vectors,
-                "inverted_index": inverted_index,
-                "token_set": tokenset_builder.root,
-                "pipeline": Pipeline.load(serialized_index["pipeline"]),
-            }
+            fields=serialized_index["fields"],
+            field_vectors=field_vectors,
+            inverted_index=inverted_index,
+            token_set=tokenset_builder.root,
+            pipeline=Pipeline.load(serialized_index["pipeline"]),
         )
