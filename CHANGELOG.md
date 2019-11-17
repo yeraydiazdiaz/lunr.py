@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.5.6 (Unreleased)
+## 0.5.6 (2019-11-17)
 
 - Support for Python 3.8
 - Compatibility with Lunr.js 2.3.8:
