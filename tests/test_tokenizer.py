@@ -88,3 +88,13 @@ class TestTokenizer:
             for token in Tokenizer("foo_bar-baz", separator=re.compile(r"[_\-]+"))
         ]
         assert tokens == ["foo", "bar", "baz"]
+
+    def test_tracking_token_position_with_left_hand_whitespace(self):
+        tokens = Tokenizer(" foo bar")
+        assert tokens[0].metadata["position"] == [1, 3]
+        assert tokens[1].metadata["position"] == [5, 3]
+
+    def test_tracking_token_position_with_right_hand_whitespace(self):
+        tokens = Tokenizer("foo bar ")
+        assert tokens[0].metadata["position"] == [0, 3]
+        assert tokens[1].metadata["position"] == [4, 3]
