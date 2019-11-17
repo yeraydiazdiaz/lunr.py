@@ -33,25 +33,21 @@ def Tokenizer(obj, metadata=None, separator=SEPARATOR):
             Token(as_string(element).lower(), deepcopy(metadata)) for element in obj
         ]
 
-    string = str(obj).strip().lower()
+    string = str(obj).lower()
     length = len(string)
     tokens = []
     slice_start = 0
-    for slice_end in range(length):
-        char = string[slice_end]
+    for slice_end in range(length + 1):
+        char = string[slice_end] if slice_end != length else ""
         slice_length = slice_end - slice_start
-        if separator.match(char) or slice_end == length - 1:
+        if separator.match(char) or slice_end == length:
             if slice_length > 0:
-                sl = slice(slice_start, slice_end if slice_end < length - 1 else None)
-
                 token_metadata = {}
-                token_metadata["position"] = [
-                    slice_start,
-                    slice_length if slice_end < length - 1 else slice_length + 1,
-                ]
+                token_metadata["position"] = [slice_start, slice_length]
                 token_metadata["index"] = len(tokens)
                 token_metadata.update(metadata)
 
+                sl = slice(slice_start, slice_end)
                 tokens.append(Token(string[sl], token_metadata))
 
             slice_start = slice_end + 1
