@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.6 (Unreleased)
+
+- Compatibility with Lunr.js 2.3.8:
+    - Fix bug where leading white space would cause token position metadata to be reported incorrectly.
+
 ## 0.5.5
 
 - Compatibility with Lunr.js 2.3.6:
