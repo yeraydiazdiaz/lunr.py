@@ -141,12 +141,14 @@ class TestRun(BaseTestPipeline):
 
         assert self.pipeline.run(["foo"]) == ["FOO"]
 
-    def test_run_filters_out_none_values(self):
+    def test_run_filters_out_none_and_empty_string_values(self):
         tokens = []
 
         def fn1(t, i, _):
             if i % 2:
                 return t
+            elif i == 5:
+                return ""
 
         def fn2(t, *args):
             tokens.append(t)
@@ -155,7 +157,7 @@ class TestRun(BaseTestPipeline):
         self.pipeline.add(fn1)
         self.pipeline.add(fn2)
 
-        output = self.pipeline.run(list("abcd"))
+        output = self.pipeline.run(list("abcde"))
 
         assert tokens == ["b", "d"]
         assert output == ["b", "d"]
