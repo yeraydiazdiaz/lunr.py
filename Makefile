@@ -26,3 +26,19 @@ tests-full: tests tests-acceptance
 
 tests-benchmark:
 	pytest tests/benchmarks.py --benchmark-warmup=on
+
+package:
+	rm -fr dist/*
+	python setup.py sdist bdist_wheel
+
+release-test: package
+	@echo "Are you sure you want to release to test.pypi.org? [y/N]" && \
+		read ans && \
+		[ $${ans:-N} = y ] && \
+		twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
+release-pypi: package
+	@echo "Are you sure you want to release to pypi.org? [y/N]" && \
+		read ans && \
+		[ $${ans:-N} = y ] && \
+		twine upload dist/*
