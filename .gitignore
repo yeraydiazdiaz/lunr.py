@@ -13,6 +13,7 @@ build/
 .venv/
 target/
 **/*.so
+.venv/
 
 .vscode/
 *.code-workspace

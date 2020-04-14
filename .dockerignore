@@ -1,0 +1,8 @@
+.tox/
+.git/
+target/
+build/
+dist/
+.mypy-cache/
+tests/
+.venv/

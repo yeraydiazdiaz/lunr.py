@@ -44,3 +44,9 @@ release-pypi: package
 		read ans && \
 		[ $${ans:-N} = y ] && \
 		twine upload dist/*
+
+build_docker_image:
+	docker build . --tag manylinux1_x86_64_rust
+
+build_manylinux_wheels: build_docker_image
+	docker run --rm -v `pwd`:/io manylinux1_x86_64_rust /io/build_wheels.sh
