@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.7 (2020-04-14)
+
+- Prevent installing an unsupported version of NLTK in Python 2.7.
+
 ## 0.5.6 (2019-11-17)
 
 - Support for Python 3.8
