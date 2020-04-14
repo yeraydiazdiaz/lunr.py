@@ -8,13 +8,18 @@ from lunr import lunr
 from lunr.pipeline import Pipeline
 
 
-def index_mkdocs_data(data):
-    lunr(ref="id", fields=("title", "text"), documents=data["docs"])
-
-
-def test_index_mkdocs(benchmark):
+def get_mkdocs_index():
     data = read_json_fixture("mkdocs_index.json")
-    benchmark(index_mkdocs_data, data)
+    return lunr(ref="id", fields=("title", "text"), documents=data["docs"])
+
+
+class TestSearchBenchmarks:
+    @pytest.fixture(scope="session")
+    def index(self):
+        return get_mkdocs_index()
+
+    def test_search(self, index, benchmark):
+        benchmark(index.search, "styling")
 
 
 class TestPipelineBenchmarks:
@@ -66,5 +71,4 @@ class TestPipelineBenchmarks:
 
 
 if __name__ == "__main__":
-    data = read_json_fixture("mkdocs_index.json")
-    index_mkdocs_data(data)
+    get_mkdocs_index()
