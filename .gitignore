@@ -12,7 +12,7 @@ build/
 .state
 .venv/
 target/
-lunr_stemmer.so
+**/*.so
 
 .vscode/
 *.code-workspace

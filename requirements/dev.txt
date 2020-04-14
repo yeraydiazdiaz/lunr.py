@@ -8,3 +8,5 @@ black
 pdbpp
 ipython
 setuptools-rust
+flake8
+ipython

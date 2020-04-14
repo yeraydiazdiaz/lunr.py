@@ -13,7 +13,7 @@ fn stem(word: &str) -> PyResult<String>{
 }
 
 #[pymodule]
-fn lunr_stemmer(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+fn rust_stemmer(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_wrapped(wrap_pyfunction!(stem))?;
 
     Ok(())
