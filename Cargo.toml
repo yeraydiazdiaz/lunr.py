@@ -1,0 +1,12 @@
+[package]
+name = "lunr-stemmer"
+version = "0.1.0"
+authors = ["Yeray Diaz Diaz <yeraydiazdiaz@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+pyo3 = { version = "0.9.2", features = ["extension-module"] }
+
+[lib]
+name = "lunr_stemmer"
+crate-type = ["cdylib"]
