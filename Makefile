@@ -13,6 +13,7 @@ clean:
 	rm .state/*
 
 install-dev:
+	pip install -U setuptools wheel setuptools-rust
 	pip install -r requirements/dev.txt
 
 tests:
@@ -44,7 +45,7 @@ release-pypi: package
 		[ $${ans:-N} = y ] && \
 		twine upload dist/*
 
-build:
+link_rust_stemmer:
 	# From https://pyo3.rs/v0.9.2/
 	cargo rustc --release -- -C link-arg=-undefined -C link-arg=dynamic_lookup
 	ln -s target/release/liblunr_stemmer.dylib lunr_stemmer.so

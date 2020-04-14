@@ -7,3 +7,4 @@ mypy
 black
 pdbpp
 ipython
+setuptools-rust

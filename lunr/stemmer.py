@@ -434,10 +434,10 @@ class PorterStemmer:
 
 try:
     # use Rust stemmer if available
-    import lunr_stemmer
+    import lunr.rust_stemmer
 
     def wrapped_stemmer(term, metadata=None):
-        return lunr_stemmer.stem(term)
+        return lunr.rust_stemmer.stem(term)
 
 except ImportError:
     porter_stemmer = PorterStemmer()

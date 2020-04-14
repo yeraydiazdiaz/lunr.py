@@ -1,6 +1,7 @@
 import os
 import re
 from setuptools import setup, find_packages
+from setuptools_rust import RustExtension
 
 
 PATH = os.path.abspath(os.path.dirname(__file__))
@@ -36,6 +37,9 @@ setup(
     author_email="yeraydiazdiaz@gmail.com",
     packages=find_packages(exclude=("tests",)),
     include_package_data=True,
+    setup_requires=["wheel", "setuptools-rust"],
+    rust_extensions=[RustExtension("lunr.rust_stemmer")],
+    zip_safe=False,
     install_requires=["future>=0.16.0", "six>=1.11.0"],
     extras_require={
         "languages": [
