@@ -431,7 +431,17 @@ class PorterStemmer:
         return self.b[self.k0 : self.k + 1]
 
 
-porter_stemmer = PorterStemmer()
+
+try:
+    # use Rust stemmer if available
+    import lunr_stemmer
+
+    def wrapped_stemmer(term, metadata=None):
+        return lunr_stemmer.stem(term)
+
+except ImportError:
+    porter_stemmer = PorterStemmer()
+    wrapped_stemmer = porter_stemmer.stem
 
 
 def stemmer(token, i=None, tokens=None):
@@ -443,7 +453,7 @@ def stemmer(token, i=None, tokens=None):
         i (int): The index of the token in a set.
         tokens (list): A list of tokens representing the set.
     """
-    return token.update(porter_stemmer.stem)
+    return token.update(wrapped_stemmer)
 
 
 Pipeline.register_function(stemmer, "stemmer")
