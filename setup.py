@@ -38,7 +38,7 @@ setup(
     install_requires=["future>=0.16.0", "six>=1.11.0"],
     extras_require={
         "languages": ["nltk>=3.2.5"],
-        ":python_version<'3'": ["enum34", "nltk<3.5"],
+        ":python_version<'3'": ["enum34", "nltk<3.6"],
     },
     keywords="lunr full text search",
     classifiers=[
