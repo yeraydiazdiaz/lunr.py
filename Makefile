@@ -50,3 +50,7 @@ build_docker_image:
 
 build_manylinux_wheels: build_docker_image
 	docker run --rm -v `pwd`:/io manylinux1_x86_64_rust /io/build_wheels.sh
+
+lint:
+	flake8 lunr tests
+	black lunr tests
