@@ -27,6 +27,7 @@ setup(
     name="lunr",
     version=find_version(),
     url="https://github.com/yeraydiazdiaz/lunr.py",
+    project_urls={"Documentation": "https://lunr.readthedocs.io"},
     license="MIT",
     description="A Python implementation of Lunr.js",
     long_description=read_file("README.md"),
