@@ -1,7 +1,6 @@
 import re
 
 import pytest
-import six
 
 from lunr.tokenizer import Tokenizer
 

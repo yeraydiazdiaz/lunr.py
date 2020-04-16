@@ -1,5 +1,3 @@
-import six
-
 from lunr.query_lexer import QueryLexer
 from lunr.query import Clause, QueryPresence
 from lunr.exceptions import QueryParseError

@@ -1,6 +1,3 @@
-import six
-
-
 class Token:
     def __init__(self, string="", metadata=None):
         self.string = string

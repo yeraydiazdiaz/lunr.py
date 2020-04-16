@@ -1,6 +1,3 @@
-import six
-
-
 class TokenSet:
     """
     A token set is used to store the unique list of all tokens

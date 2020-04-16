@@ -1,7 +1,5 @@
 import logging
 
-import six
-
 from lunr.exceptions import BaseLunrException
 from lunr.token import Token
 

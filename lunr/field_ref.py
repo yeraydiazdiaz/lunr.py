@@ -1,5 +1,3 @@
-import six
-
 from lunr.exceptions import BaseLunrException
 
 
