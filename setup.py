@@ -47,7 +47,7 @@ setup(
     rust_extensions=rust_extensions,
     zip_safe=False,
     python_requires=">=3.5",
-    install_requires=["future>=0.16.0", "six>=1.11.0"],
+    install_requires=[],
     extras_require={"languages": ["nltk>=3.2.5"]},
     keywords="lunr full text search",
     classifiers=[

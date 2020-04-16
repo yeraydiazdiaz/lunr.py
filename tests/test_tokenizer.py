@@ -1,7 +1,4 @@
-from __future__ import unicode_literals
-
 import re
-from builtins import str
 
 import pytest
 import six
@@ -52,7 +49,6 @@ class TestTokenizer:
         assert tokens == ["false"]
 
     def test_converting_an_object_to_tokens(self):
-        @six.python_2_unicode_compatible
         class Subject:
             def __str__(self):
                 return "custom object"

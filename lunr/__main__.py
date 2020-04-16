@@ -1,8 +1,3 @@
-from __future__ import unicode_literals
-
-
-from past.builtins import basestring
-
 from lunr import languages as lang
 from lunr.builder import Builder
 from lunr.stemmer import stemmer
@@ -31,7 +26,7 @@ def lunr(ref, fields, documents, languages=None):
         Index: The populated Index ready to search against.
     """
     if languages is not None and lang.LANGUAGE_SUPPORT:
-        if isinstance(languages, basestring):
+        if isinstance(languages, str):
             languages = [languages]
 
         unsupported_languages = set(languages) - set(lang.SUPPORTED_LANGUAGES)

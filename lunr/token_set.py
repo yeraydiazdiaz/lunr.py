@@ -1,11 +1,6 @@
-from __future__ import unicode_literals
-
-from builtins import str
-
 import six
 
 
-@six.python_2_unicode_compatible
 class TokenSet:
     """
     A token set is used to store the unique list of all tokens

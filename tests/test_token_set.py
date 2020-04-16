@@ -89,7 +89,7 @@ class TestTokenSetToList:
         word = "bat"
         token_set = TokenSet.from_string(word)
 
-        assert set([word]) == set(token_set.to_list())
+        assert {word} == set(token_set.to_list())
 
 
 class TestTokenSetIntersect:

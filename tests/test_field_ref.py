@@ -1,7 +1,3 @@
-from __future__ import unicode_literals
-
-from builtins import str
-
 import pytest
 
 from lunr.field_ref import FieldRef
