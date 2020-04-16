@@ -429,13 +429,13 @@ class PorterStemmer:
         return self.b[self.k0 : self.k + 1]
 
 
-
 try:
     # use Rust stemmer if available
     import lunr.rust_stemmer
 
     def wrapped_stemmer(term, metadata=None):
         return lunr.rust_stemmer.stem(term)
+
 
 except ImportError:
     porter_stemmer = PorterStemmer()
