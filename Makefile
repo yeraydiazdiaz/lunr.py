@@ -29,13 +29,14 @@ tests-benchmark:
 
 package:
 	rm -fr dist/*
-	python setup.py sdist bdist_wheel
+	python setup.py sdist
+	python setup.py bdist_wheel --universal
 
 release-test: package
 	@echo "Are you sure you want to release to test.pypi.org? [y/N]" && \
 		read ans && \
 		[ $${ans:-N} = y ] && \
-		twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+		twine upload --repository testpypi dist/*
 
 release-pypi: package
 	@echo "Are you sure you want to release to pypi.org? [y/N]" && \
