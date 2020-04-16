@@ -4,15 +4,15 @@ import re
 
 from lunr.pipeline import Pipeline
 
-start_re = re.compile(r"^\W+")
-end_re = re.compile(r"\W+$")
+full_re = re.compile(r"^\W*?([^\W]+)\W*?$")
 
 
 def trimmer(token, i=None, tokens=None):
     def trim(s, metadata=None):
-        s = start_re.sub("", s)
-        s = end_re.sub("", s)
-        return s
+        match = full_re.match(s)
+        if match is None:
+            return s
+        return match.group(1)
 
     return token.update(trim)
 
