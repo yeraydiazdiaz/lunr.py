@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Optimize regexes and avoid usage by default.
+
 ## 0.5.7 (2020-04-14)
 
 - Prevent installing an unsupported version of NLTK in Python 2.7.
