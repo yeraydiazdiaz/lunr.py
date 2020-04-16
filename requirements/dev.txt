@@ -5,3 +5,5 @@ pytest-benchmark
 wheel
 mypy
 black
+pdbpp
+ipython
