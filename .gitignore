@@ -10,6 +10,8 @@ htmlcov/
 dist/
 build/
 .state
+.venv/
+target/
 
 .vscode/
 *.code-workspace
