@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fix installing ntlk in 2.7 without `languages` extra.
 - Optimize regexes and avoid usage by default.
 
 ## 0.5.7 (2020-04-14)
