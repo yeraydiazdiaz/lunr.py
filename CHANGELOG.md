@@ -1,9 +1,13 @@
 # Changelog
 
-## Unreleased
+## 0.5.8 (2020-04-16)
 
 - Fix installing ntlk in 2.7 without `languages` extra.
 - Optimize regexes and avoid usage by default.
+
+### Deprecation warning
+
+- 0.5.8 will be the last release to support Python 2.7.
 
 ## 0.5.7 (2020-04-14)
 
