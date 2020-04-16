@@ -1,7 +1,3 @@
-from __future__ import unicode_literals
-
-import six
-
 from lunr.query_lexer import QueryLexer
 from lunr.query import Clause, QueryPresence
 from lunr.exceptions import QueryParseError
@@ -132,7 +128,7 @@ class QueryParser:
         try:
             edit_distance = int(lexeme["string"])
         except ValueError as e:
-            six.raise_from(QueryParseError("Edit distance must be numeric"), e)
+            raise QueryParseError("Edit distance must be numeric") from e
 
         parser.current_clause.edit_distance = edit_distance
 
@@ -145,7 +141,7 @@ class QueryParser:
         try:
             boost = int(lexeme["string"])
         except ValueError as e:
-            six.raise_from(QueryParseError("Boost must be numeric"), e)
+            raise QueryParseError("Boost must be numeric") from e
 
         parser.current_clause.boost = boost
 

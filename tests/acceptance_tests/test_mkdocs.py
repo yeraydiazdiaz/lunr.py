@@ -1,7 +1,3 @@
-from __future__ import unicode_literals
-
-from builtins import open
-
 import json
 import tempfile
 

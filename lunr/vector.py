@@ -1,5 +1,3 @@
-from __future__ import unicode_literals, division
-
 from math import sqrt
 
 from lunr.exceptions import BaseLunrException

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 """
 Implementation of Porter Stemming Algorithm from
 https://tartarus.org/martin/PorterStemmer/python.txt

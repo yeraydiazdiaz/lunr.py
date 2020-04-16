@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from lunr.tokenizer import default_separator
 
 
