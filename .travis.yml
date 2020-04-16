@@ -31,5 +31,7 @@ matrix:
     sudo: true
   - python: "3.6"
     env: TOXENV="flake8"
+  - python: "3.6"
+    env: TOXENV="black"
 
 after_success: codecov
