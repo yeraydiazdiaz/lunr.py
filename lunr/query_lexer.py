@@ -1,8 +1,6 @@
 from __future__ import unicode_literals
 
-import re
-
-from lunr.tokenizer import SEPARATOR
+from lunr.tokenizer import default_separator
 
 
 class QueryLexer:
@@ -12,7 +10,6 @@ class QueryLexer:
     TERM = "TERM"
     EDIT_DISTANCE = "EDIT_DISTANCE"
     BOOST = "BOOST"
-    TERM_SEPARATOR = SEPARATOR
     PRESENCE = "PRESENCE"
 
     def __init__(self, string):
@@ -154,5 +151,5 @@ class QueryLexer:
                 self.emit(self.PRESENCE)
                 return self.lex_text
 
-            if re.match(self.TERM_SEPARATOR, char):
+            if default_separator(char):
                 return self.lex_term

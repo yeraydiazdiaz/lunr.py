@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 
-from builtins import str
 import re
+from builtins import str
 
+import pytest
 import six
 
 from lunr.tokenizer import Tokenizer
@@ -82,11 +83,9 @@ class TestTokenizer:
         assert tokens[0].metadata["hurp"] == "durp"
         assert tokens[1].metadata["hurp"] == "durp"
 
-    def test_providing_separator(self):
-        tokens = [
-            str(token)
-            for token in Tokenizer("foo_bar-baz", separator=re.compile(r"[_\-]+"))
-        ]
+    @pytest.mark.parametrize("separator", [re.compile(r"[_\-]+"), lambda c: c in "_-"])
+    def test_providing_separator(self, separator):
+        tokens = [str(token) for token in Tokenizer("foo_bar-baz", separator=separator)]
         assert tokens == ["foo", "bar", "baz"]
 
     def test_tracking_token_position_with_left_hand_whitespace(self):

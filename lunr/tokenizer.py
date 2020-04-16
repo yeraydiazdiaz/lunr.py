@@ -1,27 +1,33 @@
 from __future__ import unicode_literals
 
-from builtins import str
-
-from copy import deepcopy
 import re
+from builtins import str
+from copy import deepcopy
 
 from lunr.token import Token
 from lunr.utils import as_string
 
-SEPARATOR = re.compile(r"[\s\-]+")
+SEPARATOR_CHARS = " \t\n\r\f\v\xa0-"
 
 
-def Tokenizer(obj, metadata=None, separator=SEPARATOR):
+def default_separator(char):
+    return char and char in SEPARATOR_CHARS
+
+
+def Tokenizer(obj, metadata=None, separator=None):
     """Splits a string into tokens ready to be inserted into the search index.
 
-    This tokenizer will convert its parameter to a string by calling `str` and
-    then will split this string on characters matching `separator`.
-    Lists will have their elements converted to strings and wrapped in a lunr
-    `Token`.
+    Args:
+        metadata (dict): Optional metadata can be passed to the tokenizer, this
+            metadata will be cloned and added as metadata to every token that is
+            created from the object to be tokenized.
+        separator (callable or compiled regex): This tokenizer will convert its
+            parameter to a string by calling `str` and then will split this
+            string on characters for which `separator` is True. Lists will have
+            their elements converted to strings and wrapped in a lunr `Token`.
 
-    Optional metadata can be passed to the tokenizer, this metadata will be
-    cloned and added as metadata to every token that is created from the object
-    to be tokenized.
+    Returns:
+        List of Token instances.
     """
     if obj is None:
         return []
@@ -33,6 +39,13 @@ def Tokenizer(obj, metadata=None, separator=SEPARATOR):
             Token(as_string(element).lower(), deepcopy(metadata)) for element in obj
         ]
 
+    if separator is None:
+        is_separator = default_separator
+    elif isinstance(separator, re.Pattern):
+        is_separator = lambda c: separator.match(c)  # noqa
+    else:
+        is_separator = separator
+
     string = str(obj).lower()
     length = len(string)
     tokens = []
@@ -40,7 +53,7 @@ def Tokenizer(obj, metadata=None, separator=SEPARATOR):
     for slice_end in range(length + 1):
         char = string[slice_end] if slice_end != length else ""
         slice_length = slice_end - slice_start
-        if separator.match(char) or slice_end == length:
+        if is_separator(char) or slice_end == length:
             if slice_length > 0:
                 token_metadata = {}
                 token_metadata["position"] = [slice_start, slice_length]
