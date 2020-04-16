@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import re
 from builtins import str
 from copy import deepcopy
 
@@ -41,10 +40,10 @@ def Tokenizer(obj, metadata=None, separator=None):
 
     if separator is None:
         is_separator = default_separator
-    elif isinstance(separator, re.Pattern):
-        is_separator = lambda c: separator.match(c)  # noqa
-    else:
+    elif callable(separator):
         is_separator = separator
+    else:  # must be a regex, remove when dropping support for 2.7
+        is_separator = lambda c: separator.match(c)  # noqa
 
     string = str(obj).lower()
     length = len(string)
