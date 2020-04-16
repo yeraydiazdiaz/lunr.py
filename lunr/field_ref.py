@@ -1,11 +1,6 @@
-from __future__ import unicode_literals
-
-import six
-
 from lunr.exceptions import BaseLunrException
 
 
-@six.python_2_unicode_compatible
 class FieldRef:
 
     JOINER = "/"

@@ -43,3 +43,7 @@ release-pypi: package
 		read ans && \
 		[ $${ans:-N} = y ] && \
 		twine upload dist/*
+
+lint:
+	flake8 lunr tests
+	black lunr tests

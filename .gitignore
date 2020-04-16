@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 *.egg-info/
+.eggs/
 .coverage
 coverage.xml
 htmlcov/

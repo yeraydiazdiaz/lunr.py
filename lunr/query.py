@@ -1,6 +1,3 @@
-from __future__ import unicode_literals
-
-
 from enum import Enum
 
 
@@ -12,7 +9,7 @@ class QueryPresence(Enum):
     PROHIBITED = 3  # documents that contain this term will not be returned
 
 
-class Query(object):
+class Query:
     """A `lunr.Query` provides a programmatic way of defining queries to be
     performed against a `lunr.Index`.
 
@@ -105,7 +102,7 @@ class Query(object):
         )
 
 
-class Clause(object):
+class Clause:
     """A single clause in a `lunr.Query` contains a term and details on
     how to match that term against a `lunr.Index`
 
@@ -135,7 +132,7 @@ class Clause(object):
         wildcard=Query.WILDCARD_NONE,
         presence=QueryPresence.OPTIONAL,
     ):
-        super(Clause, self).__init__()
+        super().__init__()
         self.term = term
         self.fields = fields or []
         self.edit_distance = edit_distance
