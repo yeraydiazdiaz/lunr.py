@@ -43,7 +43,7 @@ class Pipeline:
                 fn = cls.registered_functions[fn_name]
             except KeyError:
                 raise BaseLunrException(
-                    "Cannot load unregistered function ".format(fn_name)
+                    "Cannot load unregistered function {}".format(fn_name)
                 )
             else:
                 pipeline.add(fn)
