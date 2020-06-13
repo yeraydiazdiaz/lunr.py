@@ -1,6 +1,6 @@
 site_name: Lunr.py
 
-pages:
+nav:
   - Home: index.md
   - Searching: usage.md
   - Building indices: indices.md
