@@ -4,6 +4,7 @@ mkdocs
 pytest-benchmark
 wheel
 mypy
+flake8
 black
 pdbpp
 ipython
