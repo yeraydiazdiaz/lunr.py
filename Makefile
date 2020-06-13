@@ -1,4 +1,4 @@
-.PHONY: tests tests-acceptance tests-full install-dev
+.PHONY: tests tests-acceptance tests-full install-dev docs
 
 .state:
 	mkdir .state
@@ -47,3 +47,6 @@ release-pypi: package
 lint:
 	flake8 lunr tests
 	black lunr tests
+
+docs:
+	mkdocs serve -s

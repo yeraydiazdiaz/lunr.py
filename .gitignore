@@ -13,6 +13,7 @@ build/
 .state
 .venv/
 target/
+site/
 
 .vscode/
 *.code-workspace
