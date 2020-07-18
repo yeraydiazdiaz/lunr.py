@@ -5,6 +5,7 @@ nav:
   - Searching: usage.md
   - Building indices: indices.md
   - Languages: languages.md
+  - Interoperability with Lunr.js: lunrjs-interop.md
 
 theme: readthedocs
 
