@@ -39,7 +39,12 @@ setup(
     zip_safe=False,
     python_requires=">=3.5",
     install_requires=[],
-    extras_require={"languages": ["nltk>=3.2.5"]},
+    extras_require={
+        "languages": [
+            'nltk>=3.2.5;implementation_name=="cpython"',
+            'nltk>=3.2.5,<=3.4.5;implementation_name=="pypy"',  # 3.5 fails in PyPy
+        ]
+    },
     keywords="lunr full text search",
     classifiers=[
         "Development Status :: 4 - Beta",
