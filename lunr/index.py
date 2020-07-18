@@ -313,6 +313,7 @@ class Index:
         return sorted(results, key=lambda a: a["score"], reverse=True)
 
     def serialize(self):
+        """Returns a serialized index as a dict following lunr-schema."""
         from lunr import __TARGET_JS_VERSION__
 
         inverted_index = [

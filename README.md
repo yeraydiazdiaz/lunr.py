@@ -29,7 +29,8 @@ to recreate or read the index at the start of your application.
 
 ## Interoperability with Lunr.js
 
-A core objective of Lunr.py is to provide interoperability with the JavaScript version.
+A core objective of Lunr.py is to provide
+[interoperability with the JavaScript version](https://lunr.readthedocs.io/en/latest/lunrjs-interop).
 
 An example can be found in the [MkDocs documentation library](http://www.mkdocs.org/).
 MkDocs produces a set of documents from the pages of the documentation and uses
@@ -63,10 +64,6 @@ Each version of lunr.py
 [targets a specific version of lunr.js](https://github.com/yeraydiazdiaz/lunr.py/blob/master/lunr/__init__.py#L12)
 and produces the same results as it both in Python 2.7 and 3 for
 [non-trivial corpus of documents](https://github.com/yeraydiazdiaz/lunr.py/blob/master/tests/acceptance_tests/fixtures/mkdocs_index.json).
-
-Lunr.py also serializes `Index` instances respecting the
-[`lunr-schema`](https://github.com/olivernn/lunr-schema) which are consumable by
-Lunr.js and viceversa.
 
 ## Usage
 
