@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/yeraydiazdiaz/lunr.py.svg?branch=master)](https://travis-ci.org/yeraydiazdiaz/lunr.py)
+[![Build Status](https://github.com/yeraydiazdiaz/lunr.py/workflows/CI/badge.svg?branch=master)](https://github.com/yeraydiazdiaz/lunr.py/actions?workflow=CI)
 [![codecov](https://codecov.io/gh/yeraydiazdiaz/lunr.py/branch/master/graph/badge.svg)](https://codecov.io/gh/yeraydiazdiaz/lunr.py)
 [![Supported Python Versions](https://img.shields.io/pypi/pyversions/lunr.svg)](https://pypi.org/project/lunr/)
 [![PyPI](https://img.shields.io/pypi/v/lunr.svg)](https://pypi.org/project/lunr/)
