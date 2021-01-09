@@ -135,7 +135,7 @@ class Index:
             else:
                 terms = [clause.term]
 
-            clause_matches = CompleteSet()
+            clause_matches = set()
 
             for term in terms:
                 # Each term returned from the pipeline needs to use the same

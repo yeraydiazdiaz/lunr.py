@@ -9,6 +9,6 @@ class TestCompleteSet:
         cs = CompleteSet({"bar"})
         assert cs.intersection({"foo"}) == {"foo"}
 
-    def test_union_returns_other(self):
+    def test_union_returns_self(self):
         cs = CompleteSet({"bar"})
-        assert cs.union({"foo"}) == {"foo"}
+        assert cs.union({"foo"}) == {"bar"}
