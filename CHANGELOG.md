@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Compatibility with Lunr.js 2.3.9:
+    - Fix bug where clause matches are incorrectly initialized to a complete set.
+
 ## 0.5.8 (2020-04-16)
 
 - Fix installing ntlk in 2.7 without `languages` extra.

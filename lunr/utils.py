@@ -4,7 +4,7 @@ def as_string(obj):
 
 class CompleteSet(set):
     def union(self, other):
-        return set(other)
+        return self
 
     def intersection(self, other):
         return set(other)
