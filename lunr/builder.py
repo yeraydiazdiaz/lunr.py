@@ -110,7 +110,7 @@ class Builder:
             self._b = number
 
     def k1(self, number):
-        """ A parameter that controls the speed at which a rise in term
+        """A parameter that controls the speed at which a rise in term
         frequency results in term frequency saturation.
 
         The default value is 1.2. Setting this to a higher value will give
@@ -194,8 +194,7 @@ class Builder:
         )
 
     def _create_token_set(self):
-        """Creates a token set of all tokens in the index using `lunr.TokenSet`
-        """
+        """Creates a token set of all tokens in the index using `lunr.TokenSet`"""
         self.token_set = TokenSet.from_list(sorted(list(self.inverted_index.keys())))
 
     def _calculate_average_field_lengths(self):

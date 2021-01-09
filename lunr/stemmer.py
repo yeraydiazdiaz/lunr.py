@@ -172,23 +172,23 @@ class PorterStemmer:
     def step1ab(self):
         """step1ab() gets rid of plurals and -ed or -ing. e.g.
 
-           caresses  ->  caress
-           ponies    ->  poni
-           ties      ->  ti
-           caress    ->  caress
-           cats      ->  cat
+        caresses  ->  caress
+        ponies    ->  poni
+        ties      ->  ti
+        caress    ->  caress
+        cats      ->  cat
 
-           feed      ->  feed
-           agreed    ->  agree
-           disabled  ->  disable
+        feed      ->  feed
+        agreed    ->  agree
+        disabled  ->  disable
 
-           matting   ->  mat
-           mating    ->  mate
-           meeting   ->  meet
-           milling   ->  mill
-           messing   ->  mess
+        matting   ->  mat
+        mating    ->  mate
+        meeting   ->  meet
+        milling   ->  mill
+        messing   ->  mess
 
-           meetings  ->  meet
+        meetings  ->  meet
         """
         if self.b[self.k] == "s":
             if self.ends("sses"):
