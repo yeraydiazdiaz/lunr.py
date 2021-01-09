@@ -8,8 +8,6 @@ This Python version of Lunr.js aims to bring the simple and powerful full text s
 capabilities into Python guaranteeing results as close as the original
 implementation as possible.
 
-- [Documentation](http://lunr.readthedocs.io/en/latest/)
-
 ## What does this even do?
 
 Lunr is a simple full text search solution for situations where deploying a full
@@ -22,7 +20,8 @@ to recreate or read the index at the start of your application.
 
 ## Interoperability with Lunr.js
 
-A core objective of Lunr.py is to provide interoperability with the JavaScript version.
+A core objective of Lunr.py is to [provide interoperability with the JavaScript
+version](lunrjs-interop.md).
 
 An example can be found in the [MkDocs documentation library](http://www.mkdocs.org/).
 MkDocs produces a set of documents from the pages of the documentation and uses
