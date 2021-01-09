@@ -4,6 +4,8 @@
 
 - Compatibility with Lunr.js 2.3.9:
     - Fix bug where clause matches are incorrectly initialized to a complete set.
+- Add support for Python 3.9
+- Drop support for Python 3.5
 
 ## 0.5.8 (2020-04-16)
 
