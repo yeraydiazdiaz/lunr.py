@@ -56,6 +56,6 @@ def test_add_token_metadata():
 
     idx = lunr("id", ("title", "body"), documents, builder=builder)
 
-    [result] = idx.search("kill")
-    assert result["match_data"].metadata["kill"]["title"]["token_length"] == [4]
-    assert result["match_data"].metadata["kill"]["body"]["token_length"] == [4]
+    [result, _, _] = idx.search("green")
+    assert result["match_data"].metadata["green"]["title"]["token_length"] == [5]
+    assert result["match_data"].metadata["green"]["body"]["token_length"] == [5, 5]
