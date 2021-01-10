@@ -26,7 +26,8 @@ class Pipeline:
     # TODO: add iterator methods?
 
     @classmethod
-    def register_function(cls, fn, label):
+    def register_function(cls, fn, label=None):
+        label = label or fn.__name__
         """Register a function with the pipeline."""
         if label in cls.registered_functions:
             log.warning("Overwriting existing registered function %s", label)
