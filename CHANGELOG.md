@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.5.9 (2021-01-10)
 
 - Compatibility with Lunr.js 2.3.9:
     - Fix bug where clause matches are incorrectly initialized to a complete set.
