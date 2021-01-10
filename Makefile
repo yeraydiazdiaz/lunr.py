@@ -48,5 +48,8 @@ lint:
 	flake8 lunr tests
 	black lunr tests
 
+docs:
+	sphinx-build docs docs/_build/html
+
 docs-server:
 	sphinx-autobuild docs docs/_build/html
