@@ -14,6 +14,7 @@ build/
 .venv/
 target/
 site/
+docs/_build
 
 .vscode/
 *.code-workspace
