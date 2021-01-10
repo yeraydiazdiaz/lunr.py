@@ -1,3 +1,7 @@
+---
+hide-toc: true
+---
+
 # Lunr.py 🌖
 
 A Python implementation of [Lunr.js](https://lunrjs.com) by [Oliver Nightingale](https://github.com/olivernn).
@@ -89,5 +93,12 @@ Lunr provides a convenience `lunr` function to quickly index this set of documen
 [{'ref': 'b', 'score': 0.23576799568081389, 'match_data': <MatchData "studi">}, {'ref': 'a', 'score': 0.2236629211724517, 'match_data': <MatchData "studi">}]
 ```
 
-Please refer to the [documentation](http://lunr.readthedocs.io/en/latest/)
-for more usage examples.
+```{toctree}
+:hidden:
+usage
+indices
+languages
+lunrjs-interop
+changelog
+GitHub Repository <https://github.com/yeraydiazdiaz/lunr.py>
+```

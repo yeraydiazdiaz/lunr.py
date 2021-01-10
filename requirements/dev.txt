@@ -1,6 +1,5 @@
 -r test.txt
 twine
-mkdocs
 pytest-benchmark
 wheel
 mypy
@@ -8,3 +7,7 @@ flake8
 black
 pdbpp
 ipython
+furo
+sphinx
+sphinx-autobuild
+myst-parser
