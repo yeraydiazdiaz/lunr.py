@@ -1,4 +1,5 @@
 from lunr import lunr, get_default_builder
+from lunr.pipeline import Pipeline
 from lunr.stemmer import stemmer
 from lunr.trimmer import trimmer
 from lunr.stop_word_filter import stop_word_filter
@@ -40,3 +41,21 @@ def test_drop_pipeline_function():
     idx = lunr("id", ("title", "body"), documents, builder=builder)
 
     assert idx.search("kill") == []  # no match because "killed" was not stemmed
+
+
+def test_add_token_metadata():
+    builder = get_default_builder()
+
+    def token_length(token, i, tokens):
+        token.metadata["token_length"] = len(str(token))
+        return token
+
+    Pipeline.register_function(token_length)
+    builder.pipeline.add(token_length)
+    builder.metadata_whitelist.append("token_length")
+
+    idx = lunr("id", ("title", "body"), documents, builder=builder)
+
+    [result] = idx.search("kill")
+    assert result["match_data"].metadata["kill"]["title"]["token_length"] == [4]
+    assert result["match_data"].metadata["kill"]["body"]["token_length"] == [4]

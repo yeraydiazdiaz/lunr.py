@@ -27,8 +27,8 @@ class Pipeline:
 
     @classmethod
     def register_function(cls, fn, label=None):
-        label = label or fn.__name__
         """Register a function with the pipeline."""
+        label = label or fn.__name__
         if label in cls.registered_functions:
             log.warning("Overwriting existing registered function %s", label)
 
