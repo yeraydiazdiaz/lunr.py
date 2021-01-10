@@ -26,6 +26,7 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '14'
+
       - name: "Install dependencies"
         run: |
           set -xe
@@ -37,3 +38,12 @@ jobs:
 
       - name: "Run tox targets for ${{ matrix.python-version }}"
         run: "python -m tox"
+
+      - name: "Convert coverage"
+        run: "python -m coverage xml"
+
+      - name: "Upload coverage to Codecov"
+        uses: "codecov/codecov-action@v1"
+        with:
+          fail_ci_if_error: true
+
