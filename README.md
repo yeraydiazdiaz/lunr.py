@@ -45,6 +45,11 @@ Lunr.py provides a backend solution, allowing you to parse the documents in Pyth
 of time and create a serialized Lunr.js index you can pass have the browser
 version read, minimizing start up time of your application.
 
+Each version of lunr.py
+[targets a specific version of lunr.js](https://github.com/yeraydiazdiaz/lunr.py/blob/master/lunr/__init__.py#L12)
+and produces the same results for a
+[non-trivial corpus of documents](https://github.com/yeraydiazdiaz/lunr.py/blob/master/tests/acceptance_tests/fixtures/mkdocs_index.json).
+
 ## Installation
 
 `pip install lunr`
@@ -57,13 +62,6 @@ An optional and experimental support for other languages thanks to the
 Please refer to the
 [documentation page on languages](https://lunr.readthedocs.io/en/latest/languages/)
 for more information.
-
-## Current state
-
-Each version of lunr.py
-[targets a specific version of lunr.js](https://github.com/yeraydiazdiaz/lunr.py/blob/master/lunr/__init__.py#L12)
-and produces the same results as it both in Python 2.7 and 3 for
-[non-trivial corpus of documents](https://github.com/yeraydiazdiaz/lunr.py/blob/master/tests/acceptance_tests/fixtures/mkdocs_index.json).
 
 ## Usage
 
