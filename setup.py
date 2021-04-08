@@ -43,7 +43,7 @@ setup(
         # NLTK 3.5 requires regex which does not ship with all types of wheels
         # and causes installation issues in mkdocs upstream
         # https://github.com/mkdocs/mkdocs/issues/2062
-        "languages": ["nltk>=3.2.5,<3.5"]
+        "languages": ["nltk>=3.2.5,<3.7"]
     },
     keywords="lunr full text search",
     classifiers=[
