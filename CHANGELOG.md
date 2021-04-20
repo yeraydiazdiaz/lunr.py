@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Add index customisation, enabling build and search pipeline tweaks as well as
+meta-data whitelisting.
+
 ## 0.5.9 (2021-01-10)
 
 - Compatibility with Lunr.js 2.3.9:
