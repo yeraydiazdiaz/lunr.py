@@ -1,4 +1,5 @@
 import logging
+from typing import Callable, Dict
 
 from lunr.exceptions import BaseLunrException
 from lunr.token import Token
@@ -12,7 +13,7 @@ class Pipeline:
 
     """
 
-    registered_functions = {}
+    registered_functions: Dict[str, Callable] = {}
 
     def __init__(self):
         self._stack = []

@@ -31,7 +31,7 @@ SUPPORTED_LANGUAGES = {
 }
 
 try:  # pragma: no cover
-    import nltk
+    import nltk  # type: ignore
 
     LANGUAGE_SUPPORT = True
 except ImportError:  # pragma: no cover

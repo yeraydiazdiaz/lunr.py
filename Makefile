@@ -13,6 +13,7 @@ clean:
 	rm .state/*
 
 install-dev:
+	pip install -U pip wheel setuptools
 	pip install -r requirements/dev.txt
 
 tests:
@@ -47,6 +48,7 @@ release-pypi: package
 lint:
 	flake8 lunr tests
 	black lunr tests
+	mypy lunr
 
 docs:
 	sphinx-build docs docs/_build/html
