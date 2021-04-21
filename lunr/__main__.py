@@ -5,7 +5,7 @@ from lunr.trimmer import trimmer
 from lunr.stop_word_filter import stop_word_filter
 
 
-def lunr(ref, fields, documents, languages=None):
+def lunr(ref, fields, documents, languages=None, builder=None):
     """A convenience function to configure and construct a lunr.Index.
 
     Args:
@@ -24,6 +24,28 @@ def lunr(ref, fields, documents, languages=None):
 
     Returns:
         Index: The populated Index ready to search against.
+    """
+    builder = builder or get_default_builder(languages)
+    builder.ref(ref)
+    for field in fields:
+        if isinstance(field, dict):
+            builder.field(**field)
+        else:
+            builder.field(field)
+
+    for document in documents:
+        if isinstance(document, (tuple, list)):
+            builder.add(document[0], attributes=document[1])
+        else:
+            builder.add(document)
+
+    return builder.build()
+
+
+def get_default_builder(languages=None):
+    """Creates a new pre-configured instance of Builder.
+
+    Useful as a starting point to tweak the defaults.
     """
     if languages is not None and lang.LANGUAGE_SUPPORT:
         if isinstance(languages, str):
@@ -44,17 +66,4 @@ def lunr(ref, fields, documents, languages=None):
         builder.pipeline.add(trimmer, stop_word_filter, stemmer)
         builder.search_pipeline.add(stemmer)
 
-    builder.ref(ref)
-    for field in fields:
-        if isinstance(field, dict):
-            builder.field(**field)
-        else:
-            builder.field(field)
-
-    for document in documents:
-        if isinstance(document, (tuple, list)):
-            builder.add(document[0], attributes=document[1])
-        else:
-            builder.add(document)
-
-    return builder.build()
+    return builder

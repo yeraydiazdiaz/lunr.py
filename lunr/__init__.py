@@ -1,8 +1,8 @@
 import logging
 
-from lunr.__main__ import lunr
+from lunr.__main__ import lunr, get_default_builder
 
-__all__ = ("lunr",)
+__all__ = ("lunr", "get_default_builder")
 
 logging.basicConfig(format="%(levelname)-7s -  %(message)s")
 

@@ -98,5 +98,6 @@ indices
 languages
 lunrjs-interop
 changelog
+customisation
 GitHub Repository <https://github.com/yeraydiazdiaz/lunr.py>
 ```

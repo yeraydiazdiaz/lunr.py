@@ -216,6 +216,11 @@ class TestRegisterFunction(BaseTestPipeline):
 
         assert self.fn.label == "fn"
 
+    def test_register_function_adds_defaults_to_name_of_the_function(self):
+        Pipeline.register_function(self.fn)
+
+        assert self.fn.label == self.fn.__name__
+
     def test_register_function_adds_function_to_list_of_registered_functions(self):
         Pipeline.register_function(self.fn, "fn")
 
