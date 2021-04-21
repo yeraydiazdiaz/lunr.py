@@ -5,7 +5,7 @@ def get_language_stemmer(language):
         language (str): ISO-639-1 code of the language.
     """
     from lunr.languages import SUPPORTED_LANGUAGES
-    from nltk.stem.snowball import SnowballStemmer
+    from nltk.stem.snowball import SnowballStemmer  # type: ignore
 
     return SnowballStemmer(SUPPORTED_LANGUAGES[language])
 
