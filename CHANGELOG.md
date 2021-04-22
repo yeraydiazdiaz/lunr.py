@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.6.0 (2021-04-22)
 
 - Add index customisation, enabling build and search pipeline tweaks as well as
 meta-data whitelisting.
