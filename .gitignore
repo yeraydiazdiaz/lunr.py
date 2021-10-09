@@ -24,4 +24,7 @@ docs/_build
 *TODO.md
 tests/profiles/
 .mypy_cache/
-dev/
+.dev/
+.direnv/
+.envrc
+.tool-versions
