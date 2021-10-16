@@ -40,10 +40,7 @@ setup(
     python_requires=">=3.6",
     install_requires=[],
     extras_require={
-        # NLTK 3.5 requires regex which does not ship with all types of wheels
-        # and causes installation issues in mkdocs upstream
-        # https://github.com/mkdocs/mkdocs/issues/2062
-        "languages": ["nltk>=3.2.5,<3.5"]
+        "languages": ["nltk"]
     },
     keywords="lunr full text search",
     classifiers=[
@@ -57,6 +54,7 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Text Processing",
