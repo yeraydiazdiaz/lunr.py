@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Add support for Python 3.10.
+- Remove pin to NLTK < 3.5.
+
 ## 0.6.0 (2021-04-22)
 
 - Add index customisation, enabling build and search pipeline tweaks as well as
