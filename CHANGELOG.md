@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.6.1
 
 - Add support for Python 3.10.
 - Remove pin to NLTK < 3.5.
