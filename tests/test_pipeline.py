@@ -193,7 +193,26 @@ class TestRun(BaseTestPipeline):
         self.pipeline.run(["foo"])
 
         assert received == ["foo", "FOO"]
+    
+    def test_skip_pipeline_function(self) -> None:
 
+        def upper(t, *args):
+            return t.upper()
+
+        def lower(t, *args):
+            return t.lower()
+
+        self.pipeline.add(upper)
+        self.pipeline.skip(upper, ['no_upper', 'nothing'])
+        assert self.pipeline.run(["Foo"]) == ["FOO"]
+
+        self.pipeline.add(lower)
+        self.pipeline.skip(lower, ['no_lower', 'nothing'])
+        assert self.pipeline.run(["Foo"]) == ["foo"]
+
+        assert self.pipeline.run(["Foo"], field_name='no_lower') == ["FOO"]
+        assert self.pipeline.run(["Foo"], field_name='no_upper') == ["foo"]
+        assert self.pipeline.run(["Foo"], field_name='nothing') == ["Foo"]
 
 class TestSerialize(BaseTestPipeline):
     def test_serialize_returns_array_of_registered_function_labels(self):
