@@ -105,12 +105,12 @@ class Pipeline:
             self._stack.remove(fn)
         except ValueError:
             pass
-    
+
     def skip(self, fn, field_names: List[str]):
         """
         Make the pipeline skip the function based on field name we're processing.
-        
-        This relies on passing the field name to Pipeline.run(). 
+
+        This relies on passing the field name to Pipeline.run().
         """
         self._skip[fn].update(field_names)
 
@@ -118,7 +118,7 @@ class Pipeline:
         """
         Runs the current list of functions that make up the pipeline against
         the passed tokens.
-        
+
         :param tokens: The tokens to process.
         :param field_name: The name of the field these tokens belongs to, can be ommited.
             Used to skip some functions based on field names.
@@ -147,9 +147,9 @@ class Pipeline:
         """Convenience method for passing a string through a pipeline and
         getting strings out. This method takes care of wrapping the passed
         string in a token and mapping the resulting tokens back to strings.
-        
-        .. note:: This ignores the skipped functions since we can't 
-            access field names from this context. 
+
+        .. note:: This ignores the skipped functions since we can't
+            access field names from this context.
         """
         token = Token(string, metadata)
         return [str(tkn) for tkn in self.run([token])]
