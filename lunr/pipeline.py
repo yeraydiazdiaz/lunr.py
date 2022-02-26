@@ -18,7 +18,7 @@ class Pipeline:
 
     def __init__(self):
         self._stack = []
-        self._skip: Dict[str, Set[Callable]] = defaultdict(set)
+        self._skip: Dict[str, Set[str]] = defaultdict(set)
 
     def __len__(self):
         return len(self._stack)
