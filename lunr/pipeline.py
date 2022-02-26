@@ -17,8 +17,8 @@ class Pipeline:
     registered_functions: Dict[str, Callable] = {}
 
     def __init__(self):
-        self._stack = []
-        self._skip: Dict[str, Set[str]] = defaultdict(set)
+        self._stack: List[Callable] = []
+        self._skip: Dict[Callable, Set[str]] = defaultdict(set)
 
     def __len__(self):
         return len(self._stack)
@@ -106,7 +106,7 @@ class Pipeline:
         except ValueError:
             pass
 
-    def skip(self, fn, field_names: List[str]):
+    def skip(self, fn: Callable, field_names: List[str]):
         """
         Make the pipeline skip the function based on field name we're processing.
 
