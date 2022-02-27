@@ -1,5 +1,6 @@
+from collections import defaultdict
 import logging
-from typing import Callable, Dict
+from typing import Callable, Dict, List, Set
 
 from lunr.exceptions import BaseLunrException
 from lunr.token import Token
@@ -16,7 +17,8 @@ class Pipeline:
     registered_functions: Dict[str, Callable] = {}
 
     def __init__(self):
-        self._stack = []
+        self._stack: List[Callable] = []
+        self._skip: Dict[Callable, Set[str]] = defaultdict(set)
 
     def __len__(self):
         return len(self._stack)
@@ -104,10 +106,27 @@ class Pipeline:
         except ValueError:
             pass
 
-    def run(self, tokens):
-        """Runs the current list of functions that make up the pipeline against
-        the passed tokens."""
+    def skip(self, fn: Callable, field_names: List[str]):
+        """
+        Make the pipeline skip the function based on field name we're processing.
+
+        This relies on passing the field name to Pipeline.run().
+        """
+        self._skip[fn].update(field_names)
+
+    def run(self, tokens, field_name=None):
+        """
+        Runs the current list of functions that make up the pipeline against
+        the passed tokens.
+
+        :param tokens: The tokens to process.
+        :param field_name: The name of the field these tokens belongs to, can be ommited.
+            Used to skip some functions based on field names.
+        """
         for fn in self._stack:
+            # Skip the function based on field name.
+            if field_name and field_name in self._skip[fn]:
+                continue
             results = []
             for i, token in enumerate(tokens):
                 # JS ignores additional arguments to the functions but we
@@ -127,7 +146,11 @@ class Pipeline:
     def run_string(self, string, metadata=None):
         """Convenience method for passing a string through a pipeline and
         getting strings out. This method takes care of wrapping the passed
-        string in a token and mapping the resulting tokens back to strings."""
+        string in a token and mapping the resulting tokens back to strings.
+
+        .. note:: This ignores the skipped functions since we can't
+            access field names from this context.
+        """
         token = Token(string, metadata)
         return [str(tkn) for tkn in self.run([token])]
 

@@ -41,6 +41,23 @@ idx = lunr(ref="id", fields=("title", "body"), documents=documents, builder=buil
 Note pipeline functions take the token being processed, its position in the
 token list, and the token list itself.
 
+## Skip a pipeline function for specific field names
+
+The `Pipeline.skip()` method allows you to skip a pipeline function for specific field names.
+This example skips the `stop_word_filter` pipeline function for the field `fullName`.
+
+```python
+from lunr import lunr, get_default_builder, stop_word_filter
+
+documents = [...]
+
+builder = get_default_builder()
+
+builder.pipeline.skip(stop_word_filter.stop_word_filter, ["fullName"])
+
+idx = lunr(ref="id", fields=("fullName", "body"), documents=documents, builder=builder)
+```
+
 ## Token meta-data
 
 Lunr.py `Token` instances include meta-data information which can be used in

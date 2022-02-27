@@ -144,7 +144,7 @@ class Builder:
             extractor = field.extractor
             field_value = doc[field_name] if extractor is None else extractor(doc)
             tokens = Tokenizer(field_value)
-            terms = self.pipeline.run(tokens)
+            terms = self.pipeline.run(tokens, field_name)
             field_ref = FieldRef(doc_ref, field_name)
             field_terms = defaultdict(int)
 
