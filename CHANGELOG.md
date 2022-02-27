@@ -1,11 +1,15 @@
 # Changelog
 
-## Unreleased
+## 0.6.2 (2022-02-27)
 
 - Add `Pipeline.skip` method to skip pipeline functions on specific fields
 @tristanlatr
 
-## 0.6.1
+### Deprecation warning
+
+- 0.6.2 will be the last release to support Python 3.6.
+
+## 0.6.1 (2021-10-16)
 
 - Add support for Python 3.10.
 - Remove pin to NLTK < 3.5.
