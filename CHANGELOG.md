@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Add `Pipeline.skip` method to skip pipeline functions on specific fields
+@tristanlatr
+
 ## 0.6.1
 
 - Add support for Python 3.10.
