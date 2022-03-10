@@ -90,7 +90,7 @@ Lunr.js uses the
 [`lunr-languages`](https://lunrjs.com/guides/language_support.html) package,
 a community driven collection of stemmers and trimmers for many languages.
 
-Porting each of those into Python was not feasible so Lunr.py uses [NTLK](nltk.org/)
+Porting each of those into Python was not feasible so Lunr.py uses [NTLK](https://www.nltk.org/)
 for language support and will configure the serialized index as expected by Lunr.js
 to ensure compatibility.
 
