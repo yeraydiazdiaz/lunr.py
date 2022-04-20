@@ -35,7 +35,7 @@ here is a complete example with the data from the [introduction](index.md):
 ...: )
 >>> serialized_idx = idx.serialize()
 >>> with open('idx.json', 'w') as fd:
-...:    fd.write(json.dump(serialized_idx))
+...:    json.dump(serialized_idx, fd)
 ```
 
 As you can see `serialize` will produce a JSON friendly dict you can write to
