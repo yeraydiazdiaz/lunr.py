@@ -4,7 +4,6 @@
 [![PyPI](https://img.shields.io/pypi/v/lunr.svg)](https://pypi.org/project/lunr/)
 [![Read the Docs](https://img.shields.io/readthedocs/lunr.svg)](http://lunr.readthedocs.io/en/latest/)
 [![Downloads](http://pepy.tech/badge/lunr)](http://pepy.tech/project/lunr)
-[![shoutouts.dev](https://shoutouts.dev/projects/yeraydiazdiaz/lunr.py/badge)](https://shoutouts.dev/projects/yeraydiazdiaz/lunr.py)
 
 # Lunr.py
 

@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = "lunr.py"
-copyright = "2021, Yeray Diaz Diaz"
+copyright = "2022, Yeray Diaz Diaz"
 author = "Yeray Diaz Diaz"
 
 
@@ -58,13 +58,6 @@ html_title = "Lunr.py"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-html_theme_options = {
-    "announcement": (
-        "👋 If you like lunr.py, consider giving it a "
-        '<a href="https://shoutouts.dev/projects/yeraydiazdiaz/lunr.py">'
-        "shoutout</a>! 🙏"
-    )
-}
 
 #
 # -- Options for extlinks ----------------------------------------------------
