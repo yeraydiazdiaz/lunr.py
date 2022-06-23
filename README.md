@@ -60,7 +60,7 @@ An optional and experimental support for other languages thanks to the
 [NTLK corpus licensing clauses](https://github.com/nltk/nltk#redistributing).
 
 Please refer to the
-[documentation page on languages](https://lunr.readthedocs.io/en/latest/languages/)
+[documentation page on languages](https://lunr.readthedocs.io/en/latest/languages.html)
 for more information.
 
 ## Usage
