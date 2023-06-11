@@ -39,7 +39,7 @@ except ImportError:  # pragma: no cover
 
 
 def _get_stopwords_and_word_characters(language):
-    nltk.download("stopwords")
+    nltk.download("stopwords", quiet=True)
     verbose_language = SUPPORTED_LANGUAGES[language]
     stopwords = nltk.corpus.stopwords.words(verbose_language)
     # TODO: search for a more exhaustive list of word characters

@@ -19,7 +19,6 @@ def test_vector_repr():
 
 
 class TestVectorPositionForIndex:
-
     vector = Vector([1, "a", 2, "b", 4, "c", 7, "d", 11, "e"])
 
     def test_position_for_index_at_the_beggining(self):
