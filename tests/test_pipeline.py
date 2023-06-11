@@ -47,7 +47,6 @@ class TestRemove(BaseTestPipeline):
         assert len(self.pipeline) == 0
 
     def test_remove_function_does_not_exist_in_pipeline(self):
-
         self.pipeline.add(noop)
         assert len(self.pipeline) == 1
 

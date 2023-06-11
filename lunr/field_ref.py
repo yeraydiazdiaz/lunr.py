@@ -2,7 +2,6 @@ from lunr.exceptions import BaseLunrException
 
 
 class FieldRef:
-
     JOINER = "/"
 
     def __init__(self, doc_ref, field_name, string_value=None):
