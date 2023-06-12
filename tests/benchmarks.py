@@ -23,7 +23,6 @@ class TestSearchBenchmarks:
 
 
 class TestPipelineBenchmarks:
-
     FEW_COUNT = 50
     MANY_COUNT = 1000
 
