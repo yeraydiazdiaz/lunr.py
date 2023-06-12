@@ -12,20 +12,21 @@ jobs:
     name: "Python ${{ matrix.python-version }}"
     runs-on: "ubuntu-latest"
     env:
-      USING_COVERAGE: '3.8'
+      USING_COVERAGE: "3.10"
 
     strategy:
       matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10", "pypy3"]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "pypy3.9"]
 
     steps:
-      - uses: "actions/checkout@v2"
-      - uses: "actions/setup-python@v2"
+      - uses: actions/checkout@v3
+      - uses: "actions/setup-python@v4"
         with:
           python-version: "${{ matrix.python-version }}"
-      - uses: actions/setup-node@v1
+
+      - uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: "18"
 
       - name: "Install dependencies"
         run: |
@@ -45,7 +46,6 @@ jobs:
 
       - name: "Upload coverage to Codecov"
         if: "contains(env.USING_COVERAGE, matrix.python-version)"
-        uses: "codecov/codecov-action@v1"
+        uses: "codecov/codecov-action@v3"
         with:
           fail_ci_if_error: true
-
