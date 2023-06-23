@@ -37,7 +37,7 @@ setup(
     packages=find_packages(exclude=("tests",)),
     include_package_data=True,
     zip_safe=False,
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     install_requires=[],
     extras_require={
         "languages": ["nltk"]
