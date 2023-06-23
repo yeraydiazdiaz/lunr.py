@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Drop support for Python 3.6
+- Add support for Python 3.11
+- Remove logging configuration @ping
+
 ## 0.6.2 (2022-02-27)
 
 - Add `Pipeline.skip` method to skip pipeline functions on specific fields
