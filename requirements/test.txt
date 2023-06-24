@@ -1,6 +1,0 @@
--e .[languages]
-pytest
-pytest-timeout
-mock
-tox
-coverage

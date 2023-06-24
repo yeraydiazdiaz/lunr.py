@@ -13,8 +13,8 @@ clean:
 	rm .state/*
 
 install-dev:
-	pip install -U pip wheel setuptools
-	pip install -r requirements/dev.txt
+	pip install -U pip wheel
+	pip install .[dev]
 
 tests:
 	coverage run -m pytest -m "not acceptance"
