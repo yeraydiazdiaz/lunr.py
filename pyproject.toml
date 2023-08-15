@@ -56,6 +56,7 @@ docs = [
     "sphinx-autobuild",
 ]
 local = [
+    "build",
     "twine",
     "pytest-benchmark",
     "wheel",
@@ -69,5 +70,4 @@ local = [
 dev = ["lunr[tests,docs,local]"]
 
 [tool.hatch.version]
-source = "vcs"
-raw-options = { local_scheme = "no-local-version" }
+path = "lunr/__init__.py"

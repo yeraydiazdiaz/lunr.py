@@ -30,8 +30,7 @@ tests-benchmark:
 
 package:
 	rm -fr dist/*
-	python setup.py sdist
-	python setup.py bdist_wheel --universal
+	python -m build
 
 release-test: package
 	@echo "Are you sure you want to release to test.pypi.org? [y/N]" && \
