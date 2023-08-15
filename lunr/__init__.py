@@ -1,4 +1,4 @@
-from lunr.__main__ import lunr, get_default_builder
+from lunr.lunr import lunr, get_default_builder
 
 __all__ = ("lunr", "get_default_builder")
 
