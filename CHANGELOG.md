@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.7.0 (2023-08-15)
 
 - Fix misleading usage of `__main__.py` without runnable code to be ran on `python -m lunr`
 - Move to pyproject.toml packaging
