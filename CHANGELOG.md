@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix misleading usage of `__main__.py` without runnable code to be ran on `python -m lunr`
+- Move to pyproject.toml packaging
 - Drop support for Python 3.6
 - Add support for Python 3.11
 - Remove logging configuration @ping
