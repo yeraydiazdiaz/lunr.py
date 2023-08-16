@@ -21,7 +21,7 @@ token into the other:
 
 ```python
 from lunr import lunr, get_default_builder
-import lunr.pipeline.Pipeline
+from lunr.pipeline import Pipeline
 
 documents = [...]
 
@@ -67,7 +67,7 @@ include the meta-data in the search results:
 
 ```python
 from lunr import lunr, get_default_builder
-import lunr.pipeline.Pipeline
+from lunr.pipeline import Pipeline
 
 builder = get_default_builder()
 
