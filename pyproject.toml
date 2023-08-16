@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling", "hatch-vcs", "hatch-fancy-pypi-readme>=22.8.0"]
+requires = ["hatchling", "hatch-fancy-pypi-readme>=22.8.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -66,8 +66,15 @@ local = [
     "pdbpp",
     "ipython",
     "mypy",
+    "hatch-fancy-pypi-readme",
 ]
 dev = ["lunr[tests,docs,local]"]
 
 [tool.hatch.version]
 path = "lunr/__init__.py"
+
+[tool.hatch.metadata.hooks.fancy-pypi-readme]
+content-type = "text/markdown"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+path = "README.md"
