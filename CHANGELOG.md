@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.0 (2023-08-16)
+
+- Fix misleading usage of `__main__.py` without runnable code to be ran on `python -m lunr`
+- Move to pyproject.toml packaging
+- Drop support for Python 3.6
+- Add support for Python 3.11
+- Remove logging configuration @ping
+
 ## 0.6.2 (2022-02-27)
 
 - Add `Pipeline.skip` method to skip pipeline functions on specific fields
