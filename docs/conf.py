@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = "lunr.py"
-copyright = "2022, Yeray Diaz Diaz"
+copyright = "2023, Yeray Diaz Diaz"
 author = "Yeray Diaz Diaz"
 
 
@@ -28,13 +28,13 @@ author = "Yeray Diaz Diaz"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
-    "myst_parser",
 ]
 
 # Add any paths that contain templates here, relative to this directory.

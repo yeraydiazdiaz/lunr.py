@@ -52,7 +52,7 @@ tests = [
 docs = [
     "furo",
     "myst-parser",
-    "sphinx",
+    "sphinx==7.1.2",  # see https://github.com/pradyunsg/furo/discussions/693
     "sphinx-autobuild",
 ]
 local = [
