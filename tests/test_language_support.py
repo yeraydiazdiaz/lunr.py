@@ -77,3 +77,53 @@ class TestLanguageSupport:
 
         results = idx.search("inventando")
         assert len(results) == 2
+
+    def test_trimmers(self):
+        french_index = lunr(
+            ref="id",
+            fields=["texte"],
+            documents=[{"id": "1", "texte": "Allô tout le monde!"}],
+            languages="fr",
+        )
+        results = french_index.search("allô")
+        assert len(results) == 1
+        results = french_index.search("monde")
+        assert len(results) == 1
+        swedish_index = lunr(
+            ref="id",
+            fields=["texte"],
+            documents=[{"id": "1", "texte": "Hej då!"}],
+            languages="sv",
+        )
+        results = swedish_index.search("hej då")
+        assert len(results) == 1
+        # då is a stopword so don't search it individually
+        russian_index = lunr(
+            ref="id",
+            fields=["texte"],
+            documents=[{"id": "1", "texte": "здравствуйте товарищи!"}],
+            languages="ru",
+        )
+        results = russian_index.search("здравствуйте")
+        assert len(results) == 1
+        russian_index = lunr(
+            ref="id",
+            fields=["texte"],
+            documents=[{"id": "1", "texte": "здравствуйте товарищи!"}],
+            languages="ru",
+        )
+        # Okay we will test the stemmers too a bit
+        results = russian_index.search("здравствуй")
+        assert len(results) == 1
+        results = russian_index.search("товарищ")
+        assert len(results) == 1
+        finnish_index = lunr(
+            ref="id",
+            fields=["texte"],
+            documents=[{"id": "1", "texte": "Nähdään pian!"}],
+            languages="fi",
+        )
+        results = finnish_index.search("nähdä")
+        assert len(results) == 1
+        results = finnish_index.search("pian")
+        assert len(results) == 1

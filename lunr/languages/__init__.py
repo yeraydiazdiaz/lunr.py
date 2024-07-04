@@ -8,6 +8,8 @@ from lunr.languages.stemmer import nltk_stemmer, get_language_stemmer
 from lunr.pipeline import Pipeline
 from lunr.stop_word_filter import stop_word_filter, generate_stop_word_filter
 
+from lunr.languages.wordchars import WORDCHARS
+
 # map from ISO-639-1 codes to SnowballStemmer.languages
 # Languages not supported by nltk but by lunr.js: thai, japanese and turkish
 # Languages upported by nltk but not lunr.js: arabic
@@ -42,8 +44,10 @@ def _get_stopwords_and_word_characters(language):
     nltk.download("stopwords", quiet=True)
     verbose_language = SUPPORTED_LANGUAGES[language]
     stopwords = nltk.corpus.stopwords.words(verbose_language)
-    # TODO: search for a more exhaustive list of word characters
-    word_characters = {c for word in stopwords for c in word}
+    if language in WORDCHARS:
+        word_characters = {WORDCHARS[language]}
+    else:
+        word_characters = {c for word in stopwords for c in word}
     return stopwords, word_characters
 
 
