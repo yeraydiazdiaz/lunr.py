@@ -4,8 +4,8 @@ import re
 def generate_trimmer(word_characters):
     """Returns a trimmer function from a string of word characters.
 
-    TODO: lunr-languages ships with lists of word characters for each language
-    I haven't found an equivalent in Python, we may need to copy it.
+    word_characters could be a list of characters *or* a character
+    class as specified in regex, e.g. either "abc" or "a-c".
     """
     full_re = re.compile(r"^[^{0}]*?([{0}]+)[^{0}]*?$".format(word_characters))
 
