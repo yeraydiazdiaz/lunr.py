@@ -142,9 +142,11 @@ console.log(JSON.stringify(index.search("règlement de démolition")));
 # [{"ref":"1314-2023-DEM","score":0.4072935059634513,"matchData":{"metadata":{"regl":{"titre":{}},"demolit":{"titre":{}}}}}]
 ```
 
-There is also `lunr-folding` for JavaScript, but its folding is not
-the same as `unidecode` and it may not be fully compatible with
-language support, so it is recommended to use the above method.
+There is also
+[lunr-folding](https://www.npmjs.com/package/lunr-folding) for
+JavaScript, but its folding is not the same as `unidecode` and it may
+not be fully compatible with language support, so it is recommended to
+use the above method.
 
 ## Notes on language support
 
