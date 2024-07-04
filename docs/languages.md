@@ -72,6 +72,76 @@ If you have documents in multiple language pass a list of language codes:
 [{'ref': 'c', 'score': 1.106, 'match_data': <MatchData "english">}]
 ```
 
+## Folding to ASCII
+
+It is often useful to allow for transliterated or unaccented
+characters when indexing and searching.  This is not implemented in
+the language support but can be done by adding a pipeline stage which
+"folds" the tokens to ASCII.  There are
+[various](https://pypi.org/project/text-unidecode/)
+[libraries](https://pypi.org/project/Unidecode/) to do this in Python
+as well as in [JavaScript](https://www.npmjs.com/package/unidecode).
+
+On the Python side, for example, to fold accents in French text using
+`text-unidecode` or `unidecode` (depending on your licensing
+preferences):
+
+```python
+import json
+from lunr import lunr, get_default_builder
+from lunr.pipeline import Pipeline
+from text_unidecode import unidecode
+
+def unifold(token, _idx=None, _tokens=None):
+    def wrap_unidecode(text, _metadata):
+        return unidecode(text)
+    return token.update(wrap_unidecode)
+
+Pipeline.register_function(unifold, "unifold")
+builder = get_default_builder("fr")
+builder.pipeline.add(unifold)
+builder.search_pipeline.add(unifold)
+index = lunr(
+    ref="id",
+    fields=["titre", "texte"],
+    documents=[
+        {"id": "1314-2023-DEM", "titre": "Règlement de démolition", "texte": "Texte"}
+    ],
+    languages="fr",
+    builder=builder,
+)
+print(index.search("reglement de demolition"))
+# [{'ref': '1314-2023-DEM', 'score': 0.4072935059634513, 'match_data': <MatchData "demolit,regl">}]
+print(index.search("règlement de démolition"))
+# [{'ref': '1314-2023-DEM', 'score': 0.4072935059634513, 'match_data': <MatchData "demolit,regl">}]
+with open("index.json", "wt") as outfh:
+    json.dump(index.serialize(), outfh)
+```
+
+Note that it is important to do folding on both the indexing and
+search pipelines to ensure that users who have the right keyboard and
+can remember which accents go where will still get the expected
+results.
+
+On the JavaScript side [the
+API](https://lunrjs.com/docs/lunr.Pipeline.html) is of course quite
+similar:
+
+```js
+const lunr = require("lunr");
+const fs = require("fs");
+const unidecode = require("unidecode");
+require("lunr-languages/lunr.stemmer.support.js")(lunr);
+require("lunr-languages/lunr.fr.js")(lunr);
+
+lunr.Pipeline.registerFunction(token => token.update(unidecode), "unifold")
+const index = lunr.Index.load(JSON.parse(fs.readFileSync("index.json", "utf8")));
+console.log(JSON.stringify(index.search("reglement de demolition")));
+# [{"ref":"1314-2023-DEM","score":0.4072935059634513,"matchData":{"metadata":{"regl":{"titre":{}},"demolit":{"titre":{}}}}}]
+console.log(JSON.stringify(index.search("règlement de démolition")));
+# [{"ref":"1314-2023-DEM","score":0.4072935059634513,"matchData":{"metadata":{"regl":{"titre":{}},"demolit":{"titre":{}}}}}]
+```
+
 ## Notes on language support
 
 - Using multiple languages means the terms will be stemmed once per language. This can yield unexpected results.
