@@ -38,8 +38,8 @@ builder.pipeline.add(normalise_spelling)
 idx = lunr(ref="id", fields=("title", "body"), documents=documents, builder=builder)
 ```
 
-Note pipeline functions take the token being processed, its position in the
-token list, and the token list itself.
+Note that pipeline functions take the token being processed, its
+position in the token list, and the token list itself.
 
 ## Skip a pipeline function for specific field names
 
@@ -91,6 +91,21 @@ pipeline, but this is not necessarily the list of actual pipeline
 steps, which is contained in a private field (though you can see them
 in the string representation of the pipeline).
 
+By default, to match the behaviour of `lunr.js`, field-specific
+modifications to the pipeline are only applied in *indexing*, not in
+*search*.  In the case noted above, this is not a problem, because
+(again, to match the behaviour of `lunr.js`) the stop word filter is
+not applied in the default search pipeline either, but if you have
+more complex modifications (and you do not care about
+bug-compatibility with `lunr.js`), you can explicitly request that
+field-specific pipelines be run using the lower-level `query` method:
+
+```python
+from lunr.query_parser import QueryParser
+query = idx.create_query()
+QueryParser("someField:something", query).parse()
+results = idx.query(query, use_pipeline_fieds=True)
+```
 
 ## Token meta-data
 
