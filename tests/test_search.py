@@ -1,6 +1,6 @@
 import pytest
 
-from lunr import lunr
+from lunr import lunr, get_default_builder, stop_word_filter, stemmer
 from lunr.query import Query, QueryPresence
 from lunr.exceptions import QueryParseError
 
@@ -416,3 +416,25 @@ class TestBuildTimeDocumentBoost:
             results = idx.query(query)
 
         assert results[0]["ref"] == "c"
+
+
+class TestPipelineSkipInSearch:
+    def test_pipeline_skip_in_search(self):
+        builder = get_default_builder()
+        builder.pipeline.skip(stop_word_filter.stop_word_filter, ["title"])
+        # Add the stop word filter to the pipeline (see #151)
+        builder.search_pipeline.before(stemmer.stemmer, stop_word_filter.stop_word_filter)
+        builder.search_pipeline.skip(stop_word_filter.stop_word_filter, ["title"])
+
+        index = lunr(
+            ref="id",
+            fields=["title", "body"],
+            documents=[
+                # The title is entirely stopwords, but will index them anyway
+                {"id": "1", "title": "To be or not to be?", "body": "That is the question!"}
+            ],
+            builder=builder,
+        )
+        assert len(index.search("title:to")) == 1
+        assert len(index.search("body:the")) == 0
+        assert len(index.search("to")) == 1

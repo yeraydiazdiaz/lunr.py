@@ -131,7 +131,12 @@ class Index:
             # term, which means we may end up performing multiple index lookups
             # for a single query term.
             if clause.use_pipeline:
-                terms = self.pipeline.run_string(clause.term, {"fields": clause.fields})
+                # Run the pipeline for each field as we may have explicit skips
+                terms = set()
+                for field_name in clause.fields:
+                    terms.update(self.pipeline.run_string(clause.term,
+                                                          {"fields": [field_name]},
+                                                          field_name=field_name))
             else:
                 terms = [clause.term]
 

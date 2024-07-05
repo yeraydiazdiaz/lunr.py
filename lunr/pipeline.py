@@ -143,7 +143,7 @@ class Pipeline:
 
         return tokens
 
-    def run_string(self, string, metadata=None):
+    def run_string(self, string, metadata=None, field_name=None):
         """Convenience method for passing a string through a pipeline and
         getting strings out. This method takes care of wrapping the passed
         string in a token and mapping the resulting tokens back to strings.
@@ -152,7 +152,7 @@ class Pipeline:
             access field names from this context.
         """
         token = Token(string, metadata)
-        return [str(tkn) for tkn in self.run([token])]
+        return [str(tkn) for tkn in self.run([token], field_name=field_name)]
 
     def reset(self):
         self._stack = []
