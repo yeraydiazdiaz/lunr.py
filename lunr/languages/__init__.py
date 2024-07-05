@@ -75,14 +75,21 @@ def get_nltk_builder(languages):
 
     builder = Builder()
     multi_trimmer = generate_trimmer("".join(sorted(all_word_characters)))
-    Pipeline.register_function(
-        multi_trimmer, "lunr-multi-trimmer-{}".format("-".join(languages))
-    )
+    if len(languages) == 1:
+        # Be compatible with lunr-languages naming!
+        trimmer_name = f"trimmer-{languages[0]}"
+    else:
+        # FIXME: will fail to load in lunr.js, unclear how to fix
+        # this, so we will simply not add it to the search pipeline...
+        trimmer_name = "multi-trimmer-{}".format("-".join(languages))
+    Pipeline.register_function(multi_trimmer, trimmer_name)
     builder.pipeline.reset()
 
-    for fn in chain([multi_trimmer], all_stopwords_filters, all_stemmers):
+    builder.pipeline.add(multi_trimmer)
+    if len(languages) == 1:
+        builder.search_pipeline.add(multi_trimmer)
+    for fn in chain(all_stopwords_filters, all_stemmers):
         builder.pipeline.add(fn)
-    for fn in all_stemmers:
         builder.search_pipeline.add(fn)
 
     return builder
