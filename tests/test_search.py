@@ -416,3 +416,15 @@ class TestBuildTimeDocumentBoost:
             results = idx.query(query)
 
         assert results[0]["ref"] == "c"
+
+
+class TestTrimInSearch:
+    def test_trim_in_search(self):
+        index = lunr(
+            ref="id",
+            fields=["title", "body"],
+            documents=[
+                {"id": "1", "title": "To be or not to be?", "body": "That is the question!"}
+            ],
+        )
+        assert len(index.search("What is the question?")) == 1
