@@ -1,4 +1,7 @@
+from typing import Collection, List, Union
+
 from lunr.pipeline import Pipeline
+from lunr.token import Token
 
 WORDS = {
     "a",
@@ -123,7 +126,7 @@ WORDS = {
 }
 
 
-def generate_stop_word_filter(stop_words, language=None):
+def generate_stop_word_filter(stop_words: Collection[str], language=None):
     """Builds a stopWordFilter function from the provided list of stop words.
 
     The built in `stop_word_filter` is built using this factory and can be used
@@ -131,9 +134,14 @@ def generate_stop_word_filter(stop_words, language=None):
     languages.
     """
 
-    def stop_word_filter(token, i=None, tokens=None):
+    def stop_word_filter(
+        token: Token,
+        i: Union[int, None] = None,
+        tokens: Union[List[Token], None] = None,
+    ) -> Union[Token, None]:
         if token and str(token) not in stop_words:
             return token
+        return None
 
     # camelCased for for compatibility with lunr.js
     label = (

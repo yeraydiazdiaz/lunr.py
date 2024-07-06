@@ -1,4 +1,5 @@
 from collections import defaultdict
+from typing import Callable, Collection, DefaultDict, Dict, List, Set, TypedDict, Union
 import json
 import logging
 
@@ -14,6 +15,15 @@ from lunr.utils import CompleteSet
 from lunr.vector import Vector
 
 logger = logging.getLogger(__name__)
+QueryCallback = Callable[[Query], None]
+
+
+class SerializedIndex(TypedDict):
+    version: str
+    fields: List[str]
+    fieldVectors: List[List]
+    invertedIndex: List[List]
+    pipeline: List[str]
 
 
 class Index:
@@ -26,20 +36,29 @@ class Index:
     serialized indexes.
     """
 
-    def __init__(self, inverted_index, field_vectors, token_set, fields, pipeline):
+    def __init__(
+        self,
+        inverted_index: Dict[str, Dict],
+        field_vectors: Dict[str, Vector],
+        token_set: TokenSet,
+        fields: Collection[str],
+        pipeline: Pipeline,
+    ):
         self.inverted_index = inverted_index
         self.field_vectors = field_vectors
         self.token_set = token_set
         self.fields = fields
         self.pipeline = pipeline
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Index):
+            return NotImplemented
         # TODO: extend equality to other attributes
         return (
             self.inverted_index == other.inverted_index and self.fields == other.fields
         )
 
-    def search(self, query_string):
+    def search(self, query_string: str) -> List[Dict]:
         """Performs a search against the index using lunr query syntax.
 
         Results will be returned sorted by their score, the most relevant
@@ -59,7 +78,7 @@ class Index:
         parser.parse()
         return self.query(query)
 
-    def create_query(self, fields=None):
+    def create_query(self, fields: Union[Collection[str], None] = None) -> Query:
         """Convenience method to create a Query with the Index's fields.
 
         Args:
@@ -80,7 +99,11 @@ class Index:
 
         return Query(fields)
 
-    def query(self, query=None, callback=None):
+    def query(
+        self,
+        query: Union[Query, None] = None,
+        callback: Union[QueryCallback, None] = None,
+    ) -> List[Dict]:
         """Performs a query against the index using the passed lunr.Query
         object.
 
@@ -117,13 +140,16 @@ class Index:
         # * get document vectors
         # * score documents
 
-        matching_fields = {}
-        query_vectors = {field: Vector() for field in self.fields}
-        term_field_cache = {}
-        required_matches = {}
-        prohibited_matches = defaultdict(set)
+        matching_fields: Dict[str, MatchData] = {}
+        query_vectors: Dict[str, Vector] = {field: Vector() for field in self.fields}
+        term_field_cache: Dict[str, bool] = {}
+        required_matches: Dict[str, CompleteSet] = {}
+        prohibited_matches: DefaultDict[str, set] = defaultdict(set)
 
         for clause in query.clauses:
+            if clause.term is None:
+                logger.warning("Skipping empty clause %s", clause)
+                continue
             # Unless the pipeline has been disabled for this term, which is
             # the case for terms with wildcards, we need to pass the clause
             # term through the search pipeline. A pipeline returns an array
@@ -135,7 +161,7 @@ class Index:
             else:
                 terms = [clause.term]
 
-            clause_matches = set()
+            clause_matches: Set[str] = set()
 
             for term in terms:
                 # Each term returned from the pipeline needs to use the same
@@ -254,7 +280,7 @@ class Index:
         # matching documents inot a global set of required and prohibited
         # matches
         all_required_matches = CompleteSet()
-        all_prohibited_matches = set()
+        all_prohibited_matches: Set[str] = set()
         for field in self.fields:
             if field in required_matches:
                 all_required_matches = all_required_matches.intersection(
@@ -265,9 +291,9 @@ class Index:
                     prohibited_matches[field]
                 )
 
-        matching_field_refs = matching_fields.keys()
+        matching_field_refs: List[str] = list(matching_fields.keys())
         results = []
-        matches = {}
+        matches: Dict[str, Dict] = {}
 
         # If the query is negated (only contains prohibited terms)
         # we need to get _all_ field_refs currently existing in the index.
@@ -277,42 +303,42 @@ class Index:
         if query.is_negated():
             matching_field_refs = list(self.field_vectors.keys())
 
-            for matching_field_ref in matching_field_refs:
-                field_ref = FieldRef.from_string(matching_field_ref)
-                matching_fields[matching_field_ref] = MatchData()
+            for matching_field_ref_str in matching_field_refs:
+                field_ref = FieldRef.from_string(matching_field_ref_str)
+                matching_fields[matching_field_ref_str] = MatchData()
 
-        for matching_field_ref in matching_field_refs:
+        for matching_field_ref_str in matching_field_refs:
             # Currently we have document fields that match the query, but we
             # need to return documents. The matchData and scores are combined
             # from multiple fields belonging to the same document.
             #
             # Scores are calculated by field, using the query vectors created
             # above, and combined into a final document score using addition.
-            field_ref = FieldRef.from_string(matching_field_ref)
+            field_ref = FieldRef.from_string(matching_field_ref_str)
             doc_ref = field_ref.doc_ref
 
             if doc_ref not in all_required_matches or doc_ref in all_prohibited_matches:
                 continue
 
-            field_vector = self.field_vectors[matching_field_ref]
+            field_vector = self.field_vectors[matching_field_ref_str]
             score = query_vectors[field_ref.field_name].similarity(field_vector)
 
             try:
                 doc_match = matches[doc_ref]
                 doc_match["score"] += score
-                doc_match["match_data"].combine(matching_fields[matching_field_ref])
+                doc_match["match_data"].combine(matching_fields[matching_field_ref_str])
             except KeyError:
                 match = {
                     "ref": doc_ref,
                     "score": score,
-                    "match_data": matching_fields[matching_field_ref],
+                    "match_data": matching_fields[matching_field_ref_str],
                 }
                 matches[doc_ref] = match
                 results.append(match)
 
         return sorted(results, key=lambda a: a["score"], reverse=True)
 
-    def serialize(self):
+    def serialize(self) -> SerializedIndex:
         """Returns a serialized index as a dict following lunr-schema."""
         from lunr import __TARGET_JS_VERSION__
 
@@ -326,19 +352,36 @@ class Index:
         # CamelCased keys for compatibility with JS version
         return {
             "version": __TARGET_JS_VERSION__,
-            "fields": self.fields,
+            "fields": list(self.fields),
             "fieldVectors": field_vectors,
             "invertedIndex": inverted_index,
             "pipeline": self.pipeline.serialize(),
         }
 
     @classmethod
-    def load(cls, serialized_index):
+    def load(cls, serialized_index: Union[str, SerializedIndex]) -> "Index":
         """Load a serialized index"""
         from lunr import __TARGET_JS_VERSION__
 
         if isinstance(serialized_index, str):
             serialized_index = json.loads(serialized_index)
+        # FIXME: This is why Pydantic was invented
+        if not isinstance(serialized_index, dict):
+            raise BaseLunrException("Serialized index is not a dict") from ValueError
+        if "version" not in serialized_index:
+            raise BaseLunrException("Serialized index has no version") from ValueError
+        if not isinstance(serialized_index.get("fieldVectors"), list):
+            raise BaseLunrException(
+                "Serialized index has no list of field_vectors"
+            ) from ValueError
+        if not isinstance(serialized_index.get("invertedIndex"), list):
+            raise BaseLunrException(
+                "Serialized index has no inverted index"
+            ) from ValueError
+        if not isinstance(serialized_index.get("fields"), list):
+            raise BaseLunrException(
+                "Serialized index has no list of fields"
+            ) from ValueError
 
         if serialized_index["version"] != __TARGET_JS_VERSION__:
             logger.warning(

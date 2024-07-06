@@ -1,11 +1,12 @@
 from itertools import chain
 from functools import partial
+from typing import Collection, List, Set, Tuple
 
 import lunr
 from lunr.builder import Builder
 from lunr.languages.trimmer import generate_trimmer
 from lunr.languages.stemmer import nltk_stemmer, get_language_stemmer
-from lunr.pipeline import Pipeline
+from lunr.pipeline import Pipeline, PipelineFunction
 from lunr.stop_word_filter import stop_word_filter, generate_stop_word_filter
 
 # map from ISO-639-1 codes to SnowballStemmer.languages
@@ -38,7 +39,9 @@ except ImportError:  # pragma: no cover
     LANGUAGE_SUPPORT = False
 
 
-def _get_stopwords_and_word_characters(language):
+def _get_stopwords_and_word_characters(
+    language: str,
+) -> Tuple[Collection[str], Set[str]]:
     nltk.download("stopwords", quiet=True)
     verbose_language = SUPPORTED_LANGUAGES[language]
     stopwords = nltk.corpus.stopwords.words(verbose_language)
@@ -47,15 +50,15 @@ def _get_stopwords_and_word_characters(language):
     return stopwords, word_characters
 
 
-def get_nltk_builder(languages):
+def get_nltk_builder(languages: List[str]) -> Builder:
     """Returns a builder with stemmers for all languages added to it.
 
     Args:
         languages (list): A list of supported languages.
     """
-    all_stemmers = []
-    all_stopwords_filters = []
-    all_word_characters = set()
+    all_stemmers: List[PipelineFunction] = []
+    all_stopwords_filters: List[PipelineFunction] = []
+    all_word_characters: Set[str] = set()
 
     for language in languages:
         if language == "en":

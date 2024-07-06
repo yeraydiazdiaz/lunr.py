@@ -1,4 +1,13 @@
+from typing import Callable, List, TypedDict
 from lunr.tokenizer import default_separator
+
+
+# FIXME: Could use a dataclass or a NamedTuple
+class Lexeme(TypedDict):
+    type: str
+    string: str
+    start: int
+    end: int
 
 
 class QueryLexer:
@@ -10,16 +19,16 @@ class QueryLexer:
     BOOST = "BOOST"
     PRESENCE = "PRESENCE"
 
-    def __init__(self, string):
-        self.lexemes = []
+    def __init__(self, string: str):
+        self.lexemes: List[Lexeme] = []
         self.string = string
         self.length = len(string)
         self.pos = 0
         self.start = 0
-        self.escape_char_positions = []
+        self.escape_char_positions: List[int] = []
 
     @property
-    def width(self):
+    def width(self) -> int:
         return self.pos - self.start
 
     def ignore(self):
@@ -44,7 +53,7 @@ class QueryLexer:
         while state:
             state = state()
 
-    def slice_string(self):
+    def slice_string(self) -> str:
         subslices = []
         slice_start = self.start
 
@@ -57,7 +66,7 @@ class QueryLexer:
 
         return "".join(subslices)
 
-    def next(self):
+    def next(self) -> str:
         if self.pos >= self.length:
             return self.EOS
 
@@ -65,7 +74,7 @@ class QueryLexer:
         self.pos += 1
         return char
 
-    def emit(self, type_):
+    def emit(self, type_: str):
         self.lexemes.append(
             {
                 "type": type_,
@@ -80,13 +89,13 @@ class QueryLexer:
         self.escape_char_positions.append(self.pos - 1)
         self.pos += 1
 
-    def lex_field(self):
+    def lex_field(self) -> Callable[[], Callable]:
         self.backup()
         self.emit(self.FIELD)
         self.ignore()
         return self.lex_text
 
-    def lex_term(self):
+    def lex_term(self) -> Callable[[], Callable]:
         if self.width > 1:
             self.backup()
             self.emit(self.TERM)
@@ -95,13 +104,13 @@ class QueryLexer:
 
         return self.lex_text
 
-    def lex_edit_distance(self):
+    def lex_edit_distance(self) -> Callable[[], Callable]:
         self.ignore()
         self.accept_digit_run()
         self.emit(self.EDIT_DISTANCE)
         return self.lex_text
 
-    def lex_boost(self):
+    def lex_boost(self) -> Callable[[], Callable]:
         self.ignore()
         self.accept_digit_run()
         self.emit(self.BOOST)
@@ -111,7 +120,7 @@ class QueryLexer:
         if self.width > 0:
             self.emit(self.TERM)
 
-    def lex_text(self):
+    def lex_text(self) -> Callable[[], Callable]:
         while True:
             char = self.next()
             if char == self.EOS:

@@ -1,7 +1,11 @@
 import re
+from typing import Dict, List, Union
+
+from lunr.pipeline import PipelineFunction
+from lunr.token import Token
 
 
-def generate_trimmer(word_characters):
+def generate_trimmer(word_characters: str) -> PipelineFunction:
     """Returns a trimmer function from a string of word characters.
 
     TODO: lunr-languages ships with lists of word characters for each language
@@ -9,8 +13,12 @@ def generate_trimmer(word_characters):
     """
     full_re = re.compile(r"^[^{0}]*?([{0}]+)[^{0}]*?$".format(word_characters))
 
-    def trimmer(token, i=None, tokens=None):
-        def trim(s, metadata=None):
+    def trimmer(
+        token: Token,
+        i: Union[int, None] = None,
+        tokens: Union[List[Token], None] = None,
+    ) -> Token:
+        def trim(s: str, metadata: Union[Dict, None] = None) -> str:
             match = full_re.match(s)
             if match is None:
                 return s

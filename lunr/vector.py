@@ -1,4 +1,5 @@
 from math import sqrt
+from typing import cast, Callable, List, Union, Iterator
 
 from lunr.exceptions import BaseLunrException
 
@@ -16,23 +17,23 @@ class Vector:
     elements index is immediately followed by its value.
     E.g. [index, value, index, value].
 
-    TODO: consider implemetation as 2-tuples.
+    TODO: consider implemetation as 2-tuples. (or scipy.sparse)
 
     This allows the underlying array to be as sparse as possible and still
     offer decent performance when being used for vector calculations.
     """
 
-    def __init__(self, elements=None):
+    def __init__(self, elements: Union[List[Union[float, str]], None] = None) -> None:
         self._magnitude = 0
         self.elements = elements or []
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<Vector magnitude={}>".format(self.magnitude)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Union[float, str]]:
         return iter(self.elements)
 
-    def position_for_index(self, index):
+    def position_for_index(self, index: int) -> int:
         """Calculates the position within the vector to insert a given index.
 
         This is used internally by insert and upsert. If there are duplicate
@@ -47,7 +48,7 @@ class Vector:
         end = int(len(self.elements) / 2)
         slice_length = end - start
         pivot_point = int(slice_length / 2)
-        pivot_index = self.elements[pivot_point * 2]
+        pivot_index = cast(int, self.elements[pivot_point * 2])
 
         while slice_length > 1:
             if pivot_index < index:
@@ -59,7 +60,7 @@ class Vector:
 
             slice_length = end - start
             pivot_point = start + int(slice_length / 2)
-            pivot_index = self.elements[pivot_point * 2]
+            pivot_index = cast(int, self.elements[pivot_point * 2])
 
         if pivot_index == index:
             return pivot_point * 2
@@ -68,7 +69,7 @@ class Vector:
         else:
             return (pivot_point + 1) * 2
 
-    def insert(self, insert_index, val):
+    def insert(self, insert_index: int, val: Union[str, float]):
         """Inserts an element at an index within the vector.
 
         Does not allow duplicates, will throw an error if there is already an
@@ -80,13 +81,18 @@ class Vector:
 
         self.upsert(insert_index, val, prevent_duplicates)
 
-    def upsert(self, insert_index, val, fn=None):
+    def upsert(
+        self,
+        insert_index: int,
+        val: Union[str, float],
+        fn: Union[Callable, None] = None,
+    ):
         """Inserts or updates an existing index within the vector.
 
         Args:
             - insert_index (int): The index at which the element should be
                 inserted.
-            - val (int|float): The value to be inserted into the vector.
+            - val (str|int|float): The value to be inserted into the vector.
             - fn (callable, optional): An optional callable taking two
                 arguments, the current value and the passed value to generate
                 the final inserted value at the position in case of collision.
@@ -100,18 +106,25 @@ class Vector:
             self.elements.insert(position, val)
             self.elements.insert(position, insert_index)
 
-    def to_list(self):
+    def to_list(self) -> List[Union[str, float]]:
         """Converts the vector to an array of the elements within the vector"""
         output = []
         for i in range(1, len(self.elements), 2):
             output.append(self.elements[i])
         return output
 
-    def serialize(self):
+    def serialize(self) -> List[Union[str, float]]:
         # TODO: the JS version forces rounding on the elements upon insertion
         # to ensure symmetry upon serialization
-        return [round(element, 3) for element in self.elements]
+        return [
+            element if isinstance(element, str) else round(element, 3)
+            for element in self.elements
+        ]
 
+    # FIXME: Typechecking would imply testing whether elements are
+    # strings or not, which will make this unacceptably slow.
+    # Consider not mixing strings and numbers in the same type!  This
+    # is not JavaScript!
     @property
     def magnitude(self):
         if not self._magnitude:
@@ -124,6 +137,7 @@ class Vector:
 
         return self._magnitude
 
+    # FIXME: Likewise here, only defined for numeric vectors, will not check.
     def dot(self, other):
         """Calculates the dot product of this vector and another vector."""
         dot_product = 0
@@ -147,6 +161,7 @@ class Vector:
 
         return dot_product
 
+    # FIXME: Likewise here, only defined for numeric vectors, will not check.
     def similarity(self, other):
         """Calculates the cosine similarity between this vector and another
         vector."""

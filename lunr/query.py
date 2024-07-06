@@ -1,4 +1,6 @@
 from enum import Enum
+from typing import Collection, List, Union, Iterable
+from lunr.token import Token
 
 
 class QueryPresence(Enum):
@@ -28,13 +30,13 @@ class Query:
     WILDCARD_LEADING = 1
     WILDCARD_TRAILING = 2
 
-    def __init__(self, all_fields):
-        self.clauses = []
+    def __init__(self, all_fields: Collection[str]):
+        self.clauses: List[Clause] = []
         self.all_fields = all_fields
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '<Query fields="{}" clauses="{}">'.format(
-            ",".join(self.all_fields), ",".join(c.term for c in self.clauses)
+            ",".join(self.all_fields), ",".join(str(c.term) for c in self.clauses)
         )
 
     def clause(self, *args, **kwargs):
@@ -70,7 +72,9 @@ class Query:
         self.clauses.append(clause)
         return self
 
-    def term(self, term, **kwargs):
+    def term(
+        self, term: Union[str, Token, Iterable[Union[str, Token]]], **kwargs
+    ) -> "Query":
         """Adds a term to the current query, creating a Clause and adds it to
         the list of clauses making up this Query.
 
@@ -81,18 +85,17 @@ class Query:
             query.term(lunr.Tokenizer("foo bar"))
 
         Args:
-            term (Token or iterable): Token or iterable of tokens to add.
+            term (str, Token or iterable): Token or iterable of tokens to add.
             kwargs (dict): Additional properties to add to the Clause.
         """
-        if isinstance(term, (list, tuple)):
+        if isinstance(term, str) or isinstance(term, Token):
+            self.clause(str(term), **kwargs)
+        else:
             for t in term:
                 self.term(t, **kwargs)
-        else:
-            self.clause(str(term), **kwargs)
-
         return self
 
-    def is_negated(self):
+    def is_negated(self) -> bool:
         """A negated query is one in which every clause has a presence of
         prohibited. These queries require some special processing to return
         the expected results.
@@ -108,7 +111,7 @@ class Clause:
 
     Args:
         term (str, optional): The term for the clause.
-        field (iterable, optional): The fields for the term to be searched
+        field (collection, optional): The fields for the term to be searched
             against.
         edit_distance (int, optional): The character distance to use, defaults
             to 0.
@@ -124,13 +127,13 @@ class Clause:
 
     def __init__(
         self,
-        term=None,
-        fields=None,
-        edit_distance=0,
-        use_pipeline=True,
-        boost=1,
-        wildcard=Query.WILDCARD_NONE,
-        presence=QueryPresence.OPTIONAL,
+        term: Union[str, None] = None,
+        fields: Union[Collection[str], None] = None,
+        edit_distance: int = 0,
+        use_pipeline: bool = True,
+        boost: int = 1,
+        wildcard: int = Query.WILDCARD_NONE,  # FIXME: typecheck/enum
+        presence: QueryPresence = QueryPresence.OPTIONAL,
     ):
         super().__init__()
         self.term = term
