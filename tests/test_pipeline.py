@@ -275,3 +275,27 @@ class TestReset(BaseTestPipeline):
 
         self.pipeline.reset()
         assert len(self.pipeline) == 0
+
+
+class TestAccess(BaseTestPipeline):
+    def test_access_function_in_pipeline(self):
+        Pipeline.register_function(fn, "fn")
+        self.pipeline.add(fn)
+        assert self.pipeline["fn"] == fn
+
+    def test_access_function_not_in_pipeline(self):
+        with pytest.raises(BaseLunrException):
+            _ = self.pipeline["fn"]
+
+
+class TestReplace(BaseTestPipeline):
+    def test_replace_function_in_pipeline(self):
+        Pipeline.register_function(fn, "fn")
+        self.pipeline.add(noop)
+        assert len(self.pipeline) == 1
+        with pytest.raises(BaseLunrException):
+            _ = self.pipeline["fn"]
+
+        self.pipeline.replace(noop, fn)
+        assert len(self.pipeline) == 1
+        assert self.pipeline["fn"] == fn
