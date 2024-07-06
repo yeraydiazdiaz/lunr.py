@@ -70,7 +70,8 @@ class Query:
         self.clauses.append(clause)
         return self
 
-    def term(self, term, **kwargs):
+    def term(self,
+             term: Union[str, Token, Iterable[Union[str, Token]]], **kwargs) -> "Query":
         """Adds a term to the current query, creating a Clause and adds it to
         the list of clauses making up this Query.
 
@@ -81,18 +82,17 @@ class Query:
             query.term(lunr.Tokenizer("foo bar"))
 
         Args:
-            term (Token or iterable): Token or iterable of tokens to add.
+            term (str, Token or iterable): Token or iterable of tokens to add.
             kwargs (dict): Additional properties to add to the Clause.
         """
-        if isinstance(term, (list, tuple)):
+        if isinstance(term, str) or isinstance(term, Token):
+            self.clause(str(term), **kwargs)
+        else:
             for t in term:
                 self.term(t, **kwargs)
-        else:
-            self.clause(str(term), **kwargs)
-
         return self
 
-    def is_negated(self):
+    def is_negated(self) -> bool:
         """A negated query is one in which every clause has a presence of
         prohibited. These queries require some special processing to return
         the expected results.
