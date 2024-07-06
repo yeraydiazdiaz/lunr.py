@@ -12,7 +12,7 @@ jobs:
     name: "Python ${{ matrix.python-version }}"
     runs-on: "ubuntu-latest"
     env:
-      USING_COVERAGE: "3.10"
+      USING_COVERAGE: "3.11"
 
     strategy:
       matrix:
@@ -46,6 +46,7 @@ jobs:
 
       - name: "Upload coverage to Codecov"
         if: "contains(env.USING_COVERAGE, matrix.python-version)"
-        uses: "codecov/codecov-action@v3"
+        uses: "codecov/codecov-action@v4.0.1"
         with:
           fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
