@@ -9,12 +9,14 @@ from lunr.index import Index
 from lunr.vector import Vector
 from lunr.idf import idf as Idf
 
+Extractor = Callable[[Dict], str]
+
 
 class Field:
     """Represents a field with boost and extractor functions."""
 
     def __init__(self, field_name: str, boost: int = 1,
-                 extractor: Union[Callable[[Dict], Any], None] = None):
+                 extractor: Union[Extractor, None] = None):
         self.name = field_name
         self.boost = boost
         self.extractor = extractor
@@ -50,7 +52,7 @@ class Builder:
         self.term_index = 0
         self.metadata_whitelist = []
 
-    def ref(self, ref):
+    def ref(self, ref: Any):
         """Sets the document field used as the document reference.
 
         Every document must have this field. The type of this field in the
@@ -62,10 +64,10 @@ class Builder:
         Changing it during indexing can lead to inconsistent results.
 
         """
-        self._ref = ref
+        self._ref = str(ref)
 
     def field(self, field_name: str, boost: int = 1,
-              extractor: Union[Callable[[Dict], Any], None] = None):
+              extractor: Union[Extractor, None] = None):
         """Adds a field to the list of document fields that will be indexed.
 
         Every document being indexed should have this field. None values for
