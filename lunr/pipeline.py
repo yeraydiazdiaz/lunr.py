@@ -26,6 +26,13 @@ class Pipeline:
     def __repr__(self):
         return '<Pipeline stack="{}">'.format(",".join(fn.label for fn in self._stack))
 
+    def __getitem__(self, label: str) -> Callable:
+        for fn in self._stack:
+            if hasattr(fn, "label") and fn.label == label:
+                return fn
+        raise BaseLunrException(
+            f"Cannot find registered function {label} in pipeline") from KeyError
+
     # TODO: add iterator methods?
 
     @classmethod
@@ -105,6 +112,14 @@ class Pipeline:
             self._stack.remove(fn)
         except ValueError:
             pass
+
+    def replace(self, existing_fn, new_fn):
+        """Replaces a function in the pipeline with a better one."""
+        try:
+            index = self._stack.index(existing_fn)
+            self._stack[index] = new_fn
+        except ValueError as e:
+            raise BaseLunrException("Cannot find existing_fn") from e
 
     def skip(self, fn: Callable, field_names: List[str]):
         """
