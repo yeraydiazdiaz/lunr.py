@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 from math import sqrt
-from typing import Union, Iterator
+from typing import cast, Union, Iterator
 
 from lunr.exceptions import BaseLunrException
 
@@ -24,28 +24,23 @@ class Vector:
     offer decent performance when being used for vector calculations.
     """
 
-    def __init__(self, elements: Union[Sequence[Union[float, str]], None] = None) -> None:
+    def __init__(self, elements: Union[Sequence[Union[int, str]], None] = None) -> None:
         self._magnitude = 0
         self.elements = elements or []
 
     def __repr__(self) -> str:
         return "<Vector magnitude={}>".format(self.magnitude)
 
-    def __iter__(self) -> Iterator[Union[float, str]]:
+    def __iter__(self) -> Iterator[Union[int, str]]:
         return iter(self.elements)
 
-    def position_for_index(self, index) -> int:
+    def position_for_index(self, index: int) -> int:
         """Calculates the position within the vector to insert a given index.
 
         This is used internally by insert and upsert. If there are duplicate
         indexes then the position is returned as if the value for that index
         were to be updated, but it is the callers responsibility to check
         whether there is a duplicate at that index
-
-        FIXME: This should probably be replaced with bisect, except
-        that its API is very JavaScripty (interchangable
-        floats/strs/etc) and probably full of Undefined Behaviour.
-
         """
         if not self.elements:
             return 0
@@ -54,7 +49,7 @@ class Vector:
         end = int(len(self.elements) / 2)
         slice_length = end - start
         pivot_point = int(slice_length / 2)
-        pivot_index = self.elements[pivot_point * 2]
+        pivot_index = cast(int, self.elements[pivot_point * 2])
 
         while slice_length > 1:
             if pivot_index < index:
@@ -66,7 +61,7 @@ class Vector:
 
             slice_length = end - start
             pivot_point = start + int(slice_length / 2)
-            pivot_index = self.elements[pivot_point * 2]
+            pivot_index = cast(int, self.elements[pivot_point * 2])
 
         if pivot_index == index:
             return pivot_point * 2
