@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from collections import defaultdict
 import logging
 from typing import Callable, Dict, List, Set, Union
@@ -48,7 +49,7 @@ class Pipeline:
         cls.registered_functions[fn.label] = fn  # type: ignore
 
     @classmethod
-    def load(cls, serialised: List[str]) -> "Pipeline":
+    def load(cls, serialised: Sequence[str]) -> "Pipeline":
         """Loads a previously serialised pipeline."""
         pipeline = cls()
         for fn_name in serialised:
