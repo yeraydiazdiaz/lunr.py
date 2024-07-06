@@ -1,6 +1,6 @@
 from collections import defaultdict
 from collections.abc import Collection
-from typing import cast, Callable, DefaultDict, Dict, List, Set, Union
+from typing import Callable, DefaultDict, Dict, List, Set, TypedDict, Union
 import json
 import logging
 
@@ -17,8 +17,14 @@ from lunr.vector import Vector
 
 logger = logging.getLogger(__name__)
 QueryCallback = Callable[[Query], None]
-# FIXME: Should be more precise here
-SerializedIndex = Dict[str, Union[str, Dict, List[str], List[List]]]
+
+
+class SerializedIndex(TypedDict):
+    version: str
+    fields: List[str]
+    fieldVectors: List[List]
+    invertedIndex: List[List]
+    pipeline: List[str]
 
 
 class Index:
@@ -372,21 +378,21 @@ class Index:
 
         field_vectors = {
             ref: Vector(elements)
-            for ref, elements in cast(List, serialized_index["fieldVectors"])
+            for ref, elements in serialized_index["fieldVectors"]
         }
 
         tokenset_builder = TokenSetBuilder()
         inverted_index = {}
-        for term, posting in cast(List, serialized_index["invertedIndex"]):
+        for term, posting in serialized_index["invertedIndex"]:
             tokenset_builder.insert(term)
             inverted_index[term] = posting
 
         tokenset_builder.finish()
 
         return Index(
-            fields=cast(List[str], serialized_index["fields"]),
+            fields=serialized_index["fields"],
             field_vectors=field_vectors,
             inverted_index=inverted_index,
             token_set=tokenset_builder.root,
-            pipeline=Pipeline.load(cast(List[str], serialized_index["pipeline"])),
+            pipeline=Pipeline.load(serialized_index["pipeline"]),
         )
