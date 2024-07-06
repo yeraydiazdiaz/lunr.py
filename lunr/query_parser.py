@@ -108,7 +108,7 @@ class QueryParser:
         else:
             raise QueryParseError(
                 "Unrecognized parser operator: {}, expected `+` or `-`".format(
-                    lexeme.str
+                    lexeme["string"]
                 )
             )
 
