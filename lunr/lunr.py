@@ -64,6 +64,6 @@ def get_default_builder(languages=None):
     else:
         builder = Builder()
         builder.pipeline.add(trimmer, stop_word_filter, stemmer)
-        builder.search_pipeline.add(trimmer, stop_word_filter, stemmer)
+        builder.search_pipeline.add(trimmer, stemmer)
 
     return builder

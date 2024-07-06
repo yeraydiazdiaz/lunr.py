@@ -31,7 +31,7 @@ while he was away from his office last week.""",
 def test_get_default_builder():
     builder = get_default_builder()
     assert builder.pipeline._stack == [trimmer, stop_word_filter, stemmer]
-    assert builder.search_pipeline._stack == [trimmer, stop_word_filter, stemmer]
+    assert builder.search_pipeline._stack == [trimmer, stemmer]
 
 
 def test_drop_pipeline_function():

@@ -88,7 +88,9 @@ def get_nltk_builder(languages):
     builder.pipeline.add(multi_trimmer)
     if len(languages) == 1:
         builder.search_pipeline.add(multi_trimmer)
-    for fn in chain(all_stopwords_filters, all_stemmers):
+    for fn in all_stopwords_filters:
+        builder.pipeline.add(fn)
+    for fn in all_stemmers:
         builder.pipeline.add(fn)
         builder.search_pipeline.add(fn)
 
