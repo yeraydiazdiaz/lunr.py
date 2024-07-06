@@ -21,12 +21,25 @@ class Pipeline:
         self._skip: Dict[Callable, Set[str]] = defaultdict(set)
 
     def __len__(self):
+        # Note this does not necessarily match len(list(self._stack))
+        # because unregistered functions are not iterated over...
         return len(self._stack)
 
     def __repr__(self):
         return '<Pipeline stack="{}">'.format(",".join(fn.label for fn in self._stack))
 
-    # TODO: add iterator methods?
+    def __getitem__(self, label: str) -> Callable:
+        for fn in self._stack:
+            if hasattr(fn, "label") and fn.label == label:
+                return fn
+        raise BaseLunrException(
+            f"Cannot find registered function {label} in pipeline"
+        ) from KeyError
+
+    def __iter__(self):
+        for fn in self._stack:
+            if hasattr(fn, "label"):
+                yield fn.label
 
     @classmethod
     def register_function(cls, fn, label=None):
@@ -105,6 +118,14 @@ class Pipeline:
             self._stack.remove(fn)
         except ValueError:
             pass
+
+    def replace(self, existing_fn, new_fn):
+        """Replaces a function in the pipeline with a better one."""
+        try:
+            index = self._stack.index(existing_fn)
+            self._stack[index] = new_fn
+        except ValueError as e:
+            raise BaseLunrException("Cannot find existing_fn") from e
 
     def skip(self, fn: Callable, field_names: List[str]):
         """
