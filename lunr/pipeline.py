@@ -1,11 +1,14 @@
 from collections import defaultdict
 import logging
-from typing import Callable, Dict, List, Set
+from typing import Callable, Dict, List, Set, Union
 
 from lunr.exceptions import BaseLunrException
 from lunr.token import Token
 
 log = logging.getLogger(__name__)
+
+
+PipelineFunction = Callable[[Token, int, List[Token]], Token]
 
 
 class Pipeline:
@@ -14,11 +17,11 @@ class Pipeline:
 
     """
 
-    registered_functions: Dict[str, Callable] = {}
+    registered_functions: Dict[str, PipelineFunction] = {}
 
     def __init__(self):
-        self._stack: List[Callable] = []
-        self._skip: Dict[Callable, Set[str]] = defaultdict(set)
+        self._stack: List[PipelineFunction] = []
+        self._skip: Dict[PipelineFunction, Set[str]] = defaultdict(set)
 
     def __len__(self):
         return len(self._stack)
@@ -29,17 +32,21 @@ class Pipeline:
     # TODO: add iterator methods?
 
     @classmethod
-    def register_function(cls, fn, label=None):
+    def register_function(cls, fn: PipelineFunction, label: Union[str, None] = None):
         """Register a function with the pipeline."""
         label = label or fn.__name__
         if label in cls.registered_functions:
             log.warning("Overwriting existing registered function %s", label)
 
-        fn.label = label
-        cls.registered_functions[fn.label] = fn
+        # This attribute is purely internal so there's no sense in
+        # exposing it to the user in a type annotation and requiring
+        # them to declare fn in some particular way (see
+        # https://github.com/python/mypy/issues/2087#issuecomment-1672807856)
+        fn.label = label  # type: ignore
+        cls.registered_functions[fn.label] = fn  # type: ignore
 
     @classmethod
-    def load(cls, serialised):
+    def load(cls, serialised: Dict):
         """Loads a previously serialised pipeline."""
         pipeline = cls()
         for fn_name in serialised:
@@ -77,7 +84,7 @@ class Pipeline:
                 )
             )
 
-    def after(self, existing_fn, new_fn):
+    def after(self, existing_fn: PipelineFunction, new_fn: PipelineFunction):
         """Adds a single function after a function that already exists in the
         pipeline."""
         self.warn_if_function_not_registered(new_fn)
@@ -87,7 +94,7 @@ class Pipeline:
         except ValueError as e:
             raise BaseLunrException("Cannot find existing_fn") from e
 
-    def before(self, existing_fn, new_fn):
+    def before(self, existing_fn: PipelineFunction, new_fn: PipelineFunction):
         """Adds a single function before a function that already exists in the
         pipeline.
 
@@ -99,14 +106,14 @@ class Pipeline:
         except ValueError as e:
             raise BaseLunrException("Cannot find existing_fn") from e
 
-    def remove(self, fn):
+    def remove(self, fn: PipelineFunction):
         """Removes a function from the pipeline."""
         try:
             self._stack.remove(fn)
         except ValueError:
             pass
 
-    def skip(self, fn: Callable, field_names: List[str]):
+    def skip(self, fn: PipelineFunction, field_names: List[str]):
         """
         Make the pipeline skip the function based on field name we're processing.
 
@@ -114,7 +121,7 @@ class Pipeline:
         """
         self._skip[fn].update(field_names)
 
-    def run(self, tokens, field_name=None):
+    def run(self, tokens: List[Token], field_name: Union[str, None] = None) -> List[Token]:
         """
         Runs the current list of functions that make up the pipeline against
         the passed tokens.
@@ -127,7 +134,7 @@ class Pipeline:
             # Skip the function based on field name.
             if field_name and field_name in self._skip[fn]:
                 continue
-            results = []
+            results: List[Token] = []
             for i, token in enumerate(tokens):
                 # JS ignores additional arguments to the functions but we
                 # force pipeline functions to declare (token, i, tokens)
@@ -143,7 +150,7 @@ class Pipeline:
 
         return tokens
 
-    def run_string(self, string, metadata=None):
+    def run_string(self, string: str, metadata: Union[Dict, None] = None) -> List[str]:
         """Convenience method for passing a string through a pipeline and
         getting strings out. This method takes care of wrapping the passed
         string in a token and mapping the resulting tokens back to strings.
@@ -157,5 +164,5 @@ class Pipeline:
     def reset(self):
         self._stack = []
 
-    def serialize(self):
-        return [fn.label for fn in self._stack]
+    def serialize(self) -> List[str]:
+        return [fn.label for fn in self._stack]  # type: ignore

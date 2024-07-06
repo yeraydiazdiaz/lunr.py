@@ -1,5 +1,5 @@
 from collections import defaultdict
-
+from typing import Any, Callable, DefaultDict, Dict, Union
 
 from lunr.pipeline import Pipeline
 from lunr.tokenizer import Tokenizer
@@ -13,7 +13,8 @@ from lunr.idf import idf as Idf
 class Field:
     """Represents a field with boost and extractor functions."""
 
-    def __init__(self, field_name, boost=1, extractor=None):
+    def __init__(self, field_name: str, boost: int = 1,
+                 extractor: Union[Callable[[Dict], Any], None] = None):
         self.name = field_name
         self.boost = boost
         self.extractor = extractor
@@ -63,7 +64,8 @@ class Builder:
         """
         self._ref = ref
 
-    def field(self, field_name, boost=1, extractor=None):
+    def field(self, field_name: str, boost: int = 1,
+              extractor: Union[Callable[[Dict], Any], None] = None):
         """Adds a field to the list of document fields that will be indexed.
 
         Every document being indexed should have this field. None values for
@@ -94,7 +96,7 @@ class Builder:
 
         self._fields[field_name] = Field(field_name, boost, extractor)
 
-    def b(self, number):
+    def b(self, number: float):
         """A parameter to tune the amount of field length normalisation that is
         applied when calculating relevance scores.
 
@@ -109,7 +111,7 @@ class Builder:
         else:
             self._b = number
 
-    def k1(self, number):
+    def k1(self, number: float):
         """A parameter that controls the speed at which a rise in term
         frequency results in term frequency saturation.
 
@@ -119,7 +121,7 @@ class Builder:
         """
         self._k1 = number
 
-    def add(self, doc, attributes=None):
+    def add(self, doc: Dict, attributes: Union[Dict, None] = None):
         """Adds a document to the index.
 
         Before adding documents to the index it should have been fully
@@ -146,7 +148,7 @@ class Builder:
             tokens = Tokenizer(field_value)
             terms = self.pipeline.run(tokens, field_name)
             field_ref = FieldRef(doc_ref, field_name)
-            field_terms = defaultdict(int)
+            field_terms: DefaultDict[str, int] = defaultdict(int)
 
             # TODO: field_refs are casted to strings in JS, should we allow
             # FieldRef as keys?
@@ -159,7 +161,7 @@ class Builder:
 
                 field_terms[term_key] += 1
                 if term_key not in self.inverted_index:
-                    posting = {_field_name: {} for _field_name in self._fields}
+                    posting: Dict[str, Union[int, Dict]] = {_field_name: {} for _field_name in self._fields}
                     posting["_index"] = self.term_index
                     self.term_index += 1
                     self.inverted_index[term_key] = posting
@@ -175,7 +177,7 @@ class Builder:
                         metadata_key
                     ].append(metadata)
 
-    def build(self):
+    def build(self) -> Index:
         """Builds the index, creating an instance of `lunr.Index`.
 
         This completes the indexing process and should only be called once all
