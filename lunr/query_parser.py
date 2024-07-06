@@ -52,9 +52,11 @@ class QueryParser:
             raise QueryParseError(
                 "Expected either a field or a term, found {}{}".format(
                     lexeme["type"],
-                    'with value "' + lexeme["string"] + '"'
-                    if len(lexeme["string"])
-                    else "",
+                    (
+                        'with value "' + lexeme["string"] + '"'
+                        if len(lexeme["string"])
+                        else ""
+                    ),
                 )
             )
 
