@@ -1,7 +1,8 @@
 import math
+from typing import Dict
 
 
-def idf(posting, document_count):
+def idf(posting: Dict[str, Dict], document_count: int) -> float:
     """A function to calculate the inverse document frequency for a posting.
     This is shared between the builder and the index.
     """

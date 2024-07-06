@@ -1,15 +1,23 @@
+from typing import Dict, List, TypedDict
+
 from lunr.token_set import TokenSet
 from lunr.exceptions import BaseLunrException
 
 
+class UncheckedNode(TypedDict):
+    parent: TokenSet
+    char: str
+    child: TokenSet
+
+
 class TokenSetBuilder:
-    def __init__(self):
+    def __init__(self) -> None:
         self.previous_word = ""
         self.root = TokenSet()
-        self.unchecked_nodes = []
-        self.minimized_nodes = {}
+        self.unchecked_nodes: List[UncheckedNode] = []
+        self.minimized_nodes: Dict[str, TokenSet] = {}
 
-    def insert(self, word):
+    def insert(self, word: str):
         if word < self.previous_word:
             raise BaseLunrException("Out of order word insertion")
 
@@ -44,7 +52,7 @@ class TokenSetBuilder:
     def finish(self):
         self.minimize(0)
 
-    def minimize(self, down_to):
+    def minimize(self, down_to: int):
         for i in range(len(self.unchecked_nodes) - 1, down_to - 1, -1):
             node = self.unchecked_nodes[i]
             child_key = str(node["child"])
@@ -52,7 +60,7 @@ class TokenSetBuilder:
             if child_key in self.minimized_nodes:
                 node["parent"].edges[node["char"]] = self.minimized_nodes[child_key]
             else:
-                node["child"]._str = child_key
+                node["child"]._string = child_key
                 self.minimized_nodes[child_key] = node["child"]
 
             self.unchecked_nodes.pop()
