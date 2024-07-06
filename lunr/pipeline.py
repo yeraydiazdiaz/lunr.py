@@ -8,7 +8,8 @@ from lunr.token import Token
 log = logging.getLogger(__name__)
 
 
-PipelineFunction = Callable[[Token, int, List[Token]], Token]
+PipelineFunction = Callable[[Token, Union[int, None], Union[List[Token], None]],
+                            Union[Token, None]]
 
 
 class Pipeline:
@@ -140,7 +141,7 @@ class Pipeline:
                 # force pipeline functions to declare (token, i, tokens)
                 # or *args
                 result = fn(token, i, tokens)
-                if not result:
+                if result is None:
                     continue
                 if isinstance(result, (list, tuple)):  # simulate Array.concat
                     results.extend(result)
