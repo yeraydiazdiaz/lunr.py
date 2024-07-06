@@ -26,7 +26,7 @@ def nltk_stemmer(stemmer, token: Token, i: Union[int, None] = None,
         tokens (list): A list of tokens representing the set.
     """
 
-    def wrapped_stem(token: Token, metadata: Union[Dict, None] = None) -> str:
+    def wrapped_stem(token: str, metadata: Union[Dict, None] = None) -> str:
         return stemmer.stem(token)
 
     return token.update(wrapped_stem)
