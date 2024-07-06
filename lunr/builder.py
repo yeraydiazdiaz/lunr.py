@@ -268,7 +268,7 @@ class Builder:
         """Applies a plugin to the index builder.
 
         A plugin is a function that is called with the index builder as its
-        context. Plugins can be used to customise or extend the behaviour of
+        first argument. Plugins can be used to customise or extend the behaviour of
         the index in some way.
 
         A plugin is just a function, that encapsulated the custom behaviour
