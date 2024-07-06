@@ -20,15 +20,16 @@ class Pipeline:
 
     registered_functions: Dict[str, PipelineFunction] = {}
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._stack: List[PipelineFunction] = []
         self._skip: Dict[PipelineFunction, Set[str]] = defaultdict(set)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._stack)
 
-    def __repr__(self):
-        return '<Pipeline stack="{}">'.format(",".join(fn.label for fn in self._stack))
+    def __repr__(self) -> str:
+        return '<Pipeline stack="{}">'.format(
+            ",".join(fn.label for fn in self._stack))  # type: ignore
 
     # TODO: add iterator methods?
 
@@ -47,7 +48,7 @@ class Pipeline:
         cls.registered_functions[fn.label] = fn  # type: ignore
 
     @classmethod
-    def load(cls, serialised: Dict):
+    def load(cls, serialised: List[str]) -> "Pipeline":
         """Loads a previously serialised pipeline."""
         pipeline = cls()
         for fn_name in serialised:
@@ -62,7 +63,7 @@ class Pipeline:
 
         return pipeline
 
-    def add(self, *args):
+    def add(self, *args: PipelineFunction):
         """Adds new functions to the end of the pipeline.
 
         Functions must accept three arguments:
@@ -74,9 +75,9 @@ class Pipeline:
             self.warn_if_function_not_registered(fn)
             self._stack.append(fn)
 
-    def warn_if_function_not_registered(self, fn):
+    def warn_if_function_not_registered(self, fn: PipelineFunction):
         try:
-            return fn.label in self.registered_functions
+            return fn.label in self.registered_functions  # type: ignore
         except AttributeError:
             log.warning(
                 'Function "{}" is not registered with pipeline. '

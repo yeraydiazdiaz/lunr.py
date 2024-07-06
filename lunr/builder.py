@@ -264,7 +264,7 @@ class Builder:
 
         self.field_vectors = field_vectors
 
-    def use(self, fn, *args, **kwargs):
+    def use(self, fn: Callable, *args, **kwargs):
         """Applies a plugin to the index builder.
 
         A plugin is a function that is called with the index builder as its
