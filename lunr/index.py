@@ -139,6 +139,9 @@ class Index:
         prohibited_matches: DefaultDict[str, set] = defaultdict(set)
 
         for clause in query.clauses:
+            if clause.term is None:
+                logger.warning("Skipping empty clause %s", clause)
+                continue
             # Unless the pipeline has been disabled for this term, which is
             # the case for terms with wildcards, we need to pass the clause
             # term through the search pipeline. A pipeline returns an array

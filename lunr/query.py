@@ -1,4 +1,7 @@
+from collections.abc import Collection
 from enum import Enum
+from typing import List, Union, Iterable
+from lunr.token import Token
 
 
 class QueryPresence(Enum):
@@ -28,13 +31,13 @@ class Query:
     WILDCARD_LEADING = 1
     WILDCARD_TRAILING = 2
 
-    def __init__(self, all_fields):
-        self.clauses = []
+    def __init__(self, all_fields: Collection[str]):
+        self.clauses: List[Clause] = []
         self.all_fields = all_fields
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '<Query fields="{}" clauses="{}">'.format(
-            ",".join(self.all_fields), ",".join(c.term for c in self.clauses)
+            ",".join(self.all_fields), ",".join(str(c.term) for c in self.clauses)
         )
 
     def clause(self, *args, **kwargs):
@@ -108,7 +111,7 @@ class Clause:
 
     Args:
         term (str, optional): The term for the clause.
-        field (iterable, optional): The fields for the term to be searched
+        field (collection, optional): The fields for the term to be searched
             against.
         edit_distance (int, optional): The character distance to use, defaults
             to 0.
@@ -124,13 +127,13 @@ class Clause:
 
     def __init__(
         self,
-        term=None,
-        fields=None,
-        edit_distance=0,
-        use_pipeline=True,
-        boost=1,
-        wildcard=Query.WILDCARD_NONE,
-        presence=QueryPresence.OPTIONAL,
+        term: Union[str, None] = None,
+        fields: Union[Collection[str], None] = None,
+        edit_distance: int = 0,
+        use_pipeline: bool = True,
+        boost: int = 1,
+        wildcard: int = Query.WILDCARD_NONE,  # FIXME: typecheck/enum
+        presence: QueryPresence = QueryPresence.OPTIONAL,
     ):
         super().__init__()
         self.term = term
