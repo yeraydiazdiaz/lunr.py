@@ -1,4 +1,6 @@
+from collections.abc import Sequence
 from math import sqrt
+from typing import Union, Iterator
 
 from lunr.exceptions import BaseLunrException
 
@@ -16,29 +18,34 @@ class Vector:
     elements index is immediately followed by its value.
     E.g. [index, value, index, value].
 
-    TODO: consider implemetation as 2-tuples.
+    TODO: consider implemetation as 2-tuples. (or scipy.sparse)
 
     This allows the underlying array to be as sparse as possible and still
     offer decent performance when being used for vector calculations.
     """
 
-    def __init__(self, elements=None):
+    def __init__(self, elements: Union[Sequence[Union[float, str]], None] = None) -> None:
         self._magnitude = 0
         self.elements = elements or []
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<Vector magnitude={}>".format(self.magnitude)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Union[float, str]]:
         return iter(self.elements)
 
-    def position_for_index(self, index):
+    def position_for_index(self, index) -> int:
         """Calculates the position within the vector to insert a given index.
 
         This is used internally by insert and upsert. If there are duplicate
         indexes then the position is returned as if the value for that index
         were to be updated, but it is the callers responsibility to check
         whether there is a duplicate at that index
+
+        FIXME: This should probably be replaced with bisect, except
+        that its API is very JavaScripty (interchangable
+        floats/strs/etc) and probably full of Undefined Behaviour.
+
         """
         if not self.elements:
             return 0
