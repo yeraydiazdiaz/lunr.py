@@ -1,5 +1,7 @@
 const fs = require('fs')
 const lunr = require('lunr')
+require("lunr-languages/lunr.stemmer.support")(lunr)
+require("lunr-languages/lunr.es")(lunr)
 
 // Read the documents only to retrieve the title for the results
 const data = JSON.parse(
