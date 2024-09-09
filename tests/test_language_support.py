@@ -81,4 +81,4 @@ class TestLanguageSupport:
     def test_trim_in_search(self):
         builder = get_default_builder("es", trimmer_in_search=True)
         index = lunr("id", ["title", "text"], documents, builder=builder)
-        assert len(index.search("inventado!")) == 2
+        assert len(index.search("¡inventando!")) == 2
