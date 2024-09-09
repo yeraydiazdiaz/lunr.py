@@ -1,6 +1,6 @@
 import pytest
 
-from lunr import lunr
+from lunr import lunr, get_default_builder
 from lunr.languages import LANGUAGE_SUPPORT, SUPPORTED_LANGUAGES
 from lunr.pipeline import Pipeline
 
@@ -77,3 +77,8 @@ class TestLanguageSupport:
 
         results = idx.search("inventando")
         assert len(results) == 2
+
+    def test_trim_in_search(self):
+        builder = get_default_builder("es", trimmer_in_search=True)
+        index = lunr("id", ["title", "text"], documents, builder=builder)
+        assert len(index.search("¡inventando!")) == 2

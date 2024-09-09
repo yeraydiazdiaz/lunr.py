@@ -1,6 +1,6 @@
 import pytest
 
-from lunr import lunr
+from lunr import lunr, get_default_builder
 from lunr.query import Query, QueryPresence
 from lunr.exceptions import QueryParseError
 
@@ -416,3 +416,21 @@ class TestBuildTimeDocumentBoost:
             results = idx.query(query)
 
         assert results[0]["ref"] == "c"
+
+
+class TestTrimInSearch:
+    def test_trim_in_search(self):
+        builder = get_default_builder(trimmer_in_search=True)
+        index = lunr(
+            ref="id",
+            fields=["title", "body"],
+            documents=[
+                {
+                    "id": "1",
+                    "title": "To be or not to be?",
+                    "body": "That is the question!",
+                }
+            ],
+            builder=builder,
+        )
+        assert len(index.search("What is the question?")) == 1
