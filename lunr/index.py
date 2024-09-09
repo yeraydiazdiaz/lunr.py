@@ -80,7 +80,7 @@ class Index:
 
         return Query(fields)
 
-    def query(self, query=None, callback=None):
+    def query(self, query=None, callback=None, use_pipeline_fields=False):
         """Performs a query against the index using the passed lunr.Query
         object.
 
@@ -94,6 +94,9 @@ class Index:
                 or use `callback` for convenience.
             callback (callable): An optional function taking a single Query
                 object result of `create_query` for further configuration.
+            use_pipeline_fields (bool): Apply field-specific pipeline steps.
+                Disabled by default since lunr.js does not do this (and it
+                may be very slightly slower).
         """
         if query is None:
             query = self.create_query()
@@ -130,7 +133,17 @@ class Index:
             # of processed terms. Pipeline functions may expand the passed
             # term, which means we may end up performing multiple index lookups
             # for a single query term.
-            if clause.use_pipeline:
+            if use_pipeline_fields and clause.use_pipeline:
+                # Run the pipeline for each field as we may have
+                # explicit skips. Use dict to preserve insertion order.
+                field_terms = {}
+                for field_name in clause.fields:
+                    for term in self.pipeline.run_string(
+                        clause.term, {"fields": [field_name]}, field_name=field_name
+                    ):
+                        field_terms[term] = 1
+                terms = list(field_terms)
+            elif clause.use_pipeline:
                 terms = self.pipeline.run_string(clause.term, {"fields": clause.fields})
             else:
                 terms = [clause.term]

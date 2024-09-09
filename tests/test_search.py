@@ -1,7 +1,8 @@
 import pytest
 
-from lunr import lunr
+from lunr import lunr, get_default_builder, stop_word_filter, stemmer, trimmer
 from lunr.query import Query, QueryPresence
+from lunr.query_parser import QueryParser
 from lunr.exceptions import QueryParseError
 
 
@@ -416,3 +417,68 @@ class TestBuildTimeDocumentBoost:
             results = idx.query(query)
 
         assert results[0]["ref"] == "c"
+
+
+class TestTrimmerInSearch:
+    def test_trimmer_in_search(self):
+        builder = get_default_builder()
+        builder.search_pipeline.before(stemmer.stemmer, trimmer.trimmer)
+        index = lunr(
+            ref="id",
+            fields=["title", "body"],
+            documents=[
+                {
+                    "id": "1",
+                    "title": "To be or not to be?",
+                    "body": "That is the question!",
+                }
+            ],
+            builder=builder,
+        )
+        assert len(index.search("What is the question?")) == 1
+
+
+class TestPipelineSkipInSearch:
+    def test_pipeline_skip_in_search(self):
+        builder = get_default_builder()
+        builder.pipeline.skip(stop_word_filter.stop_word_filter, ["title"])
+        # Add the stop word filter to the pipeline (see #151)
+        builder.search_pipeline.before(
+            stemmer.stemmer, stop_word_filter.stop_word_filter
+        )
+        builder.search_pipeline.skip(stop_word_filter.stop_word_filter, ["title"])
+
+        index = lunr(
+            ref="id",
+            fields=["title", "body"],
+            documents=[
+                # The title is entirely stopwords, but will index them anyway
+                {
+                    "id": "1",
+                    "title": "To be or not to be?",
+                    "body": "That is the question!",
+                }
+            ],
+            builder=builder,
+        )
+
+        query = index.create_query()
+        QueryParser("title:to", query).parse()
+        assert len(index.query(query, use_pipeline_fields=True)) == 1
+        query = index.create_query()
+        QueryParser("title:to", query).parse()
+        assert len(index.query(query, use_pipeline_fields=False)) == 0
+
+        query = index.create_query()
+        QueryParser("body:the", query).parse()
+        assert len(index.query(query, use_pipeline_fields=True)) == 0
+        query = index.create_query()
+        QueryParser("body:the", query).parse()
+        assert len(index.query(query, use_pipeline_fields=False)) == 0
+
+        query = index.create_query()
+        QueryParser("to", query).parse()
+        assert len(index.query(query, use_pipeline_fields=True)) == 1
+        query = index.create_query()
+        QueryParser("to", query).parse()
+        assert len(index.query(query, use_pipeline_fields=False)) == 0
