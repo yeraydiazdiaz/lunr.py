@@ -76,9 +76,7 @@ documents = [...]
 builder = get_default_builder("fr")
 
 for funcname in "stopWordFilter-fr", "stemmer-fr":
-    builder.pipeline.skip(
-        builder.pipeline.registered_functions[funcname], ["titre"]
-    )
+    builder.pipeline.skip(builder.pipeline[funcname], ["titre"])
 
 idx = lunr(ref="id", fields=("titre", "texte"), documents=documents, builder=builder)
 ```
@@ -86,11 +84,10 @@ idx = lunr(ref="id", fields=("titre", "texte"), documents=documents, builder=bui
 The current language support registers the functions
 `lunr-multi-trimmer-{lang}`, `stopWordFilter-{lang}` and
 `stemmer-{lang}` but these are by convention only.  You can access the
-full list through the `registered_functions` attribute of the
-pipeline, but this is not necessarily the list of actual pipeline
-steps, which is contained in a private field (though you can see them
-in the string representation of the pipeline).
-
+full list (for all languages) through the `registered_functions`
+attribute of the pipeline, but this is not necessarily the list of
+steps for a given pipeline.  The list of names of registered functions
+in a pipeline can be obtained by iterating over it or converting it to a `list`.
 
 ## Token meta-data
 

@@ -275,3 +275,44 @@ class TestReset(BaseTestPipeline):
 
         self.pipeline.reset()
         assert len(self.pipeline) == 0
+
+
+class TestAccess(BaseTestPipeline):
+    def test_access_function_in_pipeline(self):
+        Pipeline.register_function(fn, "fn")
+        self.pipeline.add(fn)
+        assert self.pipeline["fn"] == fn
+
+    def test_access_function_not_in_pipeline(self):
+        with pytest.raises(BaseLunrException):
+            _ = self.pipeline["fn"]
+
+
+class TestReplace(BaseTestPipeline):
+    def test_replace_function_in_pipeline(self):
+        Pipeline.register_function(fn, "fn")
+        self.pipeline.add(noop)
+        assert len(self.pipeline) == 1
+        with pytest.raises(BaseLunrException):
+            _ = self.pipeline["fn"]
+
+        self.pipeline.replace(noop, fn)
+        assert len(self.pipeline) == 1
+        assert self.pipeline["fn"] == fn
+
+
+class TestIterate:
+    def test_iterate(self):
+        def fn1(t, *args):
+            return t
+
+        def fn2(t, *args):
+            return t
+
+        pipeline = Pipeline()
+        pipeline.register_function(fn1)
+        pipeline.register_function(fn2, "foo")
+        pipeline.add(fn1, fn2)
+        assert list(pipeline) == ["fn1", "foo"]
+        assert "fn1" in pipeline
+        assert "fn2" not in pipeline
