@@ -79,12 +79,6 @@ class TestSerializationWithTrimmer:
         )
         serialized_index = json.dumps(idx.serialize())
         loaded_index = Index.load(json.loads(serialized_index))
-        assert idx.search("inventado") == loaded_index.search(
-            "inventado"
-        )
-        assert idx.search("inventado?") == loaded_index.search(
-            "inventado?"
-        )
-        assert idx.search("inventado!") == loaded_index.search(
-            "inventado!"
-        )
+        assert idx.search("inventado") == loaded_index.search("inventado")
+        assert idx.search("inventado?") == loaded_index.search("inventado?")
+        assert idx.search("inventado!") == loaded_index.search("inventado!")

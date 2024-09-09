@@ -425,7 +425,11 @@ class TestTrimInSearch:
             ref="id",
             fields=["title", "body"],
             documents=[
-                {"id": "1", "title": "To be or not to be?", "body": "That is the question!"}
+                {
+                    "id": "1",
+                    "title": "To be or not to be?",
+                    "body": "That is the question!",
+                }
             ],
             builder=builder,
         )
