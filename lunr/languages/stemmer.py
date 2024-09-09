@@ -1,4 +1,8 @@
-def get_language_stemmer(language):
+from typing import Dict, List, Union
+from lunr.token import Token
+
+
+def get_language_stemmer(language: str):
     """Retrieves the SnowballStemmer for a particular language.
 
     Args:
@@ -10,7 +14,12 @@ def get_language_stemmer(language):
     return SnowballStemmer(SUPPORTED_LANGUAGES[language])
 
 
-def nltk_stemmer(stemmer, token, i=None, tokens=None):
+def nltk_stemmer(
+    stemmer,
+    token: Token,
+    i: Union[int, None] = None,
+    tokens: Union[List[Token], None] = None,
+) -> Token:
     """Wrapper around a NLTK SnowballStemmer, which includes stop words for
     each language.
 
@@ -21,7 +30,7 @@ def nltk_stemmer(stemmer, token, i=None, tokens=None):
         tokens (list): A list of tokens representing the set.
     """
 
-    def wrapped_stem(token, metadata=None):
+    def wrapped_stem(token: str, metadata: Union[Dict, None] = None) -> str:
         return stemmer.stem(token)
 
     return token.update(wrapped_stem)

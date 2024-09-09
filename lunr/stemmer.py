@@ -37,7 +37,10 @@ to:
 release 2: July 2008
 """
 
+from typing import List, Union
+
 from lunr.pipeline import Pipeline
+from lunr.token import Token
 
 
 class PorterStemmer:
@@ -432,7 +435,9 @@ class PorterStemmer:
 porter_stemmer = PorterStemmer()
 
 
-def stemmer(token, i=None, tokens=None):
+def stemmer(
+    token: Token, i: Union[int, None] = None, tokens: Union[List[Token], None] = None
+) -> Token:
     """Wrapper around the PorterStemmer for inclusion in pipeline.
 
     Args:

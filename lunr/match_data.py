@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import Dict, Union
 
 
 class MatchData:
@@ -8,8 +9,13 @@ class MatchData:
     lunr.Index.Result.
     """
 
-    def __init__(self, term=None, field=None, metadata=None):
-        self.metadata = {}
+    def __init__(
+        self,
+        term: Union[str, None] = None,
+        field: Union[str, None] = None,
+        metadata: Union[Dict[str, Dict], None] = None,
+    ):
+        self.metadata: Dict[str, Dict] = {}
         if term is not None:
             self.metadata[term] = {}
             if field is not None:
@@ -17,10 +23,10 @@ class MatchData:
                     deepcopy(metadata) if metadata is not None else {}
                 )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '<MatchData "{}">'.format(",".join(sorted(self.metadata.keys())))
 
-    def combine(self, other):
+    def combine(self, other: "MatchData"):
         """An instance of lunr.MatchData will be created for every term that
         matches a document.
 
@@ -48,7 +54,7 @@ class MatchData:
                             other.metadata[term][field][key]
                         )
 
-    def add(self, term, field, metadata):
+    def add(self, term: str, field: str, metadata: Dict[str, Dict]):
         """Add metadata for a term/field pair to this instance of match data"""
         if term not in self.metadata:
             self.metadata[term] = {field: metadata}
@@ -64,5 +70,7 @@ class MatchData:
             else:
                 self.metadata[term][field][key] = metadata[key]
 
-    def __eq__(self, other):
+    def __eq__(self, other: object):
+        if not isinstance(other, MatchData):
+            return NotImplemented
         return self.metadata == other.metadata

@@ -1,10 +1,14 @@
+from typing import Union
+
 from lunr.exceptions import BaseLunrException
 
 
 class FieldRef:
     JOINER = "/"
 
-    def __init__(self, doc_ref, field_name, string_value=None):
+    def __init__(
+        self, doc_ref: str, field_name: str, string_value: Union[str, None] = None
+    ):
         self.doc_ref = doc_ref
         self.field_name = field_name
         self._string_value = string_value
@@ -13,13 +17,13 @@ class FieldRef:
         return '<FieldRef field="{}" ref="{}">'.format(self.field_name, self.doc_ref)
 
     @classmethod
-    def from_string(cls, string):
+    def from_string(cls, string: str):
         if cls.JOINER not in string:
             raise BaseLunrException("Malformed field ref string")
         field_ref, doc_ref = string.split(cls.JOINER, 1)
         return cls(doc_ref, field_ref, string)
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self._string_value is None:
             self._string_value = self.field_name + self.JOINER + str(self.doc_ref)
 

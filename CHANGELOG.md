@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add types to API
+
 ## 0.7.0 (2023-08-16)
 
 - Fix misleading usage of `__main__.py` without runnable code to be ran on `python -m lunr`

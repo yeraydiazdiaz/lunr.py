@@ -27,7 +27,7 @@ classifiers = [
     "Topic :: Text Processing",
 ]
 dependencies = [
-    "typing-extensions; python_version<'3.8'",
+    "typing-extensions",
     "importlib_metadata; python_version<'3.8'",
 ]
 

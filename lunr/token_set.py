@@ -1,3 +1,9 @@
+from typing import Dict, List
+from typing_extensions import TypedDict
+
+from lunr.query import Clause
+
+
 class TokenSet:
     """
     A token set is used to store the unique list of all tokens
@@ -22,14 +28,15 @@ class TokenSet:
     """
 
     _next_id = 1
+    _string: str
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.final = False
-        self.edges = {}
+        self.edges: Dict[str, "TokenSet"] = {}
         self.id = self._next_id
         self.__class__._next_id += 1
 
-    def __str__(self):
+    def __str__(self) -> str:
         try:
             return self._string
         except AttributeError:
@@ -52,7 +59,7 @@ class TokenSet:
         return '<TokenSet "{}">'.format(str(self))
 
     @classmethod
-    def from_string(self, string):
+    def from_string(self, string: str) -> "TokenSet":
         """Creates a TokenSet from a string.
 
         The string may contain one or more wildcard characters (*) that will
@@ -79,7 +86,7 @@ class TokenSet:
         return root
 
     @classmethod
-    def from_fuzzy_string(cls, string, edit_distance):
+    def from_fuzzy_string(cls, string: str, edit_distance: int) -> "TokenSet":
         """Creates a token set representing a single string with a specified
         edit distance.
 
@@ -92,7 +99,14 @@ class TokenSet:
         """
         root = TokenSet()
 
-        stack = [{"node": root, "edits_remaining": edit_distance, "string": string}]
+        class StackFrame(TypedDict):
+            node: "TokenSet"
+            edits_remaining: int
+            string: str
+
+        stack: List[StackFrame] = [
+            {"node": root, "edits_remaining": edit_distance, "string": string}
+        ]
 
         while stack:
             frame = stack.pop()
@@ -200,7 +214,7 @@ class TokenSet:
         return root
 
     @classmethod
-    def from_list(cls, list_of_words):
+    def from_list(cls, list_of_words: List[str]) -> "TokenSet":
         from lunr.token_set_builder import TokenSetBuilder
 
         builder = TokenSetBuilder()
@@ -211,15 +225,22 @@ class TokenSet:
         return builder.root
 
     @classmethod
-    def from_clause(cls, clause):
+    def from_clause(cls, clause: Clause) -> "TokenSet":
+        if clause.term is None:
+            return cls()
         if clause.edit_distance:
             return cls.from_fuzzy_string(clause.term, clause.edit_distance)
         else:
             return cls.from_string(clause.term)
 
-    def to_list(self):
+    def to_list(self) -> List[str]:
         words = []
-        stack = [{"prefix": "", "node": self}]
+
+        class StackFrame(TypedDict):
+            prefix: str
+            node: "TokenSet"
+
+        stack: List[StackFrame] = [{"prefix": "", "node": self}]
 
         while stack:
             frame = stack.pop()
@@ -236,7 +257,7 @@ class TokenSet:
 
         return words
 
-    def intersect(self, other):
+    def intersect(self, other: "TokenSet") -> "TokenSet":
         """Returns a new TokenSet that is the intersection of this TokenSet
         and the passed TokenSet.
 

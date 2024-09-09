@@ -1,11 +1,20 @@
+from typing import Dict, List, Tuple, Union
+
 from lunr import languages as lang
 from lunr.builder import Builder
+from lunr.index import Index
 from lunr.stemmer import stemmer
 from lunr.trimmer import trimmer
 from lunr.stop_word_filter import stop_word_filter
 
 
-def lunr(ref, fields, documents, languages=None, builder=None):
+def lunr(
+    ref: str,
+    fields: List[Union[str, Dict]],
+    documents: List[Union[Dict, Tuple[Dict, Dict], List[Dict]]],
+    languages: Union[str, List[str], None] = None,
+    builder: Union[Builder, None] = None,
+) -> Index:
     """A convenience function to configure and construct a lunr.Index.
 
     Args:
@@ -21,6 +30,8 @@ def lunr(ref, fields, documents, languages=None, builder=None):
             the document and the second the associated attributes to it.
         languages (str or list, optional): The languages to use if using
             NLTK language support, ignored if NLTK is not available.
+        builder (lunr.builder.Builder, optional): A custom builder to use to
+            create the index.
 
     Returns:
         Index: The populated Index ready to search against.
@@ -42,7 +53,7 @@ def lunr(ref, fields, documents, languages=None, builder=None):
     return builder.build()
 
 
-def get_default_builder(languages=None):
+def get_default_builder(languages: Union[str, List[str], None] = None) -> Builder:
     """Creates a new pre-configured instance of Builder.
 
     Useful as a starting point to tweak the defaults.
