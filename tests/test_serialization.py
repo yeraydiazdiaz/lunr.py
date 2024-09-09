@@ -1,6 +1,6 @@
 import json
 
-from lunr import lunr
+from lunr import lunr, get_default_builder
 from lunr.index import Index
 
 
@@ -36,3 +36,55 @@ while he was away from his office last week.""",
         loaded_index = Index.load(json.loads(serialized_index))
 
         assert self.idx.search("green") == loaded_index.search("green")
+
+
+class TestSerializationWithTrimmer:
+    def test_serialization_with_trimmer(self):
+        builder = get_default_builder(trimmer_in_search=True)
+        idx = lunr(
+            ref="id",
+            fields=["title", "body"],
+            documents=[
+                {
+                    "id": "1",
+                    "title": "To be or not to be?",
+                    "body": "That is the question!",
+                }
+            ],
+            builder=builder,
+        )
+        serialized_index = json.dumps(idx.serialize())
+        loaded_index = Index.load(json.loads(serialized_index))
+
+        assert idx.search("What is the question?") == loaded_index.search(
+            "What is the question?"
+        )
+
+    def test_multi_serialization_with_trimmer(self):
+        builder = get_default_builder(["es", "it"], trimmer_in_search=True)
+        idx = lunr(
+            ref="id",
+            fields=["title", "text"],
+            documents=[
+                {
+                    "id": "a",
+                    "text": (
+                        "Este es un ejemplo inventado de lo que sería un documento en el "
+                        "idioma que se más se habla en España."
+                    ),
+                    "title": "Ejemplo de documento en español",
+                },
+            ],
+            builder=builder,
+        )
+        serialized_index = json.dumps(idx.serialize())
+        loaded_index = Index.load(json.loads(serialized_index))
+        assert idx.search("inventado") == loaded_index.search(
+            "inventado"
+        )
+        assert idx.search("inventado?") == loaded_index.search(
+            "inventado?"
+        )
+        assert idx.search("inventado!") == loaded_index.search(
+            "inventado!"
+        )
