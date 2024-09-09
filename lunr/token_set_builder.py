@@ -1,7 +1,12 @@
-from typing import Dict, List, TypedDict
+from typing import Dict, List
 
 from lunr.token_set import TokenSet
 from lunr.exceptions import BaseLunrException
+
+try:
+    from typing import TypedDict
+except ImportError:
+    TypedDict = Dict
 
 
 class UncheckedNode(TypedDict):

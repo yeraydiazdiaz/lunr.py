@@ -1,5 +1,10 @@
-from typing import Callable, List, TypedDict
+from typing import Callable, Dict, List
 from lunr.tokenizer import default_separator
+
+try:
+    from typing import TypedDict
+except ImportError:
+    TypedDict = Dict
 
 
 # FIXME: Could use a dataclass or a NamedTuple

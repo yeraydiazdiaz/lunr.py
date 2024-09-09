@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Callable, Collection, DefaultDict, Dict, List, Set, TypedDict, Union
+from typing import Callable, Collection, DefaultDict, Dict, List, Set, Union
 import json
 import logging
 
@@ -13,6 +13,11 @@ from lunr.query import Query, QueryPresence
 from lunr.query_parser import QueryParser
 from lunr.utils import CompleteSet
 from lunr.vector import Vector
+
+try:
+    from typing import TypedDict
+except ImportError:
+    TypedDict = Dict
 
 logger = logging.getLogger(__name__)
 QueryCallback = Callable[[Query], None]

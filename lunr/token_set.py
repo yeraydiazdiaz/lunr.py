@@ -1,6 +1,11 @@
-from typing import Dict, List, TypedDict
+from typing import Dict, List
 
 from lunr.query import Clause
+
+try:
+    from typing import TypedDict
+except ImportError:
+    TypedDict = Dict
 
 
 class TokenSet:
