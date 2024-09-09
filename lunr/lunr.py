@@ -42,10 +42,17 @@ def lunr(ref, fields, documents, languages=None, builder=None):
     return builder.build()
 
 
-def get_default_builder(languages=None):
+def get_default_builder(languages=None, trimmer_in_search=False):
     """Creates a new pre-configured instance of Builder.
 
     Useful as a starting point to tweak the defaults.
+
+    Args:
+        languages (list): A list of supported languages.
+        trimmer_in_search (bool): Apply trimmer to terms in the search
+            pipeline.  Disabled by default as it does not match lunr.js
+            behaviour, and serialized multi-language models will not be
+            loadable by lunr.js.
     """
     if languages is not None and lang.LANGUAGE_SUPPORT:
         if isinstance(languages, str):
@@ -60,10 +67,12 @@ def get_default_builder(languages=None):
                     ", ".join(lang.SUPPORTED_LANGUAGES.keys()),
                 )
             )
-        builder = lang.get_nltk_builder(languages)
+        builder = lang.get_nltk_builder(languages, trimmer_in_search=trimmer_in_search)
     else:
         builder = Builder()
         builder.pipeline.add(trimmer, stop_word_filter, stemmer)
-        builder.search_pipeline.add(trimmer, stemmer)
+        if trimmer_in_search:
+            builder.search_pipeline.add(trimmer)
+        builder.search_pipeline.add(stemmer)
 
     return builder

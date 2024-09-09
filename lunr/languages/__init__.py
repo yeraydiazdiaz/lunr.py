@@ -1,4 +1,3 @@
-from itertools import chain
 from functools import partial
 
 import lunr
@@ -47,11 +46,15 @@ def _get_stopwords_and_word_characters(language):
     return stopwords, word_characters
 
 
-def get_nltk_builder(languages):
+def get_nltk_builder(languages, trimmer_in_search=False):
     """Returns a builder with stemmers for all languages added to it.
 
     Args:
         languages (list): A list of supported languages.
+        trimmer_in_search (bool): Apply trimmer to terms in the search
+            pipeline.  Disabled by default as it does not match lunr.js
+            behaviour, and serialized multi-language models will not be
+            loadable by lunr.js.
     """
     all_stemmers = []
     all_stopwords_filters = []
@@ -79,14 +82,12 @@ def get_nltk_builder(languages):
         # Be compatible with lunr-languages naming!
         trimmer_name = f"trimmer-{languages[0]}"
     else:
-        # FIXME: will fail to load in lunr.js, unclear how to fix
-        # this, so we will simply not add it to the search pipeline...
         trimmer_name = "multi-trimmer-{}".format("-".join(languages))
     Pipeline.register_function(multi_trimmer, trimmer_name)
     builder.pipeline.reset()
 
     builder.pipeline.add(multi_trimmer)
-    if len(languages) == 1:
+    if trimmer_in_search:
         builder.search_pipeline.add(multi_trimmer)
     for fn in all_stopwords_filters:
         builder.pipeline.add(fn)
