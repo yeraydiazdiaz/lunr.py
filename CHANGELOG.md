@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Drop support for Python 3.7 and 3.8
+- Add support for Python 3.12 and 3.13
+
 ## 0.7.0 (2023-08-16)
 
 - Fix misleading usage of `__main__.py` without runnable code to be ran on `python -m lunr`

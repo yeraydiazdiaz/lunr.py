@@ -12,11 +12,11 @@ jobs:
     name: "Python ${{ matrix.python-version }}"
     runs-on: "ubuntu-latest"
     env:
-      USING_COVERAGE: "3.11"
+      USING_COVERAGE: "3.13"
 
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "pypy3.9"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "pypy3.9"]
 
     steps:
       - uses: actions/checkout@v4
@@ -26,7 +26,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "22"
 
       - name: "Install dependencies"
         run: |
