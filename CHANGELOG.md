@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add `replace`, `__iter__`, and `__getitem__` to pipeline
+
 ## 0.8.0 (2025-03-08)
 
 - Drop support for Python 3.7 and 3.8
