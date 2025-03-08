@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.8.0 (2025-03-08)
 
 - Drop support for Python 3.7 and 3.8
 - Add support for Python 3.12 and 3.13
