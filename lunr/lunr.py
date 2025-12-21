@@ -5,7 +5,7 @@ from lunr.trimmer import trimmer
 from lunr.stop_word_filter import stop_word_filter
 
 
-def lunr(ref, fields, documents, languages=None, builder=None):
+def lunr(ref, fields, documents, languages=None, builder=None, separator=None):
     """A convenience function to configure and construct a lunr.Index.
 
     Args:
@@ -21,12 +21,15 @@ def lunr(ref, fields, documents, languages=None, builder=None):
             the document and the second the associated attributes to it.
         languages (str or list, optional): The languages to use if using
             NLTK language support, ignored if NLTK is not available.
+        separator (callable or compiled regex, optional): The separator to use
+            when tokenizing text. If not provided the default lunr separator
 
     Returns:
         Index: The populated Index ready to search against.
     """
     builder = builder or get_default_builder(languages)
     builder.ref(ref)
+    builder.separator = separator
     for field in fields:
         if isinstance(field, dict):
             builder.field(**field)

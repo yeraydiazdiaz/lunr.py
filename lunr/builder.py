@@ -48,6 +48,7 @@ class Builder:
         self._k1 = 1.2
         self.term_index = 0
         self.metadata_whitelist = []
+        self.separator = None
 
     def ref(self, ref):
         """Sets the document field used as the document reference.
@@ -143,7 +144,7 @@ class Builder:
         for field_name, field in self._fields.items():
             extractor = field.extractor
             field_value = doc[field_name] if extractor is None else extractor(doc)
-            tokens = Tokenizer(field_value)
+            tokens = Tokenizer(field_value, separator=self.separator)
             terms = self.pipeline.run(tokens, field_name)
             field_ref = FieldRef(doc_ref, field_name)
             field_terms = defaultdict(int)
