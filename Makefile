@@ -12,7 +12,7 @@
 clean:
 	rm .state/*
 
-install-dev:
+install-dev: .state/acceptance-npm
 	pip install -U pip wheel
 	pip install .[dev]
 
