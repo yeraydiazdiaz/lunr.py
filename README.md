@@ -94,3 +94,15 @@ Lunr provides a convenience `lunr` function to quickly index this set of documen
 
 Please refer to the [documentation](http://lunr.readthedocs.io/en/latest/)
 for more usage examples.
+
+## Development
+
+Clone this repo and follow these steps:
+
+1. Create a virtualenv on the lastest supported Python version
+2. Install node.js if necessary, it will be needed for acceptance tests
+3. `make install-dev`
+4. `make tests-full` to check the installation is working
+5. To run the tests on all Python versions you'll need to install the different
+supported interpreters.
+  - Using [`asdf`](https://asdf-vm.com/) install the [`asdf-python`](https://github.com/asdf-community/asdf-python) plugin
