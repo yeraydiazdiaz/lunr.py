@@ -7,7 +7,7 @@ dynamic = ["readme", "version"]
 name = "lunr"
 description = "A Python implementation of Lunr.js"
 authors = [{ name = "Yeray Diaz Diaz", email = "yeraydiazdiaz@gmail.com" }]
-requires-python = ">=3.7"
+requires-python = ">=3.11"
 license = "MIT"
 keywords = ["lunr", "full", "text", "search"]
 classifiers = [
