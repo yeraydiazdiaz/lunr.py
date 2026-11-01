@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.8.1 (2026-11-01)
 
 - Drop support for Python 3.9 and 3.10
 - Add support for Python 3.14 and 3.15
